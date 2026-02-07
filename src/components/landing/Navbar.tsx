@@ -40,9 +40,8 @@ const Navbar = ({ onOpenWaitlist }: NavbarProps) => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <a href="#" className="flex items-center gap-2">
-              <span className="text-primary font-bold text-lg">◆</span>
-              <span className="text-2xl font-bold gradient-text">Zenvi</span>
+            <a href="#" className="flex items-center">
+              <span className="text-2xl font-bold gradient-text">Zenvi.pro</span>
             </a>
 
             {/* Desktop navigation */}
