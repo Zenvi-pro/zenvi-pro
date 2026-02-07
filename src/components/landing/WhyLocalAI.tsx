@@ -130,8 +130,13 @@ const WhyLocalAI = () => {
 
                 <h3 className="text-2xl font-bold mb-2 text-center">Your Device. Your Data.</h3>
                 <p className="text-muted-foreground text-center max-w-xs">
-                  All AI processing happens locally on your machine—nothing is ever uploaded.
+                  Zenvi AI runs entirely on your machine—nothing is ever uploaded.
                 </p>
+                
+                {/* Zenvi.pro watermark */}
+                <div className="mt-4 px-3 py-1 rounded-full bg-primary/10 border border-primary/30">
+                  <span className="text-xs font-medium text-primary tracking-wider">zenvi.pro</span>
+                </div>
 
                 {/* Data flow indicators */}
                 <div className="flex items-center gap-8 mt-8">
