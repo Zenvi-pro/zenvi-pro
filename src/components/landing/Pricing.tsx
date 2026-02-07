@@ -8,34 +8,34 @@ interface PricingProps {
 
 const plans = [
   {
-    name: "Starter",
-    price: "$30",
+    name: "Creator",
+    price: "$29",
     period: "/month",
-    description: "Perfect for content creators getting started",
+    description: "Everything indie creators need to level up their content",
     features: [
-      "Real-time video editing",
-      "Auto-generated subtitles",
-      "5 projects per month",
-      "1080p export quality",
-      "Basic audio cleanup",
+      "Unlimited local AI processing",
+      "Auto-generated subtitles (50+ languages)",
+      "Smart scene detection & clipping",
+      "1080p & 4K export",
+      "Background noise removal",
       "Email support",
     ],
     featured: false,
   },
   {
-    name: "Pro",
-    price: "$60",
+    name: "Studio",
+    price: "$79",
     period: "/month",
-    description: "For professionals who need unlimited power",
+    description: "For professionals and teams who demand the best",
     features: [
-      "Everything in Starter",
-      "Unlimited projects",
-      "4K export quality",
-      "Advanced audio tools",
-      "Custom export presets",
-      "Smart scene detection",
-      "Priority support",
-      "Early access to new features",
+      "Everything in Creator",
+      "Batch processing for multi-project workflows",
+      "Advanced audio sweetening & EQ",
+      "Custom export presets & platform profiles",
+      "Priority feature requests",
+      "Dedicated Slack support",
+      "Team license (up to 5 seats)",
+      "Commercial usage rights",
     ],
     featured: true,
   },
@@ -57,11 +57,11 @@ const Pricing = ({ onOpenWaitlist }: PricingProps) => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Simple,{" "}
-            <span className="gradient-text">transparent pricing</span>
+            One price.{" "}
+            <span className="gradient-text">Unlimited AI power.</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            No hidden fees. No per-use charges. Just powerful AI editing for one flat rate.
+            No per-minute fees. No token limits. No cloud costs. Just powerful local AI for a flat monthly rate.
           </p>
         </motion.div>
 
@@ -120,7 +120,7 @@ const Pricing = ({ onOpenWaitlist }: PricingProps) => {
                 }`}
                 size="lg"
               >
-                {plan.featured ? "Get Started Free" : "Start Free Trial"}
+                {plan.featured ? "Get Studio Access" : "Start Creating"}
               </Button>
             </motion.div>
           ))}
@@ -134,7 +134,7 @@ const Pricing = ({ onOpenWaitlist }: PricingProps) => {
           transition={{ delay: 0.4 }}
           className="text-center text-muted-foreground mt-8"
         >
-          All plans include a 14-day free trial. No credit card required.
+          14-day free trial on all plans. No credit card required to start.
         </motion.p>
       </div>
     </section>

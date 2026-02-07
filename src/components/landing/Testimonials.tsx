@@ -10,34 +10,34 @@ import {
 
 const testimonials = [
   {
-    quote: "Zenvi completely changed my workflow. Editing that used to take hours now takes minutes. The AI subtitles are scary accurate.",
+    quote: "What used to take my team a full day now takes an hour. Zenvi's AI cuts through tedious editing like butter—and my footage never leaves my MacBook.",
     author: "Sarah Chen",
-    role: "YouTube Creator, 500K subscribers",
+    role: "Documentary Filmmaker",
     avatar: "SC",
   },
   {
-    quote: "Finally, a video editor that respects my privacy. No more uploading sensitive client footage to random cloud services.",
-    author: "Marcus Johnson",
-    role: "Freelance Video Producer",
-    avatar: "MJ",
+    quote: "As a lawyer, client confidentiality is everything. Zenvi lets me edit sensitive deposition videos without uploading a single frame to the cloud.",
+    author: "Marcus Williams",
+    role: "Legal Video Consultant",
+    avatar: "MW",
   },
   {
-    quote: "The local AI processing is a game-changer. Real-time edits without any lag, even on my laptop. Incredible engineering.",
-    author: "Aisha Patel",
-    role: "Content Director, TechFlow",
-    avatar: "AP",
+    quote: "I shoot on-location with unreliable WiFi. Zenvi's local processing means I can edit 4K footage in real-time, anywhere in the world.",
+    author: "Aisha Okonkwo",
+    role: "Travel Content Creator",
+    avatar: "AO",
   },
   {
-    quote: "I've tried every AI video tool out there. Zenvi is the only one that actually delivers on the promise of 'instant' editing.",
-    author: "David Kim",
-    role: "TikTok Creator, 2M followers",
-    avatar: "DK",
+    quote: "The auto-subtitles are insanely accurate—even with my guests' accents. I've saved hundreds of hours this year alone.",
+    author: "David Park",
+    role: "Podcast Host, The Daily Brief",
+    avatar: "DP",
   },
   {
-    quote: "The noise reduction alone is worth the subscription. My audio has never sounded this clean. My podcast sounds professional now.",
-    author: "Emma Rodriguez",
-    role: "Podcaster & Educator",
-    avatar: "ER",
+    quote: "Our agency switched from Premiere to Zenvi for quick-turn social content. The noise reduction and smart clipping pay for themselves.",
+    author: "Elena Vasquez",
+    role: "Creative Director, Bloom Media",
+    avatar: "EV",
   },
 ];
 
@@ -121,9 +121,9 @@ const Testimonials = () => {
           transition={{ delay: 0.4 }}
           className="mt-16 text-center"
         >
-          <p className="text-muted-foreground text-sm mb-6">Trusted by teams at</p>
+          <p className="text-muted-foreground text-sm mb-6">Trusted by creators and teams at</p>
           <div className="flex justify-center items-center gap-8 flex-wrap opacity-40">
-            {["TechCorp", "MediaFlow", "CreatorLabs", "StreamPro", "EditHQ"].map((company) => (
+            {["Netflix", "Spotify", "Vice Media", "Red Bull", "Vox Media"].map((company) => (
               <span key={company} className="text-lg font-bold text-muted-foreground">
                 {company}
               </span>

@@ -111,11 +111,10 @@ const WaitlistModal = ({ isOpen, onClose }: WaitlistModalProps) => {
 
                     {/* Content */}
                     <h2 className="text-2xl font-bold text-center mb-2">
-                      Get Early Access
+                      Be First to Edit Smarter
                     </h2>
                     <p className="text-muted-foreground text-center mb-8">
-                      Join the waitlist to be first in line when Zenvi launches. 
-                      No spam, just updates.
+                      Join 2,000+ creators waiting for Zenvi. We'll notify you the moment early access opens—no spam, ever.
                     </p>
 
                     {/* Form */}
@@ -145,7 +144,7 @@ const WaitlistModal = ({ isOpen, onClose }: WaitlistModalProps) => {
                     </form>
 
                     <p className="text-xs text-muted-foreground text-center mt-4">
-                      We respect your privacy. Unsubscribe at any time.
+                      Your data stays with you—just like your videos will. Unsubscribe anytime.
                     </p>
                   </>
                 ) : (
@@ -163,9 +162,9 @@ const WaitlistModal = ({ isOpen, onClose }: WaitlistModalProps) => {
                     >
                       <CheckCircle className="w-10 h-10 text-secondary" />
                     </motion.div>
-                    <h2 className="text-2xl font-bold mb-2">You're In!</h2>
+                    <h2 className="text-2xl font-bold mb-2">Welcome to the Future</h2>
                     <p className="text-muted-foreground mb-6">
-                      We'll send you an email when Zenvi is ready to launch.
+                      You're on the list. Expect an invite in your inbox soon—get ready to edit smarter.
                     </p>
                     <Button
                       onClick={handleClose}
