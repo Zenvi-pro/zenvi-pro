@@ -58,7 +58,7 @@ const Pricing = ({ onOpenWaitlist }: PricingProps) => {
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             One price.{" "}
-            <span className="gradient-text">Unlimited AI power.</span>
+            <span className="gradient-text">No hidden fees.</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             No per-minute fees. No token limits. No cloud costs. Just powerful local AI for a flat monthly rate.

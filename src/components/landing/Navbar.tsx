@@ -41,6 +41,7 @@ const Navbar = ({ onOpenWaitlist }: NavbarProps) => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <a href="#" className="flex items-center gap-2">
+              <span className="text-primary font-bold text-lg">◆</span>
               <span className="text-2xl font-bold gradient-text">Zenvi</span>
             </a>
 
