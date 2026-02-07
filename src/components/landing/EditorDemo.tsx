@@ -15,7 +15,7 @@ const EditorDemo = () => {
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             Powerful editor,{" "}
-            <span className="gradient-text">intuitive design</span>
+            <span className="gradient-text">zero latency</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             A professional workspace that feels familiar. Edit, enhance, and export with AI assistance.
