@@ -50,8 +50,8 @@ const Footer = () => {
             >
               <h3 className="text-2xl font-bold gradient-text mb-4">Zenvi</h3>
               <p className="text-muted-foreground text-sm mb-6 max-w-xs">
-                AI-powered video editing that runs entirely on your device. 
-                Edit smarter, publish faster.
+                Professional video editing powered by on-device AI. 
+                Your footage never leaves your machine—ever.
               </p>
               {/* Social links */}
               <div className="flex gap-4">
@@ -98,10 +98,10 @@ const Footer = () => {
         {/* Bottom bar */}
         <div className="pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} Zenvi. All rights reserved.
+            © {new Date().getFullYear()} Zenvi, Inc. All rights reserved.
           </p>
           <p className="text-muted-foreground text-sm">
-            Made with 💜 for creators everywhere
+            Built for creators who value privacy and speed.
           </p>
         </div>
       </div>
