@@ -48,11 +48,17 @@ const Footer = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
             >
-              <h3 className="text-2xl font-bold gradient-text mb-4">Zenvi</h3>
-              <p className="text-muted-foreground text-sm mb-6 max-w-xs">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-primary font-bold text-xl">◆</span>
+                <h3 className="text-2xl font-bold gradient-text">Zenvi</h3>
+              </div>
+              <p className="text-muted-foreground text-sm mb-4 max-w-xs">
                 Professional video editing powered by on-device AI. 
                 Your footage never leaves your machine—ever.
               </p>
+              <div className="inline-block px-2 py-1 rounded bg-muted/50 text-xs text-muted-foreground/60 font-medium tracking-wider mb-4">
+                zenvi.pro
+              </div>
               {/* Social links */}
               <div className="flex gap-4">
                 {socialLinks.map((social) => (
