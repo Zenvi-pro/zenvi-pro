@@ -40,8 +40,9 @@ const EditorDemo = () => {
                 <div className="w-3 h-3 rounded-full bg-green-500/80" />
               </div>
               <div className="flex-1 flex justify-center">
-                <div className="px-4 py-1 rounded-md bg-muted/50 text-sm text-muted-foreground">
-                  zenvi.pro/editor
+                <div className="px-4 py-1 rounded-md bg-muted/50 text-sm text-muted-foreground flex items-center gap-2">
+                  <span className="text-primary font-bold">◆</span>
+                  <span>zenvi.pro/editor</span>
                 </div>
               </div>
             </div>
@@ -75,6 +76,11 @@ const EditorDemo = () => {
                         <Sparkles className="w-4 h-4 text-secondary" />
                         <span className="text-xs font-medium text-secondary">Instant Preview</span>
                       </motion.div>
+
+                      {/* Zenvi.pro watermark */}
+                      <div className="absolute top-4 right-4 px-2 py-1 rounded bg-black/40 text-xs text-muted-foreground/60 font-medium tracking-wider">
+                        zenvi.pro
+                      </div>
 
                       {/* Timestamp */}
                       <div className="absolute bottom-4 right-4 px-2 py-1 rounded bg-black/60 text-xs text-white font-mono">
