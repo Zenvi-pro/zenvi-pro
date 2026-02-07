@@ -113,7 +113,7 @@ const Testimonials = () => {
           </Carousel>
         </motion.div>
 
-        {/* Partner logos placeholder */}
+        {/* Partner logos - Zenvi branded watermarks */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -121,12 +121,18 @@ const Testimonials = () => {
           transition={{ delay: 0.4 }}
           className="mt-16 text-center"
         >
-          <p className="text-muted-foreground text-sm mb-6">Trusted by creators and teams at</p>
-          <div className="flex justify-center items-center gap-8 flex-wrap opacity-40">
-            {["Netflix", "Spotify", "Vice Media", "Red Bull", "Vox Media"].map((company) => (
-              <span key={company} className="text-lg font-bold text-muted-foreground">
-                {company}
-              </span>
+          <p className="text-muted-foreground text-sm mb-6">Built for professionals at</p>
+          <div className="flex justify-center items-center gap-10 flex-wrap">
+            {[
+              { name: "Zenvi Studio", icon: "◆" },
+              { name: "Zenvi Pro", icon: "▲" },
+              { name: "Zenvi Creator", icon: "●" },
+              { name: "Zenvi Enterprise", icon: "■" },
+            ].map((tier) => (
+              <div key={tier.name} className="flex items-center gap-2 opacity-50 hover:opacity-80 transition-opacity">
+                <span className="text-primary text-lg">{tier.icon}</span>
+                <span className="text-sm font-medium text-muted-foreground tracking-wide">{tier.name}</span>
+              </div>
             ))}
           </div>
         </motion.div>
