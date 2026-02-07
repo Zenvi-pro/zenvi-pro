@@ -77,7 +77,7 @@ const Hero = ({ onOpenWaitlist }: HeroProps) => {
           >
             <span className="text-foreground">Edit Smarter.</span>
             <br />
-            <span className="gradient-text">Publish Faster.</span>
+            <span className="gradient-text">Stay Private.</span>
           </motion.h1>
 
           {/* Subheadline */}

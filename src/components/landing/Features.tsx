@@ -81,7 +81,7 @@ const Features = () => {
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             Everything you need to{" "}
-            <span className="gradient-text">create magic</span>
+            <span className="gradient-text">edit like a pro</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Professional-grade AI tools that run entirely on your device. No cloud, no limits.

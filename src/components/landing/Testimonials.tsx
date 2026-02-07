@@ -58,7 +58,7 @@ const Testimonials = () => {
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             Loved by{" "}
-            <span className="gradient-text">creators worldwide</span>
+            <span className="gradient-text">2,000+ creators</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Join thousands of creators who've transformed their editing workflow with Zenvi.

@@ -39,7 +39,7 @@ const WhyLocalAI = () => {
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Why{" "}
-              <span className="gradient-text">Local AI</span>?
+              <span className="gradient-text">on-device AI</span>?
             </h2>
             <p className="text-xl text-muted-foreground mb-8">
               Traditional cloud-based AI requires uploading your content, waiting for processing, 
