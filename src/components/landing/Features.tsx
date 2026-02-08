@@ -76,7 +76,6 @@ const Features = () => {
           className="text-center mb-16"
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 mb-6">
-            <span className="text-primary font-bold">◆</span>
             <span className="text-xs font-medium text-primary tracking-wider">ZENVI FEATURES</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
