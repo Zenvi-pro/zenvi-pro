@@ -1,112 +1,92 @@
-import { motion } from "framer-motion";
 import { Twitter, MessageCircle, Github } from "lucide-react";
 
 const footerLinks = {
-  product: [
+  Product: [
     { label: "Features", href: "#features" },
     { label: "Pricing", href: "#pricing" },
-    { label: "Demo", href: "#demo" },
+    { label: "Download", href: "#" },
     { label: "Changelog", href: "#" },
   ],
-  resources: [
+  Resources: [
     { label: "Documentation", href: "#" },
     { label: "Tutorials", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "API", href: "#" },
+    { label: "Community", href: "#" },
+    { label: "Support", href: "#" },
   ],
-  company: [
+  Company: [
     { label: "About", href: "#" },
+    { label: "Blog", href: "#" },
     { label: "Careers", href: "#" },
     { label: "Contact", href: "#" },
-    { label: "Press Kit", href: "#" },
   ],
-  legal: [
+  Legal: [
     { label: "Privacy", href: "#" },
     { label: "Terms", href: "#" },
-    { label: "Security", href: "#" },
+    { label: "Licenses", href: "#" },
   ],
 };
 
 const socialLinks = [
-  { icon: Twitter, href: "#", label: "Twitter" },
+  { icon: Twitter, href: "#", label: "X (Twitter)" },
   { icon: MessageCircle, href: "#", label: "Discord" },
   { icon: Github, href: "#", label: "GitHub" },
 ];
 
 const Footer = () => {
   return (
-    <footer className="py-16 border-t border-border/50 relative">
-      {/* Neon separator line */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
+    <footer className="bg-[#111111] border-t border-white/[0.06]">
+      <div className="mx-auto max-w-content px-6 py-20">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-10 mb-16">
           {/* Brand */}
           <div className="col-span-2">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-primary font-bold text-xl">◆</span>
-                <h3 className="text-2xl font-bold gradient-text">Zenvi</h3>
-              </div>
-              <p className="text-muted-foreground text-sm mb-4 max-w-xs">
-                Professional video editing powered by on-device AI. 
-                Your footage never leaves your machine—ever.
-              </p>
-              <div className="inline-block px-2 py-1 rounded bg-muted/50 text-xs text-muted-foreground/60 font-medium tracking-wider mb-4">
-                zenvi.pro
-              </div>
-              {/* Social links */}
-              <div className="flex gap-4">
-                {socialLinks.map((social) => (
-                  <a
-                    key={social.label}
-                    href={social.href}
-                    className="w-10 h-10 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                    aria-label={social.label}
-                  >
-                    <social.icon className="w-5 h-5" />
-                  </a>
-                ))}
-              </div>
-            </motion.div>
+            <h3 className="text-lg font-bold text-white mb-3">Zenvi</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-6 max-w-xs">
+              Professional video editing powered by on-device AI. Your footage
+              never leaves your machine.
+            </p>
+            {/* Social links */}
+            <div className="flex gap-3">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  className="w-9 h-9 rounded-lg border border-white/[0.06] flex items-center justify-center text-muted-foreground hover:text-white hover:border-white/10 transition-colors duration-200"
+                  aria-label={social.label}
+                >
+                  <social.icon className="w-4 h-4" />
+                </a>
+              ))}
+            </div>
           </div>
 
           {/* Links */}
-          {Object.entries(footerLinks).map(([category, links], index) => (
-            <motion.div
-              key={category}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <h4 className="font-semibold mb-4 capitalize">{category}</h4>
-              <ul className="space-y-2">
+          {Object.entries(footerLinks).map(([category, links]) => (
+            <div key={category}>
+              <h4 className="text-sm font-semibold text-white mb-4">
+                {category}
+              </h4>
+              <ul className="space-y-2.5">
                 {links.map((link) => (
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="text-muted-foreground text-sm hover:text-primary transition-colors"
+                      className="text-sm text-muted-foreground hover:text-white transition-colors duration-200"
                     >
                       {link.label}
                     </a>
                   </li>
                 ))}
               </ul>
-            </motion.div>
+            </div>
           ))}
         </div>
 
         {/* Bottom bar */}
-        <div className="pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} Zenvi, Inc. All rights reserved.
+        <div className="pt-8 border-t border-white/[0.06] flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-muted-foreground">
+            &copy; {new Date().getFullYear()} Zenvi, Inc. All rights reserved.
           </p>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             Built for creators who value privacy and speed.
           </p>
         </div>

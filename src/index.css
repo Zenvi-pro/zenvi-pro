@@ -2,89 +2,58 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Zenvi.pro Neon/Glass Design System
-   Ultra-dark futuristic theme with purple/violet/cyan neon accents
-   All colors in HSL format
+/* Zenvi — Minimal High-Contrast Design System
+   Near-black base, pure white text, single electric blue accent.
+   No gradients. No glow. No glass. Every element intentional.
 */
 
 @layer base {
   :root {
-    /* Deep black base */
-    --background: 240 10% 3%;
-    --foreground: 0 0% 95%;
+    /* Near-black base */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 100%;
 
-    /* Card with glassmorphism base */
-    --card: 240 10% 5%;
-    --card-foreground: 0 0% 95%;
+    /* Cards */
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 240 10% 5%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 100%;
 
-    /* Neon Purple Primary */
-    --primary: 270 100% 65%;
+    /* Electric blue accent as primary */
+    --primary: 216 100% 50%;
     --primary-foreground: 0 0% 100%;
 
-    /* Neon Cyan Secondary */
-    --secondary: 200 100% 60%;
-    --secondary-foreground: 0 0% 5%;
+    /* Secondary (muted blue) */
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 100%;
 
-    /* Muted grays - darker */
-    --muted: 240 10% 10%;
-    --muted-foreground: 0 0% 55%;
+    /* Muted grays */
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 63%;
 
-    /* Accent (deep purple) */
-    --accent: 270 60% 20%;
-    --accent-foreground: 0 0% 95%;
+    /* Accent */
+    --accent: 0 0% 10%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 10% 15%;
-    --input: 240 10% 10%;
-    --ring: 270 100% 65%;
+    --border: 0 0% 12%;
+    --input: 0 0% 10%;
+    --ring: 216 100% 50%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    /* Neon glow colors */
-    --neon-purple: 270 100% 65%;
-    --neon-violet: 280 100% 70%;
-    --neon-cyan: 200 100% 60%;
-
-    /* Glassmorphism */
-    --glass-bg: 0 0% 100% / 0.03;
-    --glass-border: 0 0% 100% / 0.08;
-
-    /* Sidebar */
-    --sidebar-background: 240 10% 3%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 270 100% 65%;
+    /* Sidebar (keep for shadcn compat) */
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 216 100% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 10% 8%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 240 10% 15%;
-    --sidebar-ring: 270 100% 65%;
-  }
-
-  .dark {
-    --background: 240 10% 3%;
-    --foreground: 0 0% 95%;
-    --card: 240 10% 5%;
-    --card-foreground: 0 0% 95%;
-    --popover: 240 10% 5%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 270 100% 65%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 200 100% 60%;
-    --secondary-foreground: 0 0% 5%;
-    --muted: 240 10% 10%;
-    --muted-foreground: 0 0% 55%;
-    --accent: 270 60% 20%;
-    --accent-foreground: 0 0% 95%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 95%;
-    --border: 240 10% 15%;
-    --input: 240 10% 10%;
-    --ring: 270 100% 65%;
+    --sidebar-accent: 0 0% 8%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 12%;
+    --sidebar-ring: 216 100% 50%;
   }
 }
 
@@ -104,168 +73,37 @@
 }
 
 @layer components {
-  /* Glassmorphism card */
-  .glass-card {
-    @apply relative overflow-hidden rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-xl;
-  }
-
-  /* Neon glow effects */
-  .neon-glow-purple {
-    box-shadow: 0 0 20px hsl(270 100% 65% / 0.5),
-                0 0 40px hsl(270 100% 65% / 0.3),
-                0 0 80px hsl(270 100% 65% / 0.15);
-  }
-
-  .neon-glow-cyan {
-    box-shadow: 0 0 20px hsl(200 100% 60% / 0.5),
-                0 0 40px hsl(200 100% 60% / 0.3),
-                0 0 80px hsl(200 100% 60% / 0.15);
-  }
-
-  .neon-border-purple {
-    @apply border border-transparent;
-    background: linear-gradient(hsl(240 10% 5%), hsl(240 10% 5%)) padding-box,
-                linear-gradient(135deg, hsl(270 100% 65%), hsl(200 100% 60%)) border-box;
-  }
-
-  /* Text glow */
-  .text-glow-purple {
-    text-shadow: 0 0 10px hsl(270 100% 65% / 0.8),
-                 0 0 20px hsl(270 100% 65% / 0.5),
-                 0 0 40px hsl(270 100% 65% / 0.3);
-  }
-
-  .text-glow-cyan {
-    text-shadow: 0 0 10px hsl(200 100% 60% / 0.8),
-                 0 0 20px hsl(200 100% 60% / 0.5),
-                 0 0 40px hsl(200 100% 60% / 0.3);
-  }
-
-  /* Gradient backgrounds */
-  .gradient-purple-cyan {
-    background: linear-gradient(135deg, hsl(270 100% 65%), hsl(200 100% 60%));
-  }
-
-  .gradient-text {
-    @apply text-transparent;
-    background: linear-gradient(135deg, hsl(270 100% 65%), hsl(280 100% 70%), hsl(200 100% 60%));
-    -webkit-background-clip: text;
-    background-clip: text;
-  }
-
-  /* Animated gradient background */
-  .animated-gradient-bg {
-    background: linear-gradient(
-      -45deg,
-      hsl(240 10% 3%),
-      hsl(270 50% 8%),
-      hsl(240 10% 3%),
-      hsl(200 50% 6%)
-    );
-    background-size: 400% 400%;
-    animation: gradient-shift 20s ease infinite;
-  }
-
-  @keyframes gradient-shift {
+  /* Logo ticker infinite scroll */
+  @keyframes ticker-scroll {
     0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
+      transform: translateX(0);
     }
     100% {
-      background-position: 0% 50%;
+      transform: translateX(-50%);
     }
   }
 
-  /* Hover scale with glow */
-  .hover-glow {
-    @apply transition-all duration-300;
-  }
-
-  .hover-glow:hover {
-    @apply scale-105;
-    box-shadow: 0 0 40px hsl(270 100% 65% / 0.4);
-  }
-
-  /* Neon button */
-  .neon-button {
-    @apply relative overflow-hidden rounded-lg px-6 py-3 font-semibold transition-all duration-300;
-    background: linear-gradient(135deg, hsl(270 100% 65%), hsl(280 100% 55%));
-  }
-
-  .neon-button:hover {
-    box-shadow: 0 0 30px hsl(270 100% 65% / 0.7),
-                0 0 60px hsl(270 100% 65% / 0.4),
-                0 0 100px hsl(270 100% 65% / 0.2);
-    transform: translateY(-2px);
-  }
-
-  .neon-button::before {
-    content: '';
-    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
-    background: linear-gradient(135deg, hsl(200 100% 60%), hsl(270 100% 65%));
-  }
-
-  .neon-button:hover::before {
-    opacity: 1;
-  }
-
-  /* Feature card */
-  .feature-card {
-    @apply glass-card p-6 transition-all duration-300;
-  }
-
-  .feature-card:hover {
-    @apply border-primary/40;
-    box-shadow: 0 0 40px hsl(270 100% 65% / 0.25),
-                inset 0 0 40px hsl(270 100% 65% / 0.03);
-  }
-
-  /* Pricing card */
-  .pricing-card {
-    @apply glass-card p-8 transition-all duration-500;
-  }
-
-  .pricing-card.featured {
-    @apply neon-border-purple;
-    box-shadow: 0 0 60px hsl(270 100% 65% / 0.25);
-  }
-
-  /* Futuristic glow orb */
-  .glow-orb {
-    @apply absolute rounded-full blur-3xl pointer-events-none;
-  }
-
-  .glow-orb-purple {
-    background: radial-gradient(circle, hsl(270 100% 65% / 0.4) 0%, transparent 70%);
-  }
-
-  .glow-orb-violet {
-    background: radial-gradient(circle, hsl(280 100% 70% / 0.35) 0%, transparent 70%);
-  }
-
-  .glow-orb-cyan {
-    background: radial-gradient(circle, hsl(200 100% 60% / 0.3) 0%, transparent 70%);
+  .ticker-track {
+    animation: ticker-scroll 30s linear infinite;
   }
 }
 
 @layer utilities {
-  /* Custom scrollbar */
+  /* Custom scrollbar — minimal */
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: hsl(0 0% 5%);
+    background: hsl(0 0% 4%);
   }
 
   ::-webkit-scrollbar-thumb {
-    background: hsl(0 0% 20%);
-    border-radius: 4px;
+    background: hsl(0 0% 18%);
+    border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(270 100% 65% / 0.5);
+    background: hsl(0 0% 28%);
   }
 }
