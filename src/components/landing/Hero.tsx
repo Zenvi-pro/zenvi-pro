@@ -9,16 +9,66 @@ interface HeroProps {
 const Hero = ({ onOpenWaitlist }: HeroProps) => {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 animated-gradient-bg" />
+      {/* Deep dark base */}
+      <div className="absolute inset-0 bg-background" />
       
-      {/* Floating orbs */}
+      {/* Animated gradient overlay */}
+      <div className="absolute inset-0 animated-gradient-bg opacity-80" />
+      
+      {/* Glowing orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Large purple glow - top left */}
         <motion.div
-          className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-primary/20 blur-3xl"
+          className="glow-orb glow-orb-purple w-[600px] h-[600px] -top-32 -left-32"
+          animate={{
+            x: [0, 80, 0],
+            y: [0, 60, 0],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+        
+        {/* Violet glow - center right */}
+        <motion.div
+          className="glow-orb glow-orb-violet w-[500px] h-[500px] top-1/3 -right-24"
+          animate={{
+            x: [0, -60, 0],
+            y: [0, 80, 0],
+            scale: [1, 1.15, 1],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+        
+        {/* Cyan glow - bottom center */}
+        <motion.div
+          className="glow-orb glow-orb-cyan w-[450px] h-[450px] -bottom-24 left-1/3"
           animate={{
             x: [0, 50, 0],
-            y: [0, 30, 0],
+            y: [0, -40, 0],
+            scale: [1, 1.2, 1],
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+        
+        {/* Small accent orb */}
+        <motion.div
+          className="glow-orb glow-orb-purple w-[200px] h-[200px] bottom-1/4 left-1/4"
+          animate={{
+            x: [0, 30, 0],
+            y: [0, -30, 0],
+            opacity: [0.5, 0.8, 0.5],
           }}
           transition={{
             duration: 8,
@@ -26,19 +76,17 @@ const Hero = ({ onOpenWaitlist }: HeroProps) => {
             ease: "easeInOut",
           }}
         />
-        <motion.div
-          className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-secondary/20 blur-3xl"
-          animate={{
-            x: [0, -40, 0],
-            y: [0, -40, 0],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
       </div>
+      
+      {/* Subtle grid overlay */}
+      <div 
+        className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `linear-gradient(hsl(270 100% 65% / 0.3) 1px, transparent 1px),
+                           linear-gradient(90deg, hsl(270 100% 65% / 0.3) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+        }}
+      />
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 text-center">
