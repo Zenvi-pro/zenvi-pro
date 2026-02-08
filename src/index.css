@@ -147,8 +147,10 @@
   }
 
   .gradient-text {
-    @apply bg-clip-text text-transparent;
+    @apply text-transparent;
     background: linear-gradient(135deg, hsl(270 100% 65%), hsl(155 100% 50%));
+    -webkit-background-clip: text;
+    background-clip: text;
   }
 
   /* Animated gradient background */
