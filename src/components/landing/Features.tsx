@@ -1,124 +1,110 @@
 import { motion } from "framer-motion";
-import { 
-  Zap, 
-  Shield, 
-  Captions, 
-  Scissors, 
-  AudioWaveform, 
-  Download 
+import {
+  Zap,
+  Shield,
+  Captions,
+  Scissors,
+  AudioWaveform,
+  Download,
 } from "lucide-react";
 
 const features = [
   {
     icon: Zap,
-    title: "Real-Time Editing",
-    description: "See changes instantly with live preview. No rendering wait times—your edits happen in real-time.",
+    category: "PERFORMANCE",
+    title: "Instant AI Edits",
+    description:
+      "See changes in real time. No rendering queues, no waiting—edits happen the moment you make them.",
   },
   {
     icon: Shield,
-    title: "Runs Locally",
-    description: "All processing happens on your device. Your videos never leave your machine—complete privacy.",
+    category: "PRIVACY",
+    title: "100% Local Processing",
+    description:
+      "Every frame stays on your device. No cloud uploads, no third-party access, no data collection.",
   },
   {
     icon: Captions,
-    title: "Auto-Subtitles",
-    description: "AI-generated captions in seconds. Support for 50+ languages with perfect timing sync.",
+    category: "CAPTIONS",
+    title: "Auto-Subtitles in 50+ Languages",
+    description:
+      "Generate perfectly timed captions in seconds. Accurate even with accents and background noise.",
   },
   {
     icon: Scissors,
-    title: "Smart Clipping",
-    description: "Automatic scene detection finds the best moments. AI identifies key segments instantly.",
+    category: "EDITING",
+    title: "Smart Scene Detection",
+    description:
+      "AI identifies key moments and cuts silence automatically. First cut to final cut, no grind.",
   },
   {
     icon: AudioWaveform,
-    title: "Audio Cleanup",
-    description: "Remove background noise with one click. Enhance voice clarity and balance audio levels.",
+    category: "AUDIO",
+    title: "One-Click Audio Cleanup",
+    description:
+      "Remove background noise, enhance voice clarity, and balance levels—all in a single click.",
   },
   {
     icon: Download,
-    title: "Instant Export",
-    description: "Export to any format in seconds. Optimized presets for every platform—YouTube, TikTok, Instagram.",
+    category: "EXPORT",
+    title: "Export Anywhere, Instantly",
+    description:
+      "Optimized presets for YouTube, TikTok, and Instagram. Any format, any resolution, in seconds.",
   },
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5 },
-  },
-};
-
 const Features = () => {
   return (
-    <section className="py-24 relative" id="features">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent pointer-events-none" />
-
-      <div className="container mx-auto px-4 relative z-10">
+    <section className="py-section-sm md:py-section relative" id="features">
+      <div className="mx-auto max-w-content px-6">
         {/* Section header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          transition={{ duration: 0.5 }}
+          className="text-center mb-16 md:mb-24"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 mb-6">
-            <span className="text-xs font-medium text-primary tracking-wider">ZENVI FEATURES</span>
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Everything you need to{" "}
-            <span className="gradient-text">edit like a pro</span>
+          <h2 className="text-section-title md:text-[48px] md:leading-[1.15] font-semibold text-white mb-4">
+            Everything you need to edit like a pro
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Professional-grade AI tools that run entirely on your device. No cloud, no limits.
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+            Professional-grade AI tools that run entirely on your device.
           </p>
         </motion.div>
 
-        {/* Features grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
+        {/* Features grid — 2 columns */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-16 md:gap-y-24">
           {features.map((feature, index) => (
             <motion.div
               key={index}
-              variants={itemVariants}
-              className="feature-card group cursor-pointer"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.08, duration: 0.5 }}
             >
-              {/* Icon */}
-              <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center mb-4 group-hover:neon-glow-purple transition-all duration-300">
-                <feature.icon className="w-6 h-6 text-primary" />
+              {/* Video placeholder */}
+              <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] aspect-video mb-6 flex items-center justify-center">
+                <feature.icon className="w-8 h-8 text-muted-foreground/40" />
               </div>
 
-              {/* Content */}
-              <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+              {/* Category label */}
+              <span className="text-xs font-medium tracking-widest text-primary uppercase mb-2 block">
+                {feature.category}
+              </span>
+
+              {/* Title */}
+              <h3 className="text-xl font-semibold text-white mb-2">
                 {feature.title}
               </h3>
-              <p className="text-muted-foreground leading-relaxed">
+
+              {/* Description */}
+              <p className="text-muted-foreground leading-relaxed text-[15px]">
                 {feature.description}
               </p>
-
-              {/* Hover gradient line */}
-              <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </motion.div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

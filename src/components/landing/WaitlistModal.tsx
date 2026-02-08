@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, CheckCircle, Loader2 } from "lucide-react";
+import { X, CheckCircle, Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,7 +19,7 @@ const WaitlistModal = ({ isOpen, onClose }: WaitlistModalProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email) return;
 
     setIsLoading(true);
@@ -31,9 +31,8 @@ const WaitlistModal = ({ isOpen, onClose }: WaitlistModalProps) => {
 
       if (error) {
         if (error.code === "23505") {
-          // Unique constraint violation - email already exists
           toast({
-            title: "Already on the list!",
+            title: "Already on the list",
             description: "This email is already registered for early access.",
           });
         } else {
@@ -42,7 +41,7 @@ const WaitlistModal = ({ isOpen, onClose }: WaitlistModalProps) => {
       } else {
         setIsSuccess(true);
         toast({
-          title: "You're on the list! 🎉",
+          title: "You're on the list",
           description: "We'll notify you when Zenvi is ready.",
         });
       }
@@ -60,7 +59,6 @@ const WaitlistModal = ({ isOpen, onClose }: WaitlistModalProps) => {
 
   const handleClose = () => {
     onClose();
-    // Reset state after animation completes
     setTimeout(() => {
       setEmail("");
       setIsSuccess(false);
@@ -82,100 +80,84 @@ const WaitlistModal = ({ isOpen, onClose }: WaitlistModalProps) => {
 
           {/* Modal */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: 0.96, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            exit={{ opacity: 0, scale: 0.96, y: 16 }}
             transition={{ duration: 0.2 }}
             className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md px-4"
           >
-            <div className="glass-card rounded-2xl p-8 relative overflow-hidden">
-              {/* Glow effects */}
-              <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary/30 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-secondary/30 rounded-full blur-3xl pointer-events-none" />
-
+            <div className="rounded-xl border border-white/[0.06] bg-[#111111] p-8">
               {/* Close button */}
               <button
                 onClick={handleClose}
-                className="absolute top-4 right-4 p-2 rounded-lg hover:bg-muted transition-colors"
+                className="absolute top-4 right-4 p-2 rounded-lg hover:bg-white/5 transition-colors"
               >
-                <X className="w-5 h-5 text-muted-foreground" />
+                <X className="w-4 h-4 text-muted-foreground" />
               </button>
 
-              <div className="relative z-10">
-                {!isSuccess ? (
-                  <>
-                    {/* Icon */}
-                    <div className="w-16 h-16 rounded-2xl gradient-purple-green flex items-center justify-center mx-auto mb-6">
-                      <Sparkles className="w-8 h-8 text-primary-foreground" />
-                    </div>
+              {!isSuccess ? (
+                <>
+                  <h2 className="text-xl font-semibold text-white mb-2">
+                    Get early access
+                  </h2>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    Join the waitlist. We'll notify you the moment the beta
+                    opens — no spam.
+                  </p>
 
-                    {/* Content */}
-                    <h2 className="text-2xl font-bold text-center mb-2">
-                      Be First to Edit Smarter
-                    </h2>
-                    <p className="text-muted-foreground text-center mb-8">
-                      Join 2,000+ creators waiting for Zenvi. We'll notify you the moment early access opens—no spam, ever.
-                    </p>
-
-                    {/* Form */}
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                      <Input
-                        type="email"
-                        placeholder="Enter your email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="h-12 bg-muted/50 border-border focus:border-primary"
-                      />
-                      <Button
-                        type="submit"
-                        disabled={isLoading}
-                        className="w-full h-12 neon-button text-primary-foreground"
-                      >
-                        {isLoading ? (
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                        ) : (
-                          <>
-                            <Sparkles className="w-5 h-5 mr-2" />
-                            Join Waitlist
-                          </>
-                        )}
-                      </Button>
-                    </form>
-
-                    <p className="text-xs text-muted-foreground text-center mt-4">
-                      Your data stays with you—just like your videos will. Unsubscribe anytime.
-                    </p>
-                  </>
-                ) : (
-                  /* Success state */
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-center py-8"
-                  >
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.1, type: "spring" }}
-                      className="w-20 h-20 rounded-full bg-secondary/20 flex items-center justify-center mx-auto mb-6"
-                    >
-                      <CheckCircle className="w-10 h-10 text-secondary" />
-                    </motion.div>
-                    <h2 className="text-2xl font-bold mb-2">Welcome to the Future</h2>
-                    <p className="text-muted-foreground mb-6">
-                      You're on the list. Expect an invite in your inbox soon—get ready to edit smarter.
-                    </p>
+                  <form onSubmit={handleSubmit} className="space-y-3">
+                    <Input
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="h-11 bg-white/[0.03] border-white/[0.06] focus:border-primary text-white placeholder:text-muted-foreground"
+                    />
                     <Button
-                      onClick={handleClose}
-                      variant="outline"
-                      className="border-border hover:border-primary/50"
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-medium"
                     >
-                      Close
+                      {isLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <>
+                          Join Waitlist
+                          <ArrowRight className="w-4 h-4 ml-2" />
+                        </>
+                      )}
                     </Button>
-                  </motion.div>
-                )}
-              </div>
+                  </form>
+
+                  <p className="text-xs text-muted-foreground/60 text-center mt-4">
+                    Your data stays with you — just like your videos will.
+                  </p>
+                </>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-center py-6"
+                >
+                  <div className="w-14 h-14 rounded-full border border-primary/20 flex items-center justify-center mx-auto mb-5">
+                    <CheckCircle className="w-7 h-7 text-primary" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-white mb-2">
+                    You're on the list
+                  </h2>
+                  <p className="text-sm text-muted-foreground mb-6">
+                    Expect an invite in your inbox soon.
+                  </p>
+                  <Button
+                    onClick={handleClose}
+                    variant="outline"
+                    className="border-white/[0.06] hover:bg-white/5 text-white"
+                  >
+                    Close
+                  </Button>
+                </motion.div>
+              )}
             </div>
           </motion.div>
         </>

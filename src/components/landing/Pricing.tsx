@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Check, Sparkles } from "lucide-react";
+import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface PricingProps {
@@ -10,8 +10,8 @@ const plans = [
   {
     name: "Creator",
     price: "$29",
-    period: "/month",
-    description: "Everything indie creators need to level up their content",
+    period: "/mo",
+    description: "Everything indie creators need to level up their content.",
     features: [
       "Unlimited local AI processing",
       "Auto-generated subtitles (50+ languages)",
@@ -21,91 +21,114 @@ const plans = [
       "Email support",
     ],
     featured: false,
+    cta: "Start Creating",
   },
   {
-    name: "Studio",
-    price: "$79",
-    period: "/month",
-    description: "For professionals and teams who demand the best",
+    name: "Pro",
+    price: "$49",
+    period: "/mo",
+    description: "For professionals who demand speed and flexibility.",
     features: [
       "Everything in Creator",
       "Batch processing for multi-project workflows",
       "Advanced audio sweetening & EQ",
       "Custom export presets & platform profiles",
       "Priority feature requests",
-      "Dedicated Slack support",
-      "Team license (up to 5 seats)",
-      "Commercial usage rights",
+      "Priority support",
     ],
     featured: true,
+    cta: "Get Pro",
+  },
+  {
+    name: "Studio",
+    price: "$99",
+    period: "/mo",
+    description: "For teams and agencies with demanding pipelines.",
+    features: [
+      "Everything in Pro",
+      "Team license (up to 5 seats)",
+      "Dedicated Slack support",
+      "Custom model fine-tuning",
+      "Commercial usage rights",
+      "SLA guarantee",
+    ],
+    featured: false,
+    cta: "Get Studio",
   },
 ];
 
 const Pricing = ({ onOpenWaitlist }: PricingProps) => {
   return (
-    <section className="py-24 relative" id="pricing">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent pointer-events-none" />
-
-      <div className="container mx-auto px-4 relative z-10">
+    <section className="py-section-sm md:py-section relative" id="pricing">
+      <div className="mx-auto max-w-content px-6">
         {/* Section header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            One price.{" "}
-            <span className="gradient-text">No hidden fees.</span>
+          <h2 className="text-section-title md:text-[48px] md:leading-[1.15] font-semibold text-white mb-4">
+            Simple, predictable pricing
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            No per-minute fees. No token limits. No cloud costs. Just powerful local AI for a flat monthly rate.
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+            No per-minute fees. No token limits. No cloud costs. Flat rate, unlimited use.
           </p>
         </motion.div>
 
         {/* Pricing cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {plans.map((plan, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className={`pricing-card relative ${plan.featured ? "featured" : ""}`}
+              transition={{ delay: index * 0.1, duration: 0.5 }}
+              className={`relative rounded-xl border p-8 transition-colors duration-200 ${
+                plan.featured
+                  ? "border-primary/40 bg-primary/[0.03]"
+                  : "border-white/[0.06] bg-white/[0.01]"
+              }`}
             >
-              {/* Featured badge */}
+              {/* Recommended badge */}
               {plan.featured && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full gradient-purple-green text-sm font-semibold text-primary-foreground flex items-center gap-1">
-                  <Sparkles className="w-4 h-4" />
-                  Most Popular
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary text-[11px] font-semibold text-white tracking-wide">
+                  RECOMMENDED
                 </div>
               )}
 
               {/* Plan header */}
               <div className="mb-6">
-                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                <p className="text-muted-foreground text-sm">{plan.description}</p>
+                <h3 className="text-lg font-semibold text-white mb-1">
+                  {plan.name}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {plan.description}
+                </p>
               </div>
 
               {/* Price */}
-              <div className="mb-6">
-                <span className="text-5xl font-bold">{plan.price}</span>
-                <span className="text-muted-foreground">{plan.period}</span>
+              <div className="mb-8">
+                <span className="text-5xl font-bold text-white">
+                  {plan.price}
+                </span>
+                <span className="text-muted-foreground text-base ml-1">
+                  {plan.period}
+                </span>
               </div>
 
               {/* Features */}
               <ul className="space-y-3 mb-8">
                 {plan.features.map((feature, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                      plan.featured ? "bg-secondary/20" : "bg-primary/20"
-                    }`}>
-                      <Check className={`w-3 h-3 ${plan.featured ? "text-secondary" : "text-primary"}`} />
-                    </div>
-                    <span className="text-muted-foreground">{feature}</span>
+                    <Check
+                      className={`w-4 h-4 shrink-0 mt-0.5 ${
+                        plan.featured ? "text-primary" : "text-muted-foreground"
+                      }`}
+                    />
+                    <span className="text-sm text-white/70">{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -113,14 +136,14 @@ const Pricing = ({ onOpenWaitlist }: PricingProps) => {
               {/* CTA */}
               <Button
                 onClick={onOpenWaitlist}
-                className={`w-full ${
+                className={`w-full rounded-lg font-medium ${
                   plan.featured
-                    ? "neon-button text-primary-foreground"
-                    : "bg-muted hover:bg-muted/80 text-foreground"
+                    ? "bg-primary hover:bg-primary/90 text-white"
+                    : "bg-white/[0.05] hover:bg-white/[0.08] text-white border border-white/[0.06]"
                 }`}
                 size="lg"
               >
-                {plan.featured ? "Get Studio Access" : "Start Creating"}
+                {plan.cta}
               </Button>
             </motion.div>
           ))}
@@ -132,9 +155,9 @@ const Pricing = ({ onOpenWaitlist }: PricingProps) => {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.4 }}
-          className="text-center text-muted-foreground mt-8"
+          className="text-center text-sm text-muted-foreground mt-10"
         >
-          14-day free trial on all plans. No credit card required to start.
+          14-day free trial on all plans. No credit card required.
         </motion.p>
       </div>
     </section>
