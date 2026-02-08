@@ -40,16 +40,6 @@ const Hero = ({ onOpenWaitlist }: HeroProps) => {
         />
       </div>
 
-      {/* Grid pattern overlay */}
-      <div 
-        className="absolute inset-0 opacity-20"
-        style={{
-          backgroundImage: `linear-gradient(hsl(var(--border)) 1px, transparent 1px),
-                           linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px)`,
-          backgroundSize: '50px 50px',
-        }}
-      />
-
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 text-center">
         <motion.div
