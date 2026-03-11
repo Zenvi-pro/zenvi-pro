@@ -144,6 +144,52 @@ export type Database = {
         Args: Record<string, never>
         Returns: string
       }
+      batch_record_api_usage: {
+        Args: { records: unknown }
+        Returns: number
+      }
+      get_monthly_totals: {
+        Args: Record<string, never>
+        Returns: {
+          total_cost_usd: number
+          total_requests: number
+          monthly_limit_usd: number
+          percentage_used: number
+          tier: string
+        }[]
+      }
+      get_usage_summary: {
+        Args: Record<string, never>
+        Returns: {
+          provider: string
+          total_cost_usd: number
+          total_input_tokens: number
+          total_output_tokens: number
+          request_count: number
+        }[]
+      }
+      get_usage_history: {
+        Args: { months_back?: number }
+        Returns: {
+          month: string
+          total_cost_usd: number
+          request_count: number
+        }[]
+      }
+      check_usage_allowed: {
+        Args: { p_estimated_cost?: number }
+        Returns: boolean
+      }
+      calculate_api_cost: {
+        Args: {
+          p_provider: string
+          p_model: string
+          p_input_tokens: number
+          p_output_tokens: number
+          p_units?: number
+        }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
