@@ -22,7 +22,7 @@ const Index = () => {
       <Features />
       <EditorDemo />
       <Comparison />
-      <Pricing onOpenWaitlist={openWaitlist} />
+      <Pricing />
       <LogoTicker />
       <Footer />
       <WaitlistModal isOpen={isWaitlistOpen} onClose={closeWaitlist} />
