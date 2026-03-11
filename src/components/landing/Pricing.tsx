@@ -1,13 +1,11 @@
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-
-interface PricingProps {
-  onOpenWaitlist: () => void;
-}
 
 const plans = [
   {
+    key: "creator",
     name: "Creator",
     price: "$29",
     period: "/mo",
@@ -24,6 +22,7 @@ const plans = [
     cta: "Start Creating",
   },
   {
+    key: "pro",
     name: "Pro",
     price: "$49",
     period: "/mo",
@@ -40,6 +39,7 @@ const plans = [
     cta: "Get Pro",
   },
   {
+    key: "studio",
     name: "Studio",
     price: "$99",
     period: "/mo",
@@ -57,7 +57,9 @@ const plans = [
   },
 ];
 
-const Pricing = ({ onOpenWaitlist }: PricingProps) => {
+const Pricing = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="py-section-sm md:py-section relative" id="pricing">
       <div className="mx-auto max-w-content px-6">
@@ -73,7 +75,8 @@ const Pricing = ({ onOpenWaitlist }: PricingProps) => {
             Simple, predictable pricing
           </h2>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            No per-minute fees. No token limits. No cloud costs. Flat rate, unlimited use.
+            No per-minute fees. No token limits. No cloud costs. Flat rate,
+            unlimited use.
           </p>
         </motion.div>
 
@@ -135,7 +138,7 @@ const Pricing = ({ onOpenWaitlist }: PricingProps) => {
 
               {/* CTA */}
               <Button
-                onClick={onOpenWaitlist}
+                onClick={() => navigate(`/checkout?plan=${plan.key}`)}
                 className={`w-full rounded-lg font-medium ${
                   plan.featured
                     ? "bg-primary hover:bg-primary/90 text-white"
@@ -157,7 +160,7 @@ const Pricing = ({ onOpenWaitlist }: PricingProps) => {
           transition={{ delay: 0.4 }}
           className="text-center text-sm text-muted-foreground mt-10"
         >
-          14-day free trial on all plans. No credit card required.
+          14-day free trial on all plans. No credit card required to start.
         </motion.p>
       </div>
     </section>

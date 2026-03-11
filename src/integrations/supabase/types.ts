@@ -14,21 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          id: string
+          email: string | null
+          full_name: string | null
+          avatar_url: string | null
+          stripe_customer_id: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          email?: string | null
+          full_name?: string | null
+          avatar_url?: string | null
+          stripe_customer_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string | null
+          full_name?: string | null
+          avatar_url?: string | null
+          stripe_customer_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          id: string
+          user_id: string
+          stripe_subscription_id: string | null
+          stripe_customer_id: string | null
+          tier: string
+          status: string
+          current_period_end: string | null
+          cancel_at_period_end: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          stripe_subscription_id?: string | null
+          stripe_customer_id?: string | null
+          tier?: string
+          status?: string
+          current_period_end?: string | null
+          cancel_at_period_end?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          stripe_subscription_id?: string | null
+          stripe_customer_id?: string | null
+          tier?: string
+          status?: string
+          current_period_end?: string | null
+          cancel_at_period_end?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       waitlist: {
         Row: {
+          access_token: string
           created_at: string
           email: string
           id: string
+          invited_at: string | null
+          status: string
         }
         Insert: {
+          access_token?: string
           created_at?: string
           email: string
           id?: string
+          invited_at?: string | null
+          status?: string
         }
         Update: {
+          access_token?: string
           created_at?: string
           email?: string
           id?: string
+          invited_at?: string | null
+          status?: string
         }
         Relationships: []
       }
@@ -37,7 +115,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      validate_waitlist_token: {
+        Args: { token: string }
+        Returns: { is_valid: boolean; entry_status: string }[]
+      }
+      complete_desktop_auth_session: {
+        Args: {
+          session_state: string
+          p_access_token: string
+          p_refresh_token: string
+        }
+        Returns: boolean
+      }
+      poll_desktop_auth_session: {
+        Args: { session_state: string }
+        Returns: { authenticated: boolean; access_token: string; refresh_token: string }[]
+      }
+      get_user_subscription: {
+        Args: Record<string, never>
+        Returns: {
+          tier: string
+          status: string
+          current_period_end: string
+          cancel_at_period_end: boolean
+        }[]
+      }
+      get_stripe_customer_id: {
+        Args: Record<string, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
