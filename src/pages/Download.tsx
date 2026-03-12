@@ -3,52 +3,100 @@ import { useSearchParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Download,
-  Laptop,
-  Monitor,
-  Terminal,
   CheckCircle,
   ArrowLeft,
   Loader2,
   XCircle,
   ChevronRight,
+  AlertCircle,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
 // ---------------------------------------------------------------------------
-// Release URLs — update these once GitHub CI/CD publishes artifacts
+// GitHub release types & fetch
 // ---------------------------------------------------------------------------
-const GITHUB_RELEASES_BASE =
-  "https://github.com/zenvi-app/zenvi-core/releases/latest/download";
+interface GithubAsset {
+  name: string;
+  browser_download_url: string;
+  size: number;
+  download_count: number;
+}
 
-const RELEASE_ARTIFACTS = {
+interface GithubRelease {
+  tag_name: string;
+  name: string;
+  published_at: string;
+  body: string;
+  assets: GithubAsset[];
+}
+
+async function fetchLatestRelease(): Promise<GithubRelease | null> {
+  const res = await fetch(
+    "https://api.github.com/repos/Zenvi-pro/zenvi-core/releases/latest",
+    { headers: { Accept: "application/vnd.github+json" } },
+  );
+  if (res.status === 404) return null; // no releases yet
+  if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
+  return res.json();
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+function formatBytes(bytes: number): string {
+  return `${(bytes / 1024 / 1024).toFixed(0)} MB`;
+}
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function findAsset(assets: GithubAsset[], ext: string): GithubAsset | undefined {
+  return assets.find((a) => a.name.endsWith(ext));
+}
+
+// ---------------------------------------------------------------------------
+// Platform metadata (static display info only — URLs come from GitHub API)
+// ---------------------------------------------------------------------------
+type Platform = "mac" | "windows" | "linux";
+
+const PLATFORM_META: Record<
+  Platform,
+  { label: string; sublabel: string; icon: React.FC<{ className?: string }>; ext: string }
+> = {
   mac: {
     label: "macOS",
     sublabel: "macOS 12 Monterey or later",
-    url: `${GITHUB_RELEASES_BASE}/Zenvi-macOS.dmg`,
-    fileType: ".dmg",
-    size: "~180 MB",
     icon: MacOSIcon,
+    ext: ".dmg",
   },
   windows: {
     label: "Windows",
     sublabel: "Windows 10 / 11 (64-bit)",
-    url: `${GITHUB_RELEASES_BASE}/Zenvi-Windows-Setup.exe`,
-    fileType: ".exe",
-    size: "~165 MB",
     icon: WindowsIcon,
+    ext: ".exe",
   },
   linux: {
     label: "Linux",
     sublabel: "Ubuntu 20.04+ / Debian-based",
-    url: `${GITHUB_RELEASES_BASE}/Zenvi-Linux.AppImage`,
-    fileType: ".AppImage",
-    size: "~195 MB",
     icon: LinuxIcon,
+    ext: ".AppImage",
   },
-} as const;
+};
 
-type Platform = keyof typeof RELEASE_ARTIFACTS;
+// Extra entry for .deb (Linux secondary)
+const DEB_META = {
+  label: "Linux (Debian)",
+  sublabel: "Ubuntu 20.04+ / Debian-based",
+  icon: LinuxIcon,
+  ext: ".deb",
+};
 
 // ---------------------------------------------------------------------------
 // Inline SVG platform icons (geometry only — no trademarked logos)
@@ -64,7 +112,6 @@ function MacOSIcon({ className }: { className?: string }) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      {/* Laptop silhouette */}
       <rect x="2" y="4" width="20" height="13" rx="2" />
       <path d="M0 19h24" />
       <path d="M9 19v1a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1" />
@@ -75,7 +122,6 @@ function MacOSIcon({ className }: { className?: string }) {
 function WindowsIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" className={className} fill="currentColor">
-      {/* 4-pane window grid */}
       <rect x="3" y="3" width="8" height="8" rx="1" />
       <rect x="13" y="3" width="8" height="8" rx="1" />
       <rect x="3" y="13" width="8" height="8" rx="1" />
@@ -95,7 +141,6 @@ function LinuxIcon({ className }: { className?: string }) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      {/* Terminal prompt symbol */}
       <rect x="2" y="3" width="20" height="18" rx="2" />
       <path d="M7 9l3 3-3 3" />
       <path d="M13 15h4" />
@@ -170,6 +215,17 @@ export default function DownloadPage() {
     })();
   }, [token]);
 
+  // Fetch latest GitHub release (runs regardless of token state)
+  const {
+    data: release,
+    isError: releaseError,
+  } = useQuery<GithubRelease | null>({
+    queryKey: ["zenvi-latest-release"],
+    queryFn: fetchLatestRelease,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  });
+
   // ── Loading state ─────────────────────────────────────────────────────────
   if (tokenState === "loading") {
     return (
@@ -217,10 +273,22 @@ export default function DownloadPage() {
   }
 
   // ── Valid token — Download page ───────────────────────────────────────────
-  const primary = RELEASE_ARTIFACTS[detectedPlatform];
-  const others = (Object.keys(RELEASE_ARTIFACTS) as Platform[]).filter(
+  const primaryMeta = PLATFORM_META[detectedPlatform];
+  const others = (Object.keys(PLATFORM_META) as Platform[]).filter(
     (p) => p !== detectedPlatform,
   );
+
+  const getAsset = (ext: string): GithubAsset | null =>
+    release?.assets ? (findAsset(release.assets, ext) ?? null) : null;
+
+  const primaryAsset = getAsset(primaryMeta.ext);
+
+  // Build secondary cards list
+  const secondaryCards = others.map((p) => ({ meta: PLATFORM_META[p], asset: getAsset(PLATFORM_META[p].ext) }));
+  // If Linux is primary, also add .deb as a secondary option
+  if (detectedPlatform === "linux") {
+    secondaryCards.push({ meta: DEB_META, asset: getAsset(".deb") });
+  }
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
@@ -263,8 +331,8 @@ export default function DownloadPage() {
             className="text-center text-muted-foreground text-base mb-14 max-w-md mx-auto leading-relaxed"
           >
             Download Zenvi for{" "}
-            <span className="text-white font-medium">{primary.label}</span> and
-            start editing with AI.
+            <span className="text-white font-medium">{primaryMeta.label}</span>{" "}
+            and start editing with AI.
           </motion.p>
 
           {/* Primary download card */}
@@ -278,43 +346,95 @@ export default function DownloadPage() {
               <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-lg border border-white/[0.06] bg-white/[0.03] flex items-center justify-center text-white">
-                    <primary.icon className="w-6 h-6" />
+                    <primaryMeta.icon className="w-6 h-6" />
                   </div>
                   <div>
                     <p className="text-white font-semibold text-base">
-                      Zenvi for {primary.label}
+                      Zenvi for {primaryMeta.label}
                     </p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {primary.sublabel}
+                      {primaryMeta.sublabel}
                     </p>
                   </div>
                 </div>
                 <span className="text-[11px] px-2 py-1 rounded border border-primary/20 text-primary bg-primary/5 font-medium">
-                  Beta
+                  {release?.tag_name ?? "Beta"}
                 </span>
               </div>
 
-              <a href={primary.url} onClick={() => setDownloadStarted(true)}>
-                <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-medium text-sm gap-2">
-                  {downloadStarted ? (
-                    <>
-                      <CheckCircle className="w-4 h-4" />
-                      Download started
-                    </>
-                  ) : (
-                    <>
-                      <Download className="w-4 h-4" />
-                      Download for {primary.label}
-                    </>
-                  )}
+              {primaryAsset ? (
+                <a
+                  href={primaryAsset.browser_download_url}
+                  onClick={() => setDownloadStarted(true)}
+                >
+                  <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-medium text-sm gap-2">
+                    {downloadStarted ? (
+                      <>
+                        <CheckCircle className="w-4 h-4" />
+                        Download started
+                      </>
+                    ) : (
+                      <>
+                        <Download className="w-4 h-4" />
+                        Download for {primaryMeta.label}
+                      </>
+                    )}
+                  </Button>
+                </a>
+              ) : (
+                <Button
+                  disabled
+                  className="w-full h-12 opacity-50 text-white font-medium text-sm gap-2"
+                >
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Release coming soon
                 </Button>
-              </a>
+              )}
 
               <p className="text-center text-xs text-muted-foreground mt-3">
-                {primary.fileType} · {primary.size}
+                {primaryMeta.ext}
+                {primaryAsset ? ` · ${formatBytes(primaryAsset.size)}` : ""}
+                {release?.published_at
+                  ? ` · Released ${formatDate(release.published_at)}`
+                  : ""}
               </p>
             </div>
+
+            {/* API error warning */}
+            {releaseError && (
+              <p className="text-xs text-muted-foreground text-center mt-2 flex items-center justify-center gap-1">
+                <AlertCircle className="w-3 h-3" />
+                Could not fetch release info.{" "}
+                <a
+                  href="https://github.com/Zenvi-pro/zenvi-core/releases"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  View on GitHub
+                </a>
+              </p>
+            )}
           </motion.div>
+
+          {/* What's new */}
+          {release?.body && (
+            <motion.div
+              variants={fadeUp}
+              initial="hidden"
+              animate="visible"
+              custom={0.22}
+            >
+              <div className="rounded-xl border border-white/[0.06] bg-[#0D0D0D] p-6 mb-4">
+                <h2 className="text-sm font-semibold text-white mb-3">
+                  What's new in {release.tag_name}
+                </h2>
+                <p className="text-xs text-muted-foreground whitespace-pre-line leading-relaxed line-clamp-6">
+                  {release.body}
+                </p>
+              </div>
+            </motion.div>
+          )}
 
           {/* Other platforms */}
           <motion.div
@@ -328,25 +448,39 @@ export default function DownloadPage() {
               Other platforms
             </p>
             <div className="grid grid-cols-2 gap-3">
-              {others.map((p) => {
-                const art = RELEASE_ARTIFACTS[p];
-                return (
-                  <a key={p} href={art.url}>
-                    <div className="rounded-lg border border-white/[0.06] bg-[#0F0F0F] hover:border-white/[0.12] hover:bg-[#141414] transition-all duration-200 p-4 flex items-center gap-3 group cursor-pointer">
-                      <div className="w-8 h-8 rounded-md border border-white/[0.06] flex items-center justify-center text-muted-foreground group-hover:text-white transition-colors">
-                        <art.icon className="w-4 h-4" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-white font-medium">
-                          {art.label}
-                        </p>
-                        <p className="text-[11px] text-muted-foreground">
-                          {art.fileType} · {art.size}
-                        </p>
-                      </div>
-                      <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              {secondaryCards.map(({ meta, asset }, i) => {
+                const cardContent = (
+                  <div
+                    className={`rounded-lg border border-white/[0.06] bg-[#0F0F0F] transition-all duration-200 p-4 flex items-center gap-3 group ${
+                      asset
+                        ? "hover:border-white/[0.12] hover:bg-[#141414] cursor-pointer"
+                        : "opacity-50 cursor-not-allowed"
+                    }`}
+                  >
+                    <div className="w-8 h-8 rounded-md border border-white/[0.06] flex items-center justify-center text-muted-foreground group-hover:text-white transition-colors">
+                      <meta.icon className="w-4 h-4" />
                     </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-white font-medium">
+                        {meta.label}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">
+                        {meta.ext}
+                        {asset ? ` · ${formatBytes(asset.size)}` : " · Coming soon"}
+                      </p>
+                    </div>
+                    {asset && (
+                      <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                    )}
+                  </div>
+                );
+
+                return asset ? (
+                  <a key={i} href={asset.browser_download_url}>
+                    {cardContent}
                   </a>
+                ) : (
+                  <div key={i}>{cardContent}</div>
                 );
               })}
             </div>
