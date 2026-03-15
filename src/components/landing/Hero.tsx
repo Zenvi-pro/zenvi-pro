@@ -4,10 +4,10 @@ import { ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface HeroProps {
-  onOpenWaitlist: () => void;
+  onOpenAccessCode: () => void;
 }
 
-const Hero = ({ onOpenWaitlist }: HeroProps) => {
+const Hero = ({ onOpenAccessCode }: HeroProps) => {
   const [osLabel, setOsLabel] = useState("Mac");
 
   useEffect(() => {
@@ -52,7 +52,7 @@ const Hero = ({ onOpenWaitlist }: HeroProps) => {
           className="flex flex-col sm:flex-row gap-4 justify-center items-center"
         >
           <Button
-            onClick={onOpenWaitlist}
+            onClick={onOpenAccessCode}
             size="lg"
             className="bg-primary hover:bg-primary/90 text-white text-base font-medium px-8 py-6 rounded-lg"
           >

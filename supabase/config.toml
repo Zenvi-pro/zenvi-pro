@@ -2,7 +2,7 @@ project_id = "xktarhzbrdnxkaovtdxj"
 
 [auth]
 site_url = "https://zenvi.pro"
-additional_redirect_urls = ["https://zenvi.pro/auth/callback", "https://zenvi.pro"]
+additional_redirect_urls = ["https://zenvi.pro/auth/callback", "https://zenvi.pro", "http://localhost:5173/auth/callback", "http://localhost:5173"]
 
 [auth.external.google]
 enabled = true

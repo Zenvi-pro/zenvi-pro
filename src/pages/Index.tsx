@@ -36,7 +36,7 @@ const Index = () => {
     <div className="min-h-screen bg-[#0A0A0A]">
       {introVisible && <IntroOverlay onComplete={handleIntroComplete} />}
       <Navbar onOpenWaitlist={openWaitlist} onOpenAccessCode={() => setIsAccessCodeOpen(true)} />
-      <Hero onOpenWaitlist={openWaitlist} />
+      <Hero onOpenAccessCode={() => setIsAccessCodeOpen(true)} />
       <Features />
       <EditorDemo />
       <Comparison />
