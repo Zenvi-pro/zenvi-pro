@@ -1,5 +1,14 @@
 project_id = "xktarhzbrdnxkaovtdxj"
 
+[auth]
+site_url = "https://zenvi.pro"
+additional_redirect_urls = ["https://zenvi.pro/auth/callback", "https://zenvi.pro"]
+
+[auth.external.google]
+enabled = true
+client_id = "env(SUPABASE_AUTH_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_GOOGLE_SECRET)"
+
 [auth.email.template.confirmation]
 subject = "Confirm your Zenvi account"
 content_path = "./supabase/templates/confirm.html"
