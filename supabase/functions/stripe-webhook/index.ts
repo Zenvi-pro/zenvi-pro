@@ -24,6 +24,18 @@ function priceToTier(priceId: string): string {
 }
 
 Deno.serve(async (req) => {
+  // ── Env var guard ──────────────────────────────────────────────────────────
+  const missingVars: string[] = [];
+  if (!Deno.env.get("STRIPE_SECRET_KEY")) missingVars.push("STRIPE_SECRET_KEY");
+  if (!Deno.env.get("STRIPE_WEBHOOK_SECRET")) missingVars.push("STRIPE_WEBHOOK_SECRET");
+  if (missingVars.length > 0) {
+    console.error("stripe-webhook: missing env vars:", missingVars.join(", "));
+    return new Response(
+      JSON.stringify({ error: `Missing required environment variables: ${missingVars.join(", ")}` }),
+      { status: 500, headers: { "Content-Type": "application/json" } },
+    );
+  }
+
   const body = await req.text();
   const sig = req.headers.get("stripe-signature") ?? "";
 

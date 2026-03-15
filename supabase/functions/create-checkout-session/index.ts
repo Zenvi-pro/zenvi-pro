@@ -5,6 +5,7 @@ const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
 // Plan → Stripe Price ID mapping (set these in Supabase Edge Function env vars)
@@ -17,6 +18,19 @@ const PRICE_IDS: Record<string, string> = {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: CORS });
+  }
+
+  // ── Env var guard ──────────────────────────────────────────────────────────
+  const missingVars: string[] = [];
+  if (!Deno.env.get("STRIPE_SECRET_KEY")) missingVars.push("STRIPE_SECRET_KEY");
+  if (!Deno.env.get("STRIPE_PRICE_CREATOR")) missingVars.push("STRIPE_PRICE_CREATOR");
+  if (!Deno.env.get("STRIPE_PRICE_PRO")) missingVars.push("STRIPE_PRICE_PRO");
+  if (!Deno.env.get("STRIPE_PRICE_STUDIO")) missingVars.push("STRIPE_PRICE_STUDIO");
+  if (missingVars.length > 0) {
+    return json(
+      { error: `Missing required environment variables: ${missingVars.join(", ")}` },
+      500,
+    );
   }
 
   try {
@@ -67,8 +81,7 @@ Deno.serve(async (req) => {
 
       await supabase
         .from("profiles")
-        .update({ stripe_customer_id: customerId })
-        .eq("id", user.id);
+        .upsert({ id: user.id, stripe_customer_id: customerId });
     }
 
     // Create Checkout Session

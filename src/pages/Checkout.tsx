@@ -69,21 +69,60 @@ export default function CheckoutPage() {
 
   // Auth guard
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        navigate(`/login?next=/checkout?plan=${planKey}`);
-      } else {
+    const redirectToLogin = () =>
+      navigate(`/login?next=${encodeURIComponent(`/checkout?plan=${planKey}`)}`);
+
+    supabase.auth.getSession()
+      .then(async ({ data: { session } }) => {
+        if (!session) {
+          redirectToLogin();
+          return;
+        }
+        // If the access token is expired (or within 60s of expiry), refresh it
+        // so functions.invoke() sends a valid token
+        const now = Math.floor(Date.now() / 1000);
+        const isExpired = session.expires_at != null && session.expires_at <= now + 60;
+        if (isExpired) {
+          const { error } = await supabase.auth.refreshSession();
+          if (error) {
+            redirectToLogin();
+            return;
+          }
+        }
         setStatus("ready");
-      }
-    });
+      })
+      .catch(redirectToLogin);
   }, [navigate, planKey]);
 
   async function handleCheckout() {
     setStatus("redirecting");
     try {
+      // Get the current session. If the access token is expired, refresh it
+      // and grab the new token directly from the refresh response.
+      // We then inject it explicitly into the Authorization header so
+      // functions.invoke() uses this token — not whatever supabase-js
+      // has internally cached (which may still be stale).
+      let { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        navigate(`/login?next=${encodeURIComponent(`/checkout?plan=${planKey}`)}`);
+        return;
+      }
+
+      const now = Math.floor(Date.now() / 1000);
+      if (session.expires_at != null && session.expires_at <= now + 60) {
+        const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError || !refreshed.session) {
+          navigate(`/login?next=${encodeURIComponent(`/checkout?plan=${planKey}`)}`);
+          return;
+        }
+        session = refreshed.session;
+      }
+
       const { data, error } = await supabase.functions.invoke(
         "create-checkout-session",
         {
+          headers: { Authorization: `Bearer ${session.access_token}` },
           body: {
             plan: planKey,
             successUrl: `${window.location.origin}/checkout/success?plan=${planKey}`,
@@ -97,8 +136,16 @@ export default function CheckoutPage() {
 
       window.location.href = data.url;
     } catch (err: unknown) {
-      const msg =
-        err instanceof Error ? err.message : "Could not start checkout.";
+      let msg = err instanceof Error ? err.message : "Could not start checkout.";
+      if (err instanceof Error && "context" in err) {
+        try {
+          const body = await (err as unknown as { context: Response }).context.json();
+          if (body?.error) msg = body.error;
+        } catch {
+          // keep original message
+        }
+      }
+      console.error("Checkout error:", msg);
       setErrorMsg(msg);
       setStatus("error");
       toast({ title: "Checkout failed", description: msg, variant: "destructive" });
@@ -184,7 +231,7 @@ export default function CheckoutPage() {
             {/* CTA */}
             <Button
               onClick={handleCheckout}
-              disabled={status === "redirecting" || status === "error"}
+              disabled={status === "redirecting"}
               className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-medium text-sm"
             >
               {status === "redirecting" ? (
