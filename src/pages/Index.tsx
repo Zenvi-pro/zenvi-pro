@@ -8,12 +8,14 @@ import Pricing from "@/components/landing/Pricing";
 import LogoTicker from "@/components/landing/LogoTicker";
 import Footer from "@/components/landing/Footer";
 import WaitlistModal from "@/components/landing/WaitlistModal";
+import AccessCodeModal from "@/components/landing/AccessCodeModal";
 import { IntroOverlay } from "@/components/landing/IntroOverlay";
 
 const INTRO_STORAGE_KEY = "zenvi-intro-done";
 
 const Index = () => {
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
+  const [isAccessCodeOpen, setIsAccessCodeOpen] = useState(false);
   const [introVisible, setIntroVisible] = useState(() => {
     if (typeof window === "undefined") return true;
     return !sessionStorage.getItem(INTRO_STORAGE_KEY);
@@ -33,7 +35,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-[#0A0A0A]">
       {introVisible && <IntroOverlay onComplete={handleIntroComplete} />}
-      <Navbar onOpenWaitlist={openWaitlist} />
+      <Navbar onOpenWaitlist={openWaitlist} onOpenAccessCode={() => setIsAccessCodeOpen(true)} />
       <Hero onOpenWaitlist={openWaitlist} />
       <Features />
       <EditorDemo />
@@ -42,6 +44,7 @@ const Index = () => {
       <LogoTicker />
       <Footer />
       <WaitlistModal isOpen={isWaitlistOpen} onClose={closeWaitlist} />
+      <AccessCodeModal isOpen={isAccessCodeOpen} onClose={() => setIsAccessCodeOpen(false)} />
     </div>
   );
 };
