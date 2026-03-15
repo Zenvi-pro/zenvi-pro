@@ -59,17 +59,23 @@ const Hero = ({ onOpenWaitlist }: HeroProps) => {
           </Button>
         </motion.div>
 
-        {/* Product video placeholder */}
+        {/* Product video */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.0, duration: 0.8 }}
           className="mt-20 rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden"
         >
-          <div className="aspect-video flex items-center justify-center">
-            <p className="text-sm text-muted-foreground">
-              Product video coming soon
-            </p>
+          <div className="aspect-video bg-black">
+            <iframe
+              className="h-full w-full"
+              src="https://www.youtube-nocookie.com/embed/5Nc7iPDJ4tw"
+              title="Zenvi product demo"
+              loading="lazy"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
           </div>
         </motion.div>
       </div>

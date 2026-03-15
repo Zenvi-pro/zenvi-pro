@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ZenviLogo } from "@/components/ZenviLogo";
 
 interface NavbarProps {
   onOpenWaitlist: () => void;
@@ -40,10 +41,8 @@ const Navbar = ({ onOpenWaitlist }: NavbarProps) => {
         <div className="mx-auto max-w-content px-6">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <a href="#" className="flex items-center">
-              <span className="text-xl font-bold text-white tracking-tight">
-                Zenvi
-              </span>
+            <a href="#" className="flex items-center text-white">
+              <ZenviLogo size={28} />
             </a>
 
             {/* Desktop navigation */}
