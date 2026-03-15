@@ -1,5 +1,13 @@
 project_id = "xktarhzbrdnxkaovtdxj"
 
+[auth.email.template.confirmation]
+subject = "Confirm your Zenvi account"
+content_path = "./supabase/templates/confirm.html"
+
+[auth.email.template.recovery]
+subject = "Reset your Zenvi password"
+content_path = "./supabase/templates/recovery.html"
+
 [functions.create-checkout-session]
 verify_jwt = false
 
