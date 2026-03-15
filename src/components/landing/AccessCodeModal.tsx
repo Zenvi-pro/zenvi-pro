@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, Loader2, KeyRound } from "lucide-react";
@@ -17,6 +17,19 @@ export default function AccessCodeModal({ isOpen, onClose }: AccessCodeModalProp
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // If the modal opens and the logged-in user already claimed a token, skip straight to download.
+  useEffect(() => {
+    if (!isOpen) return;
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) return;
+      const { data: hasAccess } = await supabase.rpc("get_user_download_access");
+      if (hasAccess) {
+        onClose();
+        navigate("/download");
+      }
+    });
+  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = code.trim();
@@ -26,19 +39,30 @@ export default function AccessCodeModal({ isOpen, onClose }: AccessCodeModalProp
     setError("");
 
     try {
+      // Step 1 — validate the code (works for both anon and logged-in)
       const { data, error: rpcError } = await supabase.rpc(
         "validate_waitlist_token",
         { token: trimmed },
       );
 
       if (rpcError || !data || data.length === 0) {
-        setError("Invalid access code. Check your invite email and try again.");
+        setError("Invalid or already used access code. Check your invite email and try again.");
         return;
       }
 
-      // Valid token — navigate to download page
-      onClose();
-      navigate(`/download?token=${encodeURIComponent(trimmed)}`);
+      // Step 2 — claim the code if the user is logged in
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (session) {
+        // Claim the token (marks it as used + links it to this account)
+        await supabase.rpc("claim_waitlist_token", { token: trimmed });
+        onClose();
+        navigate("/download");
+      } else {
+        // Not logged in — send them to login; the download page will claim the token after login
+        onClose();
+        navigate(`/login?next=${encodeURIComponent(`/download?token=${encodeURIComponent(trimmed)}`)}`);
+      }
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {

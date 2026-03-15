@@ -191,23 +191,36 @@ export default function DownloadPage() {
     setDetectedPlatform(detectPlatform());
   }, []);
 
-  // Validate token
+  // Validate / claim token
   useEffect(() => {
-    if (!token) {
-      setTokenState("invalid");
-      return;
-    }
-
     (async () => {
       try {
-        const { data, error } = await supabase.rpc("validate_waitlist_token", {
-          token,
-        });
+        const { data: { session } } = await supabase.auth.getSession();
 
-        if (error || !data || data.length === 0) {
-          setTokenState("invalid");
+        if (session) {
+          if (token) {
+            // Logged in with a token in the URL — try to claim it
+            const { data: claimed } = await supabase.rpc("claim_waitlist_token", { token });
+            if (claimed) {
+              setTokenState("valid");
+              return;
+            }
+            // Claim failed (token used by someone else) — but check if this user already has access
+            const { data: hasAccess } = await supabase.rpc("get_user_download_access");
+            setTokenState(hasAccess ? "valid" : "invalid");
+          } else {
+            // Logged in, no token in URL — check if they previously claimed one
+            const { data: hasAccess } = await supabase.rpc("get_user_download_access");
+            setTokenState(hasAccess ? "valid" : "invalid");
+          }
         } else {
-          setTokenState("valid");
+          // Not logged in — fall back to read-only validation via the original RPC
+          if (!token) {
+            setTokenState("invalid");
+            return;
+          }
+          const { data, error } = await supabase.rpc("validate_waitlist_token", { token });
+          setTokenState(!error && data && data.length > 0 ? "valid" : "invalid");
         }
       } catch {
         setTokenState("invalid");

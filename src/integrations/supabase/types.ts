@@ -91,6 +91,8 @@ export type Database = {
           id: string
           invited_at: string | null
           status: string
+          used_by: string | null
+          used_at: string | null
         }
         Insert: {
           access_token?: string
@@ -99,6 +101,8 @@ export type Database = {
           id?: string
           invited_at?: string | null
           status?: string
+          used_by?: string | null
+          used_at?: string | null
         }
         Update: {
           access_token?: string
@@ -107,6 +111,8 @@ export type Database = {
           id?: string
           invited_at?: string | null
           status?: string
+          used_by?: string | null
+          used_at?: string | null
         }
         Relationships: []
       }
@@ -118,6 +124,14 @@ export type Database = {
       validate_waitlist_token: {
         Args: { token: string }
         Returns: { is_valid: boolean; entry_status: string }[]
+      }
+      claim_waitlist_token: {
+        Args: { token: string }
+        Returns: boolean
+      }
+      get_user_download_access: {
+        Args: Record<string, never>
+        Returns: boolean
       }
       complete_desktop_auth_session: {
         Args: {
