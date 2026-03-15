@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,15 @@ interface HeroProps {
 }
 
 const Hero = ({ onOpenWaitlist }: HeroProps) => {
+  const [osLabel, setOsLabel] = useState("Mac");
+
+  useEffect(() => {
+    const ua = navigator.userAgent;
+    if (/Windows/i.test(ua)) setOsLabel("Windows");
+    else if (/Linux/i.test(ua) && !/Android/i.test(ua)) setOsLabel("Linux");
+    else setOsLabel("Mac");
+  }, []);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-20">
       <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
@@ -46,7 +56,7 @@ const Hero = ({ onOpenWaitlist }: HeroProps) => {
             size="lg"
             className="bg-primary hover:bg-primary/90 text-white text-base font-medium px-8 py-6 rounded-lg"
           >
-            Download for Mac
+            Download for {osLabel}
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
           <Button

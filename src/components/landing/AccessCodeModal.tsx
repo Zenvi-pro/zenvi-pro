@@ -66,14 +66,16 @@ export default function AccessCodeModal({ isOpen, onClose }: AccessCodeModalProp
             className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
           />
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 16 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 16 }}
-            transition={{ duration: 0.2 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md px-4"
-          >
-            <div className="rounded-xl border border-white/[0.06] bg-[#111111] p-8">
+          {/* Flex wrapper handles centering; framer-motion only animates scale/y */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4 pointer-events-none">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 16 }}
+              transition={{ duration: 0.2 }}
+              className="w-full max-w-md pointer-events-auto"
+            >
+            <div className="relative rounded-xl border border-white/[0.06] bg-[#111111] p-8">
               <button
                 onClick={handleClose}
                 className="absolute top-4 right-4 p-2 rounded-lg hover:bg-white/5 transition-colors"
@@ -134,6 +136,7 @@ export default function AccessCodeModal({ isOpen, onClose }: AccessCodeModalProp
               </p>
             </div>
           </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>
