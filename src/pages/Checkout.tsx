@@ -96,16 +96,14 @@ export default function CheckoutPage() {
 
   async function handleCheckout() {
     setStatus("redirecting");
+    const loginUrl = `/login?next=${encodeURIComponent(`/checkout?plan=${planKey}`)}`;
+
     try {
-      // Get the current session. If the access token is expired, refresh it
-      // and grab the new token directly from the refresh response.
-      // We then inject it explicitly into the Authorization header so
-      // functions.invoke() uses this token — not whatever supabase-js
-      // has internally cached (which may still be stale).
+      // Get session, refreshing the access token if it's expired or close to expiry.
       let { data: { session } } = await supabase.auth.getSession();
 
       if (!session) {
-        navigate(`/login?next=${encodeURIComponent(`/checkout?plan=${planKey}`)}`);
+        navigate(loginUrl);
         return;
       }
 
@@ -113,38 +111,52 @@ export default function CheckoutPage() {
       if (session.expires_at != null && session.expires_at <= now + 60) {
         const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
         if (refreshError || !refreshed.session) {
-          navigate(`/login?next=${encodeURIComponent(`/checkout?plan=${planKey}`)}`);
+          // Refresh token is invalid/not found — clear the stale session and re-login
+          await supabase.auth.signOut();
+          navigate(loginUrl);
           return;
         }
         session = refreshed.session;
       }
 
-      const { data, error } = await supabase.functions.invoke(
-        "create-checkout-session",
+      // Call the edge function directly with fetch so we have guaranteed control
+      // over the Authorization header. supabase.functions.invoke() can override
+      // custom headers with its own cached token, which may still be stale.
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`,
         {
-          headers: { Authorization: `Bearer ${session.access_token}` },
-          body: {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
             plan: planKey,
             successUrl: `${window.location.origin}/checkout/success?plan=${planKey}`,
             cancelUrl: `${window.location.origin}/#pricing`,
-          },
+          }),
         },
       );
 
-      if (error) throw error;
-      if (!data?.url) throw new Error("No checkout URL returned.");
+      const payload = await res.json().catch(() => ({}));
 
-      window.location.href = data.url;
-    } catch (err: unknown) {
-      let msg = err instanceof Error ? err.message : "Could not start checkout.";
-      if (err instanceof Error && "context" in err) {
-        try {
-          const body = await (err as unknown as { context: Response }).context.json();
-          if (body?.error) msg = body.error;
-        } catch {
-          // keep original message
-        }
+      if (res.status === 401) {
+        // The access token was rejected server-side (stale/invalidated session).
+        // Clear it and send the user to re-login to get fresh tokens.
+        await supabase.auth.signOut();
+        navigate(loginUrl);
+        return;
       }
+
+      if (!res.ok) {
+        throw new Error(payload?.error ?? `Request failed (HTTP ${res.status})`);
+      }
+
+      if (!payload?.url) throw new Error("No checkout URL returned.");
+
+      window.location.href = payload.url;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Could not start checkout.";
       console.error("Checkout error:", msg);
       setErrorMsg(msg);
       setStatus("error");
