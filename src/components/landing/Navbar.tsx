@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, LogOut, LayoutDashboard, ChevronDown } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ZenviLogo } from "@/components/ZenviLogo";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,22 +14,13 @@ interface NavbarProps {
 
 const navLinks = [
   { label: "Features", href: "#features" },
+  { label: "Showcase", href: "#demo" },
   { label: "Pricing", href: "#pricing" },
-  { label: "Docs", href: "#" },
 ];
 
 const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const userMenuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // Keep auth state in sync
   useEffect(() => {
@@ -42,23 +33,9 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
-        setIsUserMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    setIsUserMenuOpen(false);
   };
-
-  const userInitial = user?.email?.[0]?.toUpperCase() ?? "?";
 
   return (
     <>
@@ -66,118 +43,71 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled
-            ? "bg-[#0A0A0A]/95 backdrop-blur-sm border-b border-white/[0.06]"
-            : ""
-        }`}
+        className="fixed top-4 left-0 right-0 z-50"
       >
         <div className="mx-auto max-w-content px-6">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <a href="#" className="flex items-center text-white">
-              <ZenviLogo size={28} />
+          <div className="w-full hidden md:grid md:grid-cols-3 items-center">
+            <a href="#" className="justify-self-start flex items-center text-white">
+              <ZenviLogo size={42} />
             </a>
 
-            {/* Desktop nav links */}
-            <div className="hidden md:flex items-center gap-8">
+            {/* Desktop center pill nav */}
+            <div className="justify-self-center flex items-center gap-2 rounded-full border border-white/10 bg-[#1A1A1A]/80 px-3 py-2 backdrop-blur-xl shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset]">
               {navLinks.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
-                  className="text-sm text-muted-foreground hover:text-white transition-colors duration-200"
+                  className="rounded-full px-3 py-1.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
                 >
                   {link.label}
                 </a>
               ))}
             </div>
 
-            {/* Desktop right side */}
-            <div className="hidden md:flex items-center gap-2">
+            {/* Desktop right pill actions */}
+            <div className="justify-self-end flex items-center gap-3 rounded-full border border-white/10 bg-[#1A1A1A]/80 px-3 py-2 backdrop-blur-xl shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset]">
               {user ? (
-                /* Signed-in: avatar + dropdown */
-                <div ref={userMenuRef} className="relative">
-                  <button
-                    onClick={() => setIsUserMenuOpen((v) => !v)}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
-                  >
-                    <div className="w-6 h-6 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
-                      <span className="text-[10px] font-semibold text-primary">
-                        {userInitial}
-                      </span>
-                    </div>
-                    <span className="text-sm text-white/70 max-w-[130px] truncate">
-                      {user.email}
-                    </span>
-                    <ChevronDown className="w-3 h-3 text-muted-foreground" />
-                  </button>
-
-                  <AnimatePresence>
-                    {isUserMenuOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 6, scale: 0.97 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 6, scale: 0.97 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute right-0 top-full mt-2 w-48 rounded-lg border border-white/[0.08] bg-[#111111] shadow-xl overflow-hidden"
-                      >
-                        <Link
-                          to="/dashboard"
-                          onClick={() => setIsUserMenuOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                          <LayoutDashboard className="w-3.5 h-3.5" />
-                          Dashboard
-                        </Link>
-                        <div className="border-t border-white/[0.06]" />
-                        <button
-                          onClick={handleSignOut}
-                          className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-white/80 hover:text-white hover:bg-white/5 transition-colors"
-                        >
-                          <LogOut className="w-3.5 h-3.5" />
-                          Sign out
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ) : (
-                /* Signed-out: Log in + Sign up */
                 <>
-                  <Link to="/login">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-sm text-muted-foreground hover:text-white hover:bg-white/5"
-                    >
-                      Log in
-                    </Button>
+                  <Link
+                    to="/dashboard"
+                    className="rounded-full px-3 py-1.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    Dashboard
                   </Link>
-                  <Link to="/signup">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-sm border-white/[0.10] text-white hover:bg-white/5 hover:border-white/20"
-                    >
-                      Sign up
-                    </Button>
-                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="rounded-full px-3 py-1.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    Sign out
+                  </button>
                 </>
+              ) : (
+                <Link
+                  to="/login"
+                  className="rounded-full px-3 py-1.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                >
+                  Log in
+                </Link>
               )}
-
               <Button
                 onClick={onOpenAccessCode}
                 size="sm"
-                className="bg-primary hover:bg-primary/90 text-white text-sm font-medium px-5 rounded-lg ml-1"
+                className="h-10 rounded-full bg-white px-5 text-sm font-medium text-black hover:bg-white/90"
               >
-                Download Beta
+                Request Access
+                <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
             </div>
+          </div>
 
-            {/* Mobile menu toggle */}
+          {/* Mobile top row */}
+          <div className="md:hidden flex items-center justify-between rounded-full border border-white/10 bg-[#1A1A1A]/80 px-4 py-2 backdrop-blur-xl">
+            <a href="#" className="text-sm font-medium text-white">
+              Zenvi
+            </a>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-white/5 transition-colors"
+              className="p-2 rounded-full hover:bg-white/5 transition-colors"
             >
               {isMobileMenuOpen ? (
                 <X className="w-5 h-5 text-white" />
@@ -196,7 +126,7 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
           opacity: isMobileMenuOpen ? 1 : 0,
           height: isMobileMenuOpen ? "auto" : 0,
         }}
-        className="fixed top-16 left-0 right-0 z-40 bg-[#0A0A0A]/98 backdrop-blur-sm border-b border-white/[0.06] md:hidden overflow-hidden"
+        className="fixed top-20 left-0 right-0 z-40 bg-[#0A0A0A]/98 backdrop-blur-sm border-b border-white/[0.06] md:hidden overflow-hidden"
       >
         <div className="mx-auto max-w-content px-6 py-6">
           <div className="flex flex-col gap-4">
@@ -214,12 +144,6 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
             <div className="border-t border-white/[0.06] pt-4 flex flex-col gap-3">
               {user ? (
                 <>
-                  <div className="flex items-center gap-2 py-1">
-                    <div className="w-7 h-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center">
-                      <span className="text-xs font-semibold text-primary">{userInitial}</span>
-                    </div>
-                    <span className="text-sm text-white/70 truncate">{user.email}</span>
-                  </div>
                   <Link
                     to="/dashboard"
                     onClick={() => setIsMobileMenuOpen(false)}
@@ -251,9 +175,9 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
 
               <Button
                 onClick={() => { setIsMobileMenuOpen(false); onOpenAccessCode(); }}
-                className="bg-primary hover:bg-primary/90 text-white font-medium w-full"
+                className="bg-white hover:bg-white/90 text-black font-medium w-full rounded-full"
               >
-                Download Beta
+                Request Access
               </Button>
             </div>
           </div>
