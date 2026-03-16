@@ -141,7 +141,7 @@ const Hero = ({ onOpenAccessCode }: HeroProps) => {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <a
-                href="https://www.youtube.com/watch?v=FmhiZ5OQBW0"
+                href="https://www.youtube.com/watch?v=5Nc7iPDJ4tw"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -173,7 +173,7 @@ const Hero = ({ onOpenAccessCode }: HeroProps) => {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <a
-                href="https://www.youtube.com/watch?v=FmhiZ5OQBW0"
+                href="https://www.youtube.com/watch?v=5Nc7iPDJ4tw"
                 target="_blank"
                 rel="noreferrer"
                 className="w-full"
