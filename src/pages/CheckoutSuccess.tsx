@@ -5,6 +5,8 @@ import { CheckCircle, Download, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ACCESS_CODE_KEY } from "@/components/landing/AccessCodeModal";
 
+// this is the checkout page
+
 const TIER_LABELS: Record<string, string> = {
   creator: "Creator",
   pro: "Pro",
@@ -102,7 +104,7 @@ export default function CheckoutSuccessPage() {
             </div>
           </Link>
 
-          <a href="mailto:support@zenvi.app">
+          <a href="mailto:support@zenvi.pro">
             <div className="group flex items-center justify-between rounded-xl border border-white/[0.06] bg-[#0D0D0D] hover:border-white/[0.12] transition-all duration-200 p-5 cursor-pointer">
               <div className="flex items-center gap-4">
                 <div className="w-10 h-10 rounded-lg border border-white/[0.06] flex items-center justify-center text-muted-foreground">
@@ -110,7 +112,7 @@ export default function CheckoutSuccessPage() {
                 </div>
                 <div className="text-left">
                   <p className="text-sm font-semibold text-white">Get in touch</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">support@zenvi.app — we reply fast</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">support@zenvi.pro — we reply fast</p>
                 </div>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />

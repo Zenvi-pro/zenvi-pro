@@ -547,10 +547,10 @@ export default function DownloadPage() {
           <p className="text-xs text-muted-foreground">
             Having trouble?{" "}
             <a
-              href="mailto:support@zenvi.app"
+              href="mailto:support@zenvi.pro"
               className="text-primary hover:underline"
             >
-              support@zenvi.app
+              support@zenvi.pro
             </a>
           </p>
         </div>
