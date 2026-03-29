@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Menu, X, LogOut, LayoutDashboard, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ZenviLogo } from "@/components/ZenviLogo";
@@ -22,7 +22,6 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
 
-  // Keep auth state in sync
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -46,7 +45,7 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
         className="fixed top-4 left-0 right-0 z-50"
       >
         <div className="mx-auto max-w-content px-6">
-          <div className="w-full hidden md:grid md:grid-cols-3 items-center">
+          <div className="w-full hidden lg:grid lg:grid-cols-3 items-center">
             <a
               href="#"
               data-zenvi-logo-target
@@ -98,14 +97,14 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
                 size="sm"
                 className="h-10 rounded-full bg-white px-5 text-sm font-medium text-black hover:bg-white/90"
               >
-                Download
+                Request Access
                 <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
             </div>
           </div>
 
           {/* Mobile top row */}
-          <div className="md:hidden flex items-center justify-between rounded-full border border-white/10 bg-[#1A1A1A]/80 px-4 py-2 backdrop-blur-xl">
+          <div className="lg:hidden flex items-center justify-between rounded-full border border-white/10 bg-[#1A1A1A]/80 px-4 py-2 backdrop-blur-xl">
             <a
               href="#"
               data-zenvi-logo-target
@@ -135,7 +134,7 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
           opacity: isMobileMenuOpen ? 1 : 0,
           height: isMobileMenuOpen ? "auto" : 0,
         }}
-        className="fixed top-20 left-4 right-4 z-40 rounded-2xl border border-white/10 bg-[#161616]/95 backdrop-blur-xl shadow-[0_24px_60px_rgba(0,0,0,0.6)] md:hidden overflow-hidden"
+        className="fixed top-20 left-4 right-4 z-40 rounded-2xl border border-white/10 bg-[#161616]/95 backdrop-blur-xl shadow-[0_24px_60px_rgba(0,0,0,0.6)] lg:hidden overflow-hidden"
       >
         <div className="mx-auto max-w-content px-5 py-5">
           <div className="flex flex-col gap-4">
@@ -186,7 +185,7 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
                 onClick={() => { setIsMobileMenuOpen(false); onOpenAccessCode(); }}
                 className="bg-white hover:bg-white/90 text-black font-medium w-full rounded-full"
               >
-                Download
+                Request Access
               </Button>
             </div>
           </div>

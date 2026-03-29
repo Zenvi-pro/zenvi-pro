@@ -1,18 +1,12 @@
 import { motion } from "framer-motion";
 
-/* Placeholder company names — replace with real logos/SVGs when available */
-const logos = [
-  "Acme Studios",
-  "Vortex Media",
-  "Pixel & Frame",
-  "RedThread",
-  "Luminar Creative",
-  "CutAbove",
-  "Frameshift",
-  "Motionhaus",
-  "SilverReel",
-  "Epoch Films",
+const partners = [
+  { name: "Superteam Canada", url: "https://superteam.ca/" },
+  { name: "Ajna Materials", url: "https://www.ajnamaterials.com/" },
+  { name: "Passport", url: "https://www.passportanywhere.co/" },
 ];
+
+const items = [...partners, ...partners, ...partners, ...partners];
 
 const LogoTicker = () => {
   return (
@@ -28,22 +22,22 @@ const LogoTicker = () => {
         </motion.p>
       </div>
 
-      {/* Ticker */}
       <div className="relative">
-        {/* Fade edges */}
         <div className="absolute left-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-r from-[#0A0A0A] to-transparent pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-24 z-10 bg-gradient-to-l from-[#0A0A0A] to-transparent pointer-events-none" />
 
         <div className="flex overflow-hidden">
           <div className="ticker-track flex shrink-0 items-center gap-16">
-            {/* Double the logos for seamless loop */}
-            {[...logos, ...logos].map((name, i) => (
-              <span
+            {items.map((partner, i) => (
+              <a
                 key={i}
-                className="text-base font-medium text-white/20 whitespace-nowrap select-none tracking-wide"
+                href={partner.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-base font-medium text-white/20 hover:text-white transition-colors duration-200 whitespace-nowrap select-none tracking-wide shrink-0"
               >
-                {name}
-              </span>
+                {partner.name}
+              </a>
             ))}
           </div>
         </div>
