@@ -15,6 +15,7 @@ const INTRO_STORAGE_KEY = "zenvi-intro-done";
 
 const Index = () => {
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
+  const [accessCodePlanKey, setAccessCodePlanKey] = useState<string>("pro");
   const [isAccessCodeOpen, setIsAccessCodeOpen] = useState(false);
   const [introVisible, setIntroVisible] = useState(() => {
     if (typeof window === "undefined") return true;
@@ -23,6 +24,12 @@ const Index = () => {
 
   const openWaitlist = () => setIsWaitlistOpen(true);
   const closeWaitlist = () => setIsWaitlistOpen(false);
+
+  const openAccessCode = (planKey?: string) => {
+    setAccessCodePlanKey(planKey ?? "pro");
+    setIsAccessCodeOpen(true);
+  };
+
   const handleIntroComplete = () => {
     try {
       sessionStorage.setItem(INTRO_STORAGE_KEY, "1");
@@ -35,16 +42,20 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-[#0A0A0A]">
       {introVisible && <IntroOverlay onComplete={handleIntroComplete} />}
-      <Navbar onOpenWaitlist={openWaitlist} onOpenAccessCode={() => setIsAccessCodeOpen(true)} />
-      <Hero onOpenAccessCode={() => setIsAccessCodeOpen(true)} />
+      <Navbar onOpenWaitlist={openWaitlist} onOpenAccessCode={() => openAccessCode()} />
+      <Hero onOpenAccessCode={() => openAccessCode()} />
       <Features />
       <EditorDemo />
       <Comparison />
-      <Pricing />
+      <Pricing onOpenAccessCode={openAccessCode} />
       <LogoTicker />
       <Footer />
       <WaitlistModal isOpen={isWaitlistOpen} onClose={closeWaitlist} />
-      <AccessCodeModal isOpen={isAccessCodeOpen} onClose={() => setIsAccessCodeOpen(false)} />
+      <AccessCodeModal
+        isOpen={isAccessCodeOpen}
+        onClose={() => setIsAccessCodeOpen(false)}
+        planKey={accessCodePlanKey}
+      />
     </div>
   );
 };

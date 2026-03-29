@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -9,6 +9,8 @@ import {
   Zap,
   ArrowUpRight,
   LogOut,
+  CreditCard,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -44,6 +46,7 @@ const TIER_LABELS: Record<string, string> = {
   creator: "Creator",
   pro: "Pro",
   studio: "Studio",
+  lifetime: "Lifetime Access",
 };
 
 const PROVIDER_COLORS: Record<string, string> = {
@@ -87,6 +90,7 @@ const fadeUp = {
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const [billingLoading, setBillingLoading] = useState(false);
 
   // Auth guard
   useEffect(() => {
@@ -94,6 +98,32 @@ export default function DashboardPage() {
       if (!session) navigate("/login?next=/dashboard");
     });
   }, [navigate]);
+
+  async function handleManageBilling() {
+    setBillingLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { navigate("/login?next=/dashboard"); return; }
+
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-billing-portal`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ returnUrl: `${window.location.origin}/dashboard` }),
+        },
+      );
+      const payload = await res.json().catch(() => ({}));
+      if (payload?.url) {
+        window.location.href = payload.url;
+      }
+    } finally {
+      setBillingLoading(false);
+    }
+  }
 
   const { data: totals, isLoading: totalsLoading } = useQuery<MonthlyTotals>({
     queryKey: ["monthly-totals"],
@@ -417,6 +447,50 @@ export default function DashboardPage() {
                       </div>
                     );
                   })}
+                </div>
+              </motion.div>
+            )}
+
+            {/* ── Subscription & billing ────────────────────────────────────── */}
+            {totals && totals.tier !== "none" && (
+              <motion.div
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                custom={0.22}
+                className="rounded-xl border border-white/[0.07] bg-[#111111] p-6 mb-6"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1">Current plan</p>
+                    <p className="text-base font-semibold text-white">
+                      Zenvi {TIER_LABELS[totals.tier]}
+                    </p>
+                    {totals.tier === "lifetime" ? (
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Lifetime access · no renewal
+                      </p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        Active subscription
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleManageBilling}
+                    disabled={billingLoading}
+                    className="border-white/[0.1] text-white hover:bg-white/[0.05] text-xs h-8 gap-1.5"
+                  >
+                    {billingLoading ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <CreditCard className="w-3.5 h-3.5" />
+                    )}
+                    Manage billing
+                    {!billingLoading && <ExternalLink className="w-3 h-3 opacity-50" />}
+                  </Button>
                 </div>
               </motion.div>
             )}
