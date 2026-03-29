@@ -117,7 +117,7 @@ const PLANS = {
 } as const;
 
 type PlanKey = keyof typeof PLANS;
-type Status = "checking-auth" | "no-code" | "ready" | "redirecting" | "error";
+type Status = "checking-auth" | "no-code" | "ready" | "redirecting" | "error" | "upgrading";
 
 export default function CheckoutPage() {
   const [searchParams] = useSearchParams();
@@ -125,6 +125,7 @@ export default function CheckoutPage() {
   const { toast } = useToast();
 
   const planKey = (searchParams.get("plan") ?? "pro_monthly") as PlanKey;
+  const isUpgradeMode = searchParams.get("mode") === "upgrade";
   const plan = PLANS[planKey] ?? PLANS.pro_monthly;
 
   const [status, setStatus] = useState<Status>("checking-auth");
@@ -133,7 +134,7 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     const redirectToLogin = () =>
-      navigate(`/login?next=${encodeURIComponent(`/checkout?plan=${planKey}`)}`);
+      navigate(`/login?next=${encodeURIComponent(`/checkout?plan=${planKey}${isUpgradeMode ? "&mode=upgrade" : ""}`)}`);
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) {
@@ -146,6 +147,12 @@ export default function CheckoutPage() {
       if (session.expires_at != null && session.expires_at <= now + 60) {
         const { error } = await supabase.auth.refreshSession();
         if (error) { redirectToLogin(); return; }
+      }
+
+      // Upgrade mode — no access code needed, user already has a subscription
+      if (isUpgradeMode) {
+        setStatus("ready");
+        return;
       }
 
       // Check for access code in sessionStorage
@@ -167,11 +174,11 @@ export default function CheckoutPage() {
       // No code, no prior access — send them back to get a code
       setStatus("no-code");
     }).catch(redirectToLogin);
-  }, [navigate, planKey]);
+  }, [navigate, planKey, isUpgradeMode]);
 
   async function handleCheckout() {
-    setStatus("redirecting");
-    const loginUrl = `/login?next=${encodeURIComponent(`/checkout?plan=${planKey}`)}`;
+    setStatus(isUpgradeMode ? "upgrading" : "redirecting");
+    const loginUrl = `/login?next=${encodeURIComponent(`/checkout?plan=${planKey}${isUpgradeMode ? "&mode=upgrade" : ""}`)}`;
 
     try {
       let { data: { session } } = await supabase.auth.getSession();
@@ -189,6 +196,27 @@ export default function CheckoutPage() {
         session = refreshed.session;
       }
 
+      // ── Upgrade existing subscription ────────────────────────────────────
+      if (isUpgradeMode) {
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/upgrade-subscription`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ plan: planKey }),
+          },
+        );
+        const payload = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(payload?.error ?? `Upgrade failed (HTTP ${res.status})`);
+        toast({ title: "Plan upgraded!", description: `You're now on ${plan.name}.` });
+        navigate("/dashboard");
+        return;
+      }
+
+      // ── New checkout session ─────────────────────────────────────────────
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`,
         {
@@ -222,7 +250,7 @@ export default function CheckoutPage() {
       const msg = err instanceof Error ? err.message : "Could not start checkout.";
       setErrorMsg(msg);
       setStatus("error");
-      toast({ title: "Checkout failed", description: msg, variant: "destructive" });
+      toast({ title: isUpgradeMode ? "Upgrade failed" : "Checkout failed", description: msg, variant: "destructive" });
     }
   }
 
@@ -281,7 +309,9 @@ export default function CheckoutPage() {
           <div className="rounded-xl border border-white/[0.07] bg-[#111111] p-8 mb-4">
             <div className="flex items-start justify-between mb-6">
               <div>
-                <p className="text-xs text-muted-foreground mb-1">Selected plan</p>
+                <p className="text-xs text-muted-foreground mb-1">
+                  {isUpgradeMode ? "Upgrading to" : "Selected plan"}
+                </p>
                 <h1 className="text-2xl font-bold text-white">Zenvi {plan.name}</h1>
                 <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
               </div>
@@ -314,14 +344,15 @@ export default function CheckoutPage() {
 
             <Button
               onClick={handleCheckout}
-              disabled={status === "redirecting"}
+              disabled={status === "redirecting" || status === "upgrading"}
               className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-medium text-sm"
             >
               {status === "redirecting" ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  Redirecting to payment…
-                </>
+                <><Loader2 className="w-4 h-4 animate-spin mr-2" />Redirecting to payment…</>
+              ) : status === "upgrading" ? (
+                <><Loader2 className="w-4 h-4 animate-spin mr-2" />Upgrading plan…</>
+              ) : isUpgradeMode ? (
+                "Confirm Upgrade"
               ) : (
                 "Continue to payment"
               )}

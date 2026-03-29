@@ -161,7 +161,7 @@ function detectPlatform(): Platform {
 // ---------------------------------------------------------------------------
 // Token validation states
 // ---------------------------------------------------------------------------
-type TokenState = "loading" | "valid" | "invalid";
+type TokenState = "loading" | "valid" | "invalid" | "no-plan";
 
 // ---------------------------------------------------------------------------
 // Fade-in variants
@@ -191,36 +191,23 @@ export default function DownloadPage() {
     setDetectedPlatform(detectPlatform());
   }, []);
 
-  // Validate / claim token
+  // Check subscription access
   useEffect(() => {
     (async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
 
-        if (session) {
-          if (token) {
-            // Logged in with a token in the URL — try to claim it
-            const { data: claimed } = await supabase.rpc("claim_waitlist_token", { token });
-            if (claimed) {
-              setTokenState("valid");
-              return;
-            }
-            // Claim failed (token used by someone else) — but check if this user already has access
-            const { data: hasAccess } = await supabase.rpc("get_user_download_access");
-            setTokenState(hasAccess ? "valid" : "invalid");
-          } else {
-            // Logged in, no token in URL — check if they previously claimed one
-            const { data: hasAccess } = await supabase.rpc("get_user_download_access");
-            setTokenState(hasAccess ? "valid" : "invalid");
-          }
+        if (!session) {
+          setTokenState("invalid");
+          return;
+        }
+
+        // Require an active subscription to access downloads
+        const { data: sub } = await supabase.rpc("get_user_subscription");
+        if (sub && sub.length > 0) {
+          setTokenState("valid");
         } else {
-          // Not logged in — fall back to read-only validation via the original RPC
-          if (!token) {
-            setTokenState("invalid");
-            return;
-          }
-          const { data, error } = await supabase.rpc("validate_waitlist_token", { token });
-          setTokenState(!error && data && data.length > 0 ? "valid" : "invalid");
+          setTokenState("no-plan");
         }
       } catch {
         setTokenState("invalid");
@@ -244,6 +231,38 @@ export default function DownloadPage() {
     return (
       <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
         <Loader2 className="w-6 h-6 text-primary animate-spin" />
+      </div>
+    );
+  }
+
+  // ── No active plan ────────────────────────────────────────────────────────
+  if (tokenState === "no-plan") {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
+        <MinimalNav />
+        <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+            className="max-w-sm"
+          >
+            <div className="w-14 h-14 rounded-full border border-white/[0.08] flex items-center justify-center mx-auto mb-6">
+              <XCircle className="w-7 h-7 text-muted-foreground" />
+            </div>
+            <h1 className="text-2xl font-semibold text-white mb-3">
+              No active plan
+            </h1>
+            <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
+              You need an active Zenvi subscription to download the app.
+            </p>
+            <Link to="/#pricing">
+              <Button className="bg-primary hover:bg-primary/90 text-white">
+                View plans
+              </Button>
+            </Link>
+          </motion.div>
+        </div>
       </div>
     );
   }

@@ -21,9 +21,25 @@ export default function AccessCodeModal({ isOpen, onClose, planKey = "pro_monthl
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // If already logged in and already has a claimed code, skip straight to checkout.
+  // Skip modal if code already in sessionStorage, or if user has a prior claimed code.
   useEffect(() => {
     if (!isOpen) return;
+
+    // Code already entered this session — skip straight to checkout
+    const stored = sessionStorage.getItem(ACCESS_CODE_KEY);
+    if (stored) {
+      onClose();
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          navigate(`/checkout?plan=${planKey}`);
+        } else {
+          navigate(`/login?next=${encodeURIComponent(`/checkout?plan=${planKey}`)}`);
+        }
+      });
+      return;
+    }
+
+    // Logged in + already has a claimed code on their account — skip modal
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) return;
       const { data: hasAccess } = await supabase.rpc("get_user_download_access");

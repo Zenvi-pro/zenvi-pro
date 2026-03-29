@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
 import Features from "@/components/landing/Features";
@@ -11,10 +12,12 @@ import Footer from "@/components/landing/Footer";
 import WaitlistModal from "@/components/landing/WaitlistModal";
 import AccessCodeModal from "@/components/landing/AccessCodeModal";
 import { IntroOverlay } from "@/components/landing/IntroOverlay";
+import { supabase } from "@/integrations/supabase/client";
 
 const INTRO_STORAGE_KEY = "zenvi-intro-done";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
   const [accessCodePlanKey, setAccessCodePlanKey] = useState<string>("pro");
   const [isAccessCodeOpen, setIsAccessCodeOpen] = useState(false);
@@ -31,6 +34,20 @@ const Index = () => {
     setIsAccessCodeOpen(true);
   };
 
+  // Hero "Download" button: if user has an active sub → go to /download,
+  // otherwise scroll to pricing so they can pick a plan.
+  const handleHeroDownload = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      const { data: sub } = await supabase.rpc("get_user_subscription");
+      if (sub && sub.length > 0) {
+        navigate("/download");
+        return;
+      }
+    }
+    document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
+  };
+
   const handleIntroComplete = () => {
     try {
       sessionStorage.setItem(INTRO_STORAGE_KEY, "1");
@@ -44,7 +61,7 @@ const Index = () => {
     <div className="min-h-screen bg-[#0A0A0A]">
       {introVisible && <IntroOverlay onComplete={handleIntroComplete} />}
       <Navbar onOpenWaitlist={openWaitlist} onOpenAccessCode={() => openAccessCode()} />
-      <Hero onOpenAccessCode={() => openAccessCode()} />
+      <Hero onOpenAccessCode={handleHeroDownload} />
       <Features />
       <IntegrationsBeam />
       <EditorDemo />

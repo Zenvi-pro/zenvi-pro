@@ -92,10 +92,12 @@ export default function DashboardPage() {
   const navigate = useNavigate();
   const [billingLoading, setBillingLoading] = useState(false);
 
-  // Auth guard
+  // Auth + subscription guard
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) navigate("/login?next=/dashboard");
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) { navigate("/login?next=/dashboard"); return; }
+      const { data: sub } = await supabase.rpc("get_user_subscription");
+      if (!sub || sub.length === 0) { window.location.href = "/#pricing"; return; }
     });
   }, [navigate]);
 

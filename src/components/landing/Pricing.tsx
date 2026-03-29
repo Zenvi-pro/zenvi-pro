@@ -1,14 +1,80 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PricingProps {
   onOpenAccessCode: (planKey: string) => void;
 }
 
+// Tier upgrade hierarchy (higher = better plan)
+const TIER_ORDER: Record<string, number> = {
+  none: 0, creator: 1, pro: 2, studio: 3, lifetime: 4,
+};
+
 const Pricing = ({ onOpenAccessCode }: PricingProps) => {
+  const navigate = useNavigate();
   const [isAnnual, setIsAnnual] = useState(false);
+  const [userTier, setUserTier] = useState<string | null>(null); // null = loading
+
+  useEffect(() => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) { setUserTier("none"); return; }
+      const { data } = await supabase.rpc("get_user_subscription");
+      setUserTier(data && data.length > 0 ? (data[0].tier as string) : "none");
+    });
+  }, []);
+
+  /**
+   * Returns the correct CTA button for a given plan.
+   * - Same or lower tier than user's current plan → "Go to Dashboard"
+   * - Higher tier, user has subscription → "Upgrade"
+   * - No subscription → open access code modal
+   */
+  function planButton(
+    planTier: string,
+    planKey: string,
+    defaultLabel: string,
+    className: string,
+  ) {
+    const loading = userTier === null;
+    const userOrder = TIER_ORDER[userTier ?? "none"] ?? 0;
+    const planOrder = TIER_ORDER[planTier] ?? 0;
+
+    if (loading) {
+      return <Button className={className} disabled>{defaultLabel}</Button>;
+    }
+
+    // User already has this tier or better → dashboard
+    if (userOrder > 0 && planOrder <= userOrder) {
+      return (
+        <Button onClick={() => navigate("/dashboard")} className={className}>
+          Go to Dashboard
+        </Button>
+      );
+    }
+
+    // User has a subscription and this is an upgrade
+    if (userOrder > 0 && planOrder > userOrder) {
+      return (
+        <Button
+          onClick={() => navigate(`/checkout?plan=${planKey}&mode=upgrade`)}
+          className={className}
+        >
+          Upgrade
+        </Button>
+      );
+    }
+
+    // No subscription → access code flow
+    return (
+      <Button onClick={() => onOpenAccessCode(planKey)} className={className}>
+        {defaultLabel}
+      </Button>
+    );
+  }
 
   return (
     <section className="py-section-sm md:py-section relative" id="pricing">
@@ -99,12 +165,12 @@ const Pricing = ({ onOpenAccessCode }: PricingProps) => {
               ))}
             </ul>
 
-            <Button
-              onClick={() => onOpenAccessCode(isAnnual ? "creator_annual" : "creator_monthly")}
-              className="w-full rounded-lg font-medium bg-white/[0.05] hover:bg-white/[0.08] text-white border border-white/[0.06]"
-            >
-              Get Started
-            </Button>
+            {planButton(
+              "creator",
+              isAnnual ? "creator_annual" : "creator_monthly",
+              "Get Started",
+              "w-full rounded-lg font-medium bg-white/[0.05] hover:bg-white/[0.08] text-white border border-white/[0.06]",
+            )}
           </motion.div>
 
           {/* ── Pro ─────────────────────────────────────────────────── */}
@@ -158,12 +224,12 @@ const Pricing = ({ onOpenAccessCode }: PricingProps) => {
               ))}
             </ul>
 
-            <Button
-              onClick={() => onOpenAccessCode(isAnnual ? "pro_annual" : "pro_monthly")}
-              className="w-full rounded-lg font-medium bg-primary hover:bg-primary/90 text-white"
-            >
-              Go Pro
-            </Button>
+            {planButton(
+              "pro",
+              isAnnual ? "pro_annual" : "pro_monthly",
+              "Go Pro",
+              "w-full rounded-lg font-medium bg-primary hover:bg-primary/90 text-white",
+            )}
           </motion.div>
 
           {/* ── Studio ──────────────────────────────────────────────── */}
@@ -219,12 +285,12 @@ const Pricing = ({ onOpenAccessCode }: PricingProps) => {
                 </Button>
               </a>
             ) : (
-              <Button
-                onClick={() => onOpenAccessCode("studio_monthly")}
-                className="w-full rounded-lg font-medium bg-white/[0.05] hover:bg-white/[0.08] text-white border border-white/[0.06]"
-              >
-                Get Studio
-              </Button>
+              planButton(
+                "studio",
+                "studio_monthly",
+                "Get Studio",
+                "w-full rounded-lg font-medium bg-white/[0.05] hover:bg-white/[0.08] text-white border border-white/[0.06]",
+              )
             )}
           </motion.div>
         </div>
@@ -268,12 +334,12 @@ const Pricing = ({ onOpenAccessCode }: PricingProps) => {
             </ul>
 
             <div className="shrink-0 md:w-44">
-              <Button
-                onClick={() => onOpenAccessCode("lifetime")}
-                className="w-full rounded-lg font-medium bg-amber-500 hover:bg-amber-400 text-black"
-              >
-                Claim Lifetime Access
-              </Button>
+              {planButton(
+                "lifetime",
+                "lifetime",
+                "Claim Lifetime Access",
+                "w-full rounded-lg font-medium bg-amber-500 hover:bg-amber-400 text-black",
+              )}
               <p className="text-xs text-amber-400/70 text-center mt-2">
                 March 29 only
               </p>
