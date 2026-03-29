@@ -12,10 +12,11 @@ interface NavbarProps {
   onOpenAccessCode: () => void;
 }
 
-const navLinks = [
+const navLinks: { label: string; href?: string; to?: string }[] = [
   { label: "Features", href: "#features" },
   { label: "Showcase", href: "#demo" },
   { label: "Pricing", href: "#pricing" },
+  { label: "Docs", to: "/docs" },
 ];
 
 const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
@@ -56,15 +57,25 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
 
             {/* Desktop center pill nav */}
             <div className="justify-self-center flex items-center gap-2 rounded-full border border-white/10 bg-[#1A1A1A]/80 px-3 py-2 backdrop-blur-xl shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset]">
-              {navLinks.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  className="rounded-full px-3 py-1.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
-                >
-                  {link.label}
-                </a>
-              ))}
+              {navLinks.map((link) =>
+                link.to ? (
+                  <Link
+                    key={link.label}
+                    to={link.to}
+                    className="rounded-full px-3 py-1.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ) : (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    className="rounded-full px-3 py-1.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                  >
+                    {link.label}
+                  </a>
+                ),
+              )}
             </div>
 
             {/* Desktop right pill actions */}
@@ -138,16 +149,27 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
       >
         <div className="mx-auto max-w-content px-5 py-5">
           <div className="flex flex-col gap-4">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-muted-foreground hover:text-white transition-colors py-2 text-base"
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) =>
+              link.to ? (
+                <Link
+                  key={link.label}
+                  to={link.to}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-muted-foreground hover:text-white transition-colors py-2 text-base"
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-muted-foreground hover:text-white transition-colors py-2 text-base"
+                >
+                  {link.label}
+                </a>
+              ),
+            )}
 
             <div className="border-t border-white/[0.06] pt-4 flex flex-col gap-3">
               {user ? (

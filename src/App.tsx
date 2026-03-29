@@ -15,6 +15,9 @@ import Dashboard from "./pages/Dashboard";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
+import DocsLayout from "./components/docs/DocsLayout";
+import DocsHome from "./pages/DocsHome";
+import DocsPage from "./pages/DocsPage";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +39,10 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
+          <Route path="/docs" element={<DocsLayout />}>
+            <Route index element={<DocsHome />} />
+            <Route path=":slug" element={<DocsPage />} />
+          </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

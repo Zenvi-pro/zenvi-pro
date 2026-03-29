@@ -11,6 +11,7 @@ import {
   LogOut,
   CreditCard,
   ExternalLink,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -190,6 +191,13 @@ export default function DashboardPage() {
             Zenvi
           </Link>
           <div className="flex items-center gap-5">
+            <Link
+              to="/docs"
+              className="text-xs text-muted-foreground hover:text-white transition-colors inline-flex items-center gap-1"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              Docs
+            </Link>
             <Link
               to="/#pricing"
               className="text-xs text-muted-foreground hover:text-white transition-colors"
