@@ -101,6 +101,7 @@ export default function LoginPage() {
   const handleOAuth = async (provider: "google" | "github") => {
     setOauthLoading(provider);
     if (next) sessionStorage.setItem("auth_next", next);
+    if (state) sessionStorage.setItem("auth_state", state);
     await supabase.auth.signInWithOAuth({
       provider,
       options: { redirectTo: `${window.location.origin}/auth/callback` },

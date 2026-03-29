@@ -16,10 +16,26 @@ export default function AuthCallbackPage() {
       return n ?? "/";
     };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const getState = () => {
+      const s = sessionStorage.getItem("auth_state");
+      sessionStorage.removeItem("auth_state");
+      return s;
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
         subscription.unsubscribe();
-        navigate(getNext(), { replace: true });
+        const desktopState = getState();
+        if (desktopState) {
+          await supabase.rpc("complete_desktop_auth_session", {
+            session_state: desktopState,
+            p_access_token: session.access_token,
+            p_refresh_token: session.refresh_token,
+          });
+          navigate("/auth/success", { replace: true });
+        } else {
+          navigate(getNext(), { replace: true });
+        }
       } else if (event === "INITIAL_SESSION" && !session) {
         // OAuth exchange produced no session — go home
         subscription.unsubscribe();
