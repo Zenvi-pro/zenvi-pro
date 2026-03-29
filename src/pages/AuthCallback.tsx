@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-// Landing page for OAuth redirects (GitHub, Google).
+// Landing page for OAuth redirects (GitHub, Google). 
 // Supabase automatically exchanges the auth code for a session when this page loads.
 // We listen for the session, then forward to wherever the user was going.
 export default function AuthCallbackPage() {
