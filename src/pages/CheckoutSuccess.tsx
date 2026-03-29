@@ -9,9 +9,38 @@ import { ACCESS_CODE_KEY } from "@/components/landing/AccessCodeModal";
 
 const TIER_LABELS: Record<string, string> = {
   creator: "Creator",
+  creator_monthly: "Creator",
+  creator_annual: "Creator",
   pro: "Pro",
+  pro_monthly: "Pro",
+  pro_annual: "Pro",
   studio: "Studio",
+  studio_monthly: "Studio",
   lifetime: "Lifetime Access",
+};
+
+const SUCCESS_HEADING: Record<string, string> = {
+  lifetime: "You're in. Forever.",
+  creator_monthly: "Welcome to Zenvi Creator.",
+  creator_annual: "Welcome to Zenvi Creator.",
+  creator: "Welcome to Zenvi Creator.",
+  pro_monthly: "Welcome to Zenvi Pro.",
+  pro_annual: "Welcome to Zenvi Pro.",
+  pro: "Welcome to Zenvi Pro.",
+  studio_monthly: "Welcome to the Studio.",
+  studio: "Welcome to the Studio.",
+};
+
+const SUCCESS_SUBTEXT: Record<string, string> = {
+  lifetime: "One payment. No renewals. Ever.",
+  creator_monthly: "Your AI video editor is ready.",
+  creator_annual: "Your AI video editor is ready.",
+  creator: "Your AI video editor is ready.",
+  pro_monthly: "Professional-grade AI, unlocked.",
+  pro_annual: "Professional-grade AI, unlocked.",
+  pro: "Professional-grade AI, unlocked.",
+  studio_monthly: "Your team's AI video studio is ready.",
+  studio: "Your team's AI video studio is ready.",
 };
 
 export default function CheckoutSuccessPage() {
@@ -51,16 +80,10 @@ export default function CheckoutSuccessPage() {
         </motion.div>
 
         <h1 className="text-3xl font-bold text-white mb-3 tracking-tight">
-          {plan === "lifetime" ? "You're in. Forever." : "You're all set."}
+          {SUCCESS_HEADING[plan] ?? "You're all set."}
         </h1>
         <p className="text-muted-foreground text-base mb-10 leading-relaxed">
-          {plan === "lifetime" ? (
-            <>
-              Welcome to Zenvi{" "}
-              <span className="text-white font-medium">Lifetime Access</span>.
-              One payment, no renewals — Zenvi is yours for good.
-            </>
-          ) : (
+          {SUCCESS_SUBTEXT[plan] ?? (
             <>
               Welcome to Zenvi{" "}
               <span className="text-white font-medium">{tierLabel}</span>.

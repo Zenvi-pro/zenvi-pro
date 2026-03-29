@@ -8,9 +8,11 @@ const CORS = {
 };
 
 const PRICE_IDS: Record<string, string> = {
-  creator: Deno.env.get("STRIPE_PRICE_CREATOR") ?? "",
-  pro: Deno.env.get("STRIPE_PRICE_PRO") ?? "",
-  studio: Deno.env.get("STRIPE_PRICE_STUDIO") ?? "",
+  creator_monthly: Deno.env.get("STRIPE_PRICE_CREATOR_MONTHLY") ?? "",
+  creator_annual: Deno.env.get("STRIPE_PRICE_CREATOR_ANNUAL") ?? "",
+  pro_monthly: Deno.env.get("STRIPE_PRICE_PRO_MONTHLY") ?? "",
+  pro_annual: Deno.env.get("STRIPE_PRICE_PRO_ANNUAL") ?? "",
+  studio_monthly: Deno.env.get("STRIPE_PRICE_STUDIO_MONTHLY") ?? "",
   lifetime: Deno.env.get("STRIPE_PRICE_LIFETIME") ?? "",
 };
 
@@ -19,9 +21,11 @@ Deno.serve(async (req) => {
 
   const missingVars: string[] = [];
   if (!Deno.env.get("STRIPE_SECRET_KEY")) missingVars.push("STRIPE_SECRET_KEY");
-  if (!Deno.env.get("STRIPE_PRICE_CREATOR")) missingVars.push("STRIPE_PRICE_CREATOR");
-  if (!Deno.env.get("STRIPE_PRICE_PRO")) missingVars.push("STRIPE_PRICE_PRO");
-  if (!Deno.env.get("STRIPE_PRICE_STUDIO")) missingVars.push("STRIPE_PRICE_STUDIO");
+  if (!Deno.env.get("STRIPE_PRICE_CREATOR_MONTHLY")) missingVars.push("STRIPE_PRICE_CREATOR_MONTHLY");
+  if (!Deno.env.get("STRIPE_PRICE_CREATOR_ANNUAL")) missingVars.push("STRIPE_PRICE_CREATOR_ANNUAL");
+  if (!Deno.env.get("STRIPE_PRICE_PRO_MONTHLY")) missingVars.push("STRIPE_PRICE_PRO_MONTHLY");
+  if (!Deno.env.get("STRIPE_PRICE_PRO_ANNUAL")) missingVars.push("STRIPE_PRICE_PRO_ANNUAL");
+  if (!Deno.env.get("STRIPE_PRICE_STUDIO_MONTHLY")) missingVars.push("STRIPE_PRICE_STUDIO_MONTHLY");
   if (missingVars.length > 0) {
     return json({ error: `Missing env vars: ${missingVars.join(", ")}` }, 500);
   }
@@ -44,6 +48,15 @@ Deno.serve(async (req) => {
     const { plan, accessCode, successUrl, cancelUrl } = await req.json();
     const priceId = PRICE_IDS[plan];
     if (!priceId) return json({ error: `Unknown plan: ${plan}` }, 400);
+
+    // Derive tier and billing_interval from plan key
+    const isLifetimePlan = plan === "lifetime";
+    const billingInterval: "monthly" | "annual" | "once" = plan.endsWith("_annual")
+      ? "annual"
+      : plan === "lifetime"
+        ? "once"
+        : "monthly";
+    const tier = isLifetimePlan ? "lifetime" : (plan.replace(/_monthly$|_annual$/, ""));
 
     // ── Validate access code ─────────────────────────────────────────────────
     // Skip if user already has a claimed code (they're upgrading an existing account)
@@ -87,8 +100,13 @@ Deno.serve(async (req) => {
     }
 
     // ── Create Checkout Session (no trial) ────────────────────────────────────
-    const isLifetime = plan === "lifetime";
-    const sharedMetadata = { supabase_user_id: user.id, plan, access_code: accessCode ?? "" };
+    const isLifetime = isLifetimePlan;
+    const sharedMetadata = {
+      supabase_user_id: user.id,
+      plan: tier,
+      billing_interval: billingInterval,
+      access_code: accessCode ?? "",
+    };
 
     const session = await stripe.checkout.sessions.create(
       isLifetime

@@ -11,11 +11,11 @@ export const ACCESS_CODE_KEY = "zenvi_access_code";
 interface AccessCodeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  /** Which plan to route to after validation. Defaults to "pro". */
+  /** Which plan to route to after validation. Defaults to "pro_monthly". */
   planKey?: string;
 }
 
-export default function AccessCodeModal({ isOpen, onClose, planKey = "pro" }: AccessCodeModalProps) {
+export default function AccessCodeModal({ isOpen, onClose, planKey = "pro_monthly" }: AccessCodeModalProps) {
   const navigate = useNavigate();
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);

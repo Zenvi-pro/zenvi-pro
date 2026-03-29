@@ -8,60 +8,110 @@ import { useToast } from "@/hooks/use-toast";
 import { ACCESS_CODE_KEY } from "@/components/landing/AccessCodeModal";
 
 const PLANS = {
-  creator: {
+  creator_monthly: {
     name: "Creator",
     price: "$29",
     period: "/mo",
-    description: "Everything indie creators need to level up their content.",
+    tier: "creator",
+    interval: "monthly",
+    description: "Your AI video editor, always on.",
     features: [
-      "Unlimited local AI processing",
-      "Auto-generated subtitles (50+ languages)",
-      "Smart scene detection & clipping",
-      "1080p & 4K export",
-      "Background noise removal",
-      "Email support",
+      "1,500 AI credits per month (10 credits per video generation)",
+      "Up to 1080p export quality",
+      "60 min of video indexing & smart search",
+      "Unlimited AI chat assistance",
+      "20% credit rollover each month",
+      "Standard generation queue",
     ],
   },
-  pro: {
+  creator_annual: {
+    name: "Creator (Annual)",
+    price: "$249",
+    period: "/yr",
+    tier: "creator",
+    interval: "annual",
+    displayPrice: "$20.75",
+    displayPeriod: "/mo",
+    description: "Your AI video editor, always on. Billed as $249/yr.",
+    features: [
+      "1,500 AI credits per month (10 credits per video generation)",
+      "Up to 1080p export quality",
+      "60 min of video indexing & smart search",
+      "Unlimited AI chat assistance",
+      "20% credit rollover each month",
+      "Standard generation queue",
+    ],
+  },
+  pro_monthly: {
     name: "Pro",
-    price: "$49",
-    period: "/mo",
-    description: "For professionals who demand speed and flexibility.",
-    features: [
-      "Everything in Creator",
-      "Batch processing for multi-project workflows",
-      "Advanced audio sweetening & EQ",
-      "Custom export presets & platform profiles",
-      "Priority feature requests",
-      "Priority support",
-    ],
-  },
-  studio: {
-    name: "Studio",
     price: "$99",
     period: "/mo",
-    description: "For teams and agencies with demanding pipelines.",
+    tier: "pro",
+    interval: "monthly",
+    description: "Professional-grade AI, studio-ready output.",
     features: [
-      "Everything in Pro",
-      "Team license (up to 5 seats)",
-      "Dedicated Slack support",
-      "Custom model fine-tuning",
-      "Commercial usage rights",
-      "SLA guarantee",
+      "5,000 AI credits per month (3.3× more than Creator)",
+      "Up to 4K export quality",
+      "250 min of video indexing & smart search",
+      "Unlimited AI chat assistance",
+      "Morph & transition video generation",
+      "Product demo generation",
+      "Priority generation queue — no waiting at peak hours",
+      "25% credit rollover + brand kit",
+    ],
+  },
+  pro_annual: {
+    name: "Pro (Annual)",
+    price: "$999",
+    period: "/yr",
+    tier: "pro",
+    interval: "annual",
+    displayPrice: "$83.25",
+    displayPeriod: "/mo",
+    description: "Professional-grade AI, studio-ready output. Billed as $999/yr.",
+    features: [
+      "5,000 AI credits per month (3.3× more than Creator)",
+      "Up to 4K export quality",
+      "250 min of video indexing & smart search",
+      "Unlimited AI chat assistance",
+      "Morph & transition video generation",
+      "Product demo generation",
+      "Priority generation queue — no waiting at peak hours",
+      "25% credit rollover + brand kit",
+    ],
+  },
+  studio_monthly: {
+    name: "Studio",
+    price: "$199",
+    period: "/mo",
+    tier: "studio",
+    interval: "monthly",
+    description: "One pool. Three editors. Unlimited creativity.",
+    features: [
+      "12,000 shared AI credits/mo across 3 seats",
+      "Up to 4K export quality",
+      "600 min of video indexing & smart search",
+      "3 concurrent video generations per seat",
+      "All Pro features included",
+      "Team analytics dashboard",
+      "Priority support + dedicated onboarding",
+      "API access for custom integrations",
     ],
   },
   lifetime: {
     name: "Lifetime Access",
-    price: "$100",
+    price: "$99",
     period: "one-time",
-    description: "Pay once. Yours forever. No subscription, no renewals.",
+    tier: "lifetime",
+    interval: "once",
+    description: "Pay once. Create forever.",
     features: [
-      "Everything in Studio",
-      "Lifetime access — no subscription ever",
-      "All future updates included",
-      "5 team seats",
-      "Commercial usage rights",
-      "Priority support, always",
+      "1,000 AI credits every month, forever",
+      "All Creator features included",
+      "Credits accumulate (up to 1,500 max)",
+      "One payment, no renewals, ever",
+      "Top-up credit packs available for heavy months",
+      "Locked in at today's price — forever",
     ],
   },
 } as const;
@@ -74,8 +124,8 @@ export default function CheckoutPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const planKey = (searchParams.get("plan") ?? "pro") as PlanKey;
-  const plan = PLANS[planKey] ?? PLANS.pro;
+  const planKey = (searchParams.get("plan") ?? "pro_monthly") as PlanKey;
+  const plan = PLANS[planKey] ?? PLANS.pro_monthly;
 
   const [status, setStatus] = useState<Status>("checking-auth");
   const [errorMsg, setErrorMsg] = useState("");
@@ -236,8 +286,20 @@ export default function CheckoutPage() {
                 <p className="text-sm text-muted-foreground mt-1">{plan.description}</p>
               </div>
               <div className="text-right shrink-0 ml-4">
-                <span className="text-3xl font-bold text-white">{plan.price}</span>
-                <span className="text-muted-foreground text-sm ml-1">{plan.period}</span>
+                {"displayPrice" in plan && plan.displayPrice ? (
+                  <>
+                    <div>
+                      <span className="text-3xl font-bold text-white">{plan.displayPrice}</span>
+                      <span className="text-muted-foreground text-sm ml-1">{"displayPeriod" in plan ? plan.displayPeriod : plan.period}</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-0.5">Billed {plan.price}{plan.period}</p>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-3xl font-bold text-white">{plan.price}</span>
+                    <span className="text-muted-foreground text-sm ml-1">{plan.period}</span>
+                  </>
+                )}
               </div>
             </div>
 

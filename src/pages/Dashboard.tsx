@@ -42,11 +42,11 @@ interface HistoryRow {
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 const TIER_LABELS: Record<string, string> = {
-  none: "Free",
+  none: "No Plan",
   creator: "Creator",
   pro: "Pro",
   studio: "Studio",
-  lifetime: "Lifetime Access",
+  lifetime: "Lifetime",
 };
 
 const PROVIDER_COLORS: Record<string, string> = {

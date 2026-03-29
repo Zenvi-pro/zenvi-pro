@@ -13,14 +13,16 @@
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-function priceToTier(priceId: string): string {
-  const map: Record<string, string> = {
-    [Deno.env.get("STRIPE_PRICE_CREATOR") ?? "__none__"]: "creator",
-    [Deno.env.get("STRIPE_PRICE_PRO") ?? "__none__"]: "pro",
-    [Deno.env.get("STRIPE_PRICE_STUDIO") ?? "__none__"]: "studio",
-    [Deno.env.get("STRIPE_PRICE_LIFETIME") ?? "__none__"]: "lifetime",
+function priceToTierAndInterval(priceId: string): { tier: string; interval: "monthly" | "annual" } {
+  const map: Record<string, { tier: string; interval: "monthly" | "annual" }> = {
+    [Deno.env.get("STRIPE_PRICE_CREATOR_MONTHLY") ?? "__none__"]: { tier: "creator", interval: "monthly" },
+    [Deno.env.get("STRIPE_PRICE_CREATOR_ANNUAL") ?? "__none__"]: { tier: "creator", interval: "annual" },
+    [Deno.env.get("STRIPE_PRICE_PRO_MONTHLY") ?? "__none__"]: { tier: "pro", interval: "monthly" },
+    [Deno.env.get("STRIPE_PRICE_PRO_ANNUAL") ?? "__none__"]: { tier: "pro", interval: "annual" },
+    [Deno.env.get("STRIPE_PRICE_STUDIO_MONTHLY") ?? "__none__"]: { tier: "studio", interval: "monthly" },
+    [Deno.env.get("STRIPE_PRICE_LIFETIME") ?? "__none__"]: { tier: "lifetime", interval: "monthly" },
   };
-  return map[priceId] ?? "creator";
+  return map[priceId] ?? { tier: "creator", interval: "monthly" };
 }
 
 /** Claim an access code for a user (service-role direct write, bypasses RLS). */
@@ -90,9 +92,17 @@ Deno.serve(async (req) => {
               status: "active",
               current_period_end: null,
               cancel_at_period_end: false,
+              billing_interval: "lifetime",
             },
             { onConflict: "user_id" },
           );
+
+          // Grant lifetime points allocation
+          await supabase.rpc("allocate_monthly_points", {
+            p_user_id: userId,
+            p_tier: "lifetime",
+            p_billing_interval: "lifetime",
+          });
 
           await claimAccessCode(supabase, accessCode, userId);
           break;
@@ -106,7 +116,8 @@ Deno.serve(async (req) => {
         const accessCode = sub.metadata.access_code ?? "";
         if (!userId) break;
 
-        const tier = priceToTier(sub.items.data[0].price.id);
+        const { tier, interval } = priceToTierAndInterval(sub.items.data[0].price.id);
+        const billingInterval = sub.metadata.billing_interval ?? interval;
 
         await supabase.from("subscriptions").upsert(
           {
@@ -117,9 +128,17 @@ Deno.serve(async (req) => {
             status: sub.status,
             current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
             cancel_at_period_end: sub.cancel_at_period_end,
+            billing_interval: billingInterval,
           },
           { onConflict: "user_id" },
         );
+
+        // Grant points for new subscription
+        await supabase.rpc("allocate_monthly_points", {
+          p_user_id: userId,
+          p_tier: tier,
+          p_billing_interval: billingInterval,
+        });
 
         await claimAccessCode(supabase, accessCode, userId);
         break;
@@ -131,7 +150,8 @@ Deno.serve(async (req) => {
         const userId = sub.metadata.supabase_user_id;
         if (!userId) break;
 
-        const tier = priceToTier(sub.items.data[0].price.id);
+        const { tier, interval } = priceToTierAndInterval(sub.items.data[0].price.id);
+        const billingInterval = sub.metadata.billing_interval ?? interval;
 
         await supabase.from("subscriptions").upsert(
           {
@@ -142,9 +162,19 @@ Deno.serve(async (req) => {
             status: sub.status,
             current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
             cancel_at_period_end: sub.cancel_at_period_end,
+            billing_interval: billingInterval,
           },
           { onConflict: "user_id" },
         );
+
+        // Allocate points on renewal or plan change (only for active statuses)
+        if (sub.status === "active" || sub.status === "trialing") {
+          await supabase.rpc("allocate_monthly_points", {
+            p_user_id: userId,
+            p_tier: tier,
+            p_billing_interval: billingInterval,
+          });
+        }
         break;
       }
 
