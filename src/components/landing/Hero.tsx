@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { VideoText } from "@/components/ui/video-text";
 import { TextReveal } from "@/components/ui/text-reveal";
 
 interface HeroProps {
@@ -19,19 +18,15 @@ const Hero = ({ onOpenAccessCode }: HeroProps) => {
     offset: ["start start", "end end"],
   });
 
-  const textScale = useTransform(scrollYProgress, [0, 0.42, 0.66], [1.1, 2.6, 8.5]);
-  const textOpacity = useTransform(scrollYProgress, [0, 0.56, 0.68], [1, 1, 0]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.2, 0.34], [1, 1, 0]);
-  const outsideVideoOpacity = useTransform(scrollYProgress, [0, 0.5, 0.64, 0.88, 1], [0.02, 0.03, 0, 0.9, 0.9]);
-  const revealLayerOpacity = useTransform(scrollYProgress, [0, 0.66, 0.84], [0, 0, 1]);
-  const revealTextOpacity = useTransform(scrollYProgress, [0, 0.88, 0.92, 1], [0, 0, 1, 1]);
-  const scrollHintOpacity = useTransform(scrollYProgress, [0, 0.84, 0.92], [1, 1, 0]);
-  const revealMask = useTransform(
-    scrollYProgress,
-    [0.67, 0.9],
-    ["circle(0% at 58% 50%)", "circle(150% at 58% 50%)"],
-  );
-  const vignetteOpacity = useTransform(scrollYProgress, [0, 0.56, 0.86], [0.52, 0.4, 0.1]);
+  // Black overlay (with letter holes) zooms in as user scrolls
+  const overlayScale = useTransform(scrollYProgress, [0, 0.65], [1, 9]);
+  // Overlay fades out mid-zoom so the full video "breaks through"
+  const overlayOpacity = useTransform(scrollYProgress, [0.28, 0.63], [1, 0]);
+
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.18, 0.32], [1, 1, 0]);
+  const vignetteOpacity = useTransform(scrollYProgress, [0, 0.45, 0.72], [0.5, 0.3, 0]);
+  const revealTextOpacity = useTransform(scrollYProgress, [0, 0.88, 0.93, 1], [0, 0, 1, 1]);
+  const scrollHintOpacity = useTransform(scrollYProgress, [0, 0.82, 0.9], [1, 1, 0]);
 
   useMotionValueEvent(scrollYProgress, "change", (value) => {
     const start = 0.9;
@@ -50,9 +45,11 @@ const Hero = ({ onOpenAccessCode }: HeroProps) => {
   return (
     <section ref={sectionRef} className="relative h-screen bg-[#0A0A0A] sm:h-[340vh]">
       <div className="h-screen overflow-hidden sm:sticky sm:top-0">
+
+        {/* Mobile: static video background */}
         <video
-          className="absolute inset-0 h-full w-full object-cover opacity-45 sm:hidden"
-          src="/INTENSE Seedance 2.0 Trailer ｜ FERAL [cropped].mp4"
+          className="absolute inset-0 h-full w-full object-cover opacity-45 sm:hidden scale-[1.4]"
+          src="/hero-video.mp4"
           autoPlay
           muted
           loop
@@ -61,10 +58,11 @@ const Hero = ({ onOpenAccessCode }: HeroProps) => {
         />
         <div className="pointer-events-none absolute inset-0 z-[1] bg-black/60 sm:hidden" />
 
-        <motion.video
-          className="absolute inset-0 hidden h-full w-full object-cover sm:block"
-          style={{ opacity: outsideVideoOpacity }}
-          src="/INTENSE Seedance 2.0 Trailer ｜ FERAL [cropped].mp4"
+        {/* Desktop: full video always playing behind — visible through letter holes */}
+        {/* scale-[1.4] crops the baked-in cinematic letterbox bars off-screen */}
+        <video
+          className="absolute inset-0 hidden h-full w-full object-cover sm:block scale-[1.4]"
+          src="/hero-video.mp4"
           autoPlay
           muted
           loop
@@ -72,46 +70,53 @@ const Hero = ({ onOpenAccessCode }: HeroProps) => {
           preload="metadata"
         />
 
+        {/* Subtle vignette — fades out as overlay disappears */}
         <motion.div
-          className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/65 via-black/40 to-black/70"
+          className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/50 via-transparent to-black/60"
           style={{ opacity: vignetteOpacity }}
         />
 
+        {/*
+          Black overlay with ZENVI letter-shaped holes.
+          The video behind shows through the holes — exactly like the NYC reference image.
+          As user scrolls, overlay scales up (holes grow enormous) then fades away,
+          revealing the full-screen video.
+        */}
         <motion.div
-          className="pointer-events-none absolute inset-0 z-[2]"
-          style={{ clipPath: revealMask, opacity: revealLayerOpacity }}
+          className="pointer-events-none absolute inset-0 z-[2] hidden sm:block"
+          style={{ scale: overlayScale, opacity: overlayOpacity, transformOrigin: "58% 50%" }}
         >
-          <video
-            className="h-full w-full object-cover"
-            src="/INTENSE Seedance 2.0 Trailer ｜ FERAL [cropped].mp4"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-          />
-        </motion.div>
-
-        <motion.div
-          className="pointer-events-none absolute inset-0 z-[3] hidden sm:block"
-          style={{ scale: textScale, opacity: textOpacity, transformOrigin: "58% 50%" }}
-        >
-          <VideoText
-            src="/INTENSE Seedance 2.0 Trailer ｜ FERAL [cropped].mp4"
-            className="[&_svg]:h-full [&_svg]:w-full"
-            videoClassName="brightness-125 saturate-125"
-            tintClassName="bg-sky-400/16 mix-blend-screen"
-            whiteTintClassName="bg-white/8 mix-blend-screen"
-            fontSize={242}
-            fontWeight={900}
-            letterSpacing={12}
-            viewBoxWidth={1400}
-            viewBoxHeight={700}
+          <svg
+            viewBox="0 0 1400 700"
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-full w-full"
+            preserveAspectRatio="xMidYMid slice"
           >
-            ZENVI
-          </VideoText>
+            <defs>
+              <mask id="zenvi-letter-mask">
+                {/* White = show the black rect (opaque background) */}
+                <rect width="1400" height="700" fill="white" />
+                {/* Black = punch holes in the shape of each letter (video shows through) */}
+                <text
+                  x="700"
+                  y="360"
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fontSize="242"
+                  fontWeight="900"
+                  style={{ fontFamily: "Inter, system-ui, sans-serif", letterSpacing: "12px" }}
+                  fill="black"
+                >
+                  ZENVI
+                </text>
+              </mask>
+            </defs>
+            {/* Solid black overlay with letter holes cut out */}
+            <rect width="1400" height="700" fill="#0A0A0A" mask="url(#zenvi-letter-mask)" />
+          </svg>
         </motion.div>
 
+        {/* Desktop CTA — fades out before zoom takes over */}
         <motion.div
           className="relative z-10 mx-auto hidden h-full max-w-5xl flex-col items-center justify-center px-6 text-center sm:flex"
           style={{ opacity: contentOpacity }}
@@ -158,6 +163,7 @@ const Hero = ({ onOpenAccessCode }: HeroProps) => {
           </div>
         </motion.div>
 
+        {/* Mobile CTA */}
         <div className="relative z-10 mx-auto flex h-full max-w-5xl flex-col items-center justify-center px-6 text-center sm:hidden">
           <div className="w-full max-w-md">
             <p className="mx-auto mb-6 text-balance text-[1.75rem] font-semibold text-white">
@@ -191,6 +197,7 @@ const Hero = ({ onOpenAccessCode }: HeroProps) => {
           </div>
         </div>
 
+        {/* Text reveal at the very bottom of the scroll */}
         <motion.div
           className="pointer-events-none absolute inset-0 z-[12] hidden items-center justify-center px-6 sm:flex"
           style={{ opacity: revealTextOpacity }}
@@ -206,6 +213,7 @@ const Hero = ({ onOpenAccessCode }: HeroProps) => {
           </div>
         </motion.div>
 
+        {/* Scroll hint */}
         <motion.div
           className="pointer-events-none absolute bottom-7 left-1/2 z-20 -translate-x-1/2"
           style={{ opacity: scrollHintOpacity }}
@@ -222,6 +230,7 @@ const Hero = ({ onOpenAccessCode }: HeroProps) => {
             </div>
           </motion.div>
         </motion.div>
+
       </div>
     </section>
   );
