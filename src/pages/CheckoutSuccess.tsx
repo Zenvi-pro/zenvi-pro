@@ -5,7 +5,7 @@ import { CheckCircle, Download, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ACCESS_CODE_KEY } from "@/components/landing/AccessCodeModal";
 
-// this is the checkout page
+// this is the checkout
 
 const TIER_LABELS: Record<string, string> = {
   creator: "Creator",
