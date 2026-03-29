@@ -163,13 +163,13 @@ export default function LoginPage() {
 
           <div className="relative box-border flex min-h-screen w-full flex-col items-center justify-center md:justify-start lg:w-[54%] lg:max-w-[54%] lg:flex-none lg:justify-center lg:px-6 xl:px-8">
             <FlickeringGrid
-              className="z-0 opacity-45"
-              squareSize={3}
-              gridGap={24}
-              color="0, 102, 255"
-              maxOpacity={0.06}
-              flickerChance={0.035}
-              fps={10}
+              className="z-0 opacity-65"
+              squareSize={5}
+              gridGap={22}
+              color="180, 215, 255"
+              maxOpacity={0.12}
+              flickerChance={0.055}
+              fps={0.5}
             />
             <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-br from-transparent via-white/[0.01] to-transparent" />
             <div className="fixed right-5 top-6 z-30 flex justify-end sm:right-7 lg:absolute lg:right-4 lg:top-6">

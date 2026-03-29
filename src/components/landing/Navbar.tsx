@@ -47,7 +47,11 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
       >
         <div className="mx-auto max-w-content px-6">
           <div className="w-full hidden md:grid md:grid-cols-3 items-center">
-            <a href="#" className="justify-self-start flex items-center text-white">
+            <a
+              href="#"
+              data-zenvi-logo-target
+              className="justify-self-start flex items-center text-white"
+            >
               <ZenviLogo size={42} />
             </a>
 
@@ -94,7 +98,7 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
                 size="sm"
                 className="h-10 rounded-full bg-white px-5 text-sm font-medium text-black hover:bg-white/90"
               >
-                Request Access
+                Download
                 <ArrowRight className="ml-1.5 h-4 w-4" />
               </Button>
             </div>
@@ -102,8 +106,13 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
 
           {/* Mobile top row */}
           <div className="md:hidden flex items-center justify-between rounded-full border border-white/10 bg-[#1A1A1A]/80 px-4 py-2 backdrop-blur-xl">
-            <a href="#" className="text-sm font-medium text-white">
-              Zenvi
+            <a
+              href="#"
+              data-zenvi-logo-target
+              className="flex items-center gap-2 text-sm font-medium text-white"
+            >
+              <ZenviLogo size={20} />
+              <span>Zenvi</span>
             </a>
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -126,9 +135,9 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
           opacity: isMobileMenuOpen ? 1 : 0,
           height: isMobileMenuOpen ? "auto" : 0,
         }}
-        className="fixed top-20 left-0 right-0 z-40 bg-[#0A0A0A]/98 backdrop-blur-sm border-b border-white/[0.06] md:hidden overflow-hidden"
+        className="fixed top-20 left-4 right-4 z-40 rounded-2xl border border-white/10 bg-[#161616]/95 backdrop-blur-xl shadow-[0_24px_60px_rgba(0,0,0,0.6)] md:hidden overflow-hidden"
       >
-        <div className="mx-auto max-w-content px-6 py-6">
+        <div className="mx-auto max-w-content px-5 py-5">
           <div className="flex flex-col gap-4">
             {navLinks.map((link) => (
               <a
@@ -177,7 +186,7 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
                 onClick={() => { setIsMobileMenuOpen(false); onOpenAccessCode(); }}
                 className="bg-white hover:bg-white/90 text-black font-medium w-full rounded-full"
               >
-                Request Access
+                Download
               </Button>
             </div>
           </div>

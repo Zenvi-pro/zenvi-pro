@@ -2,6 +2,7 @@ import { useState } from "react";
 import Navbar from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
 import Features from "@/components/landing/Features";
+import IntegrationsBeam from "@/components/landing/IntegrationsBeam";
 import EditorDemo from "@/components/landing/EditorDemo";
 import Comparison from "@/components/landing/Comparison";
 import Pricing from "@/components/landing/Pricing";
@@ -45,6 +46,7 @@ const Index = () => {
       <Navbar onOpenWaitlist={openWaitlist} onOpenAccessCode={() => openAccessCode()} />
       <Hero onOpenAccessCode={() => openAccessCode()} />
       <Features />
+      <IntegrationsBeam />
       <EditorDemo />
       <Comparison />
       <Pricing onOpenAccessCode={openAccessCode} />

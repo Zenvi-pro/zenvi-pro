@@ -9,6 +9,11 @@ enabled = true
 client_id = "env(SUPABASE_AUTH_GOOGLE_CLIENT_ID)"
 secret = "env(SUPABASE_AUTH_GOOGLE_SECRET)"
 
+[auth.external.github]
+enabled = true
+client_id = "env(SUPABASE_AUTH_GITHUB_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_GITHUB_SECRET)"
+
 [auth.email.template.confirmation]
 subject = "Confirm your Zenvi account"
 content_path = "./supabase/templates/confirm.html"
@@ -21,4 +26,7 @@ content_path = "./supabase/templates/recovery.html"
 verify_jwt = false
 
 [functions.stripe-webhook]
+verify_jwt = false
+
+[functions.send-welcome-email]
 verify_jwt = false
