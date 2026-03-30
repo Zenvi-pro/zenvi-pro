@@ -12,6 +12,7 @@ import {
   CreditCard,
   ExternalLink,
   BookOpen,
+  Coins,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,6 +39,17 @@ interface HistoryRow {
   month: string;
   total_cost_usd: number;
   request_count: number;
+}
+
+interface CreditsBalance {
+  subscription_points: number;
+  rollover_points: number;
+  bonus_points: number;
+  topup_points: number;
+  total_points: number;
+  overage_enabled: boolean;
+  in_standard_mode: boolean;
+  billing_interval: string;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -171,6 +183,27 @@ export default function DashboardPage() {
         total_cost_usd: Number(r.total_cost_usd ?? 0),
         request_count: Number(r.request_count ?? 0),
       }));
+    },
+  });
+
+  const { data: credits } = useQuery<CreditsBalance | null>({
+    queryKey: ["credits-balance"],
+    queryFn: async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase.rpc as any)("get_credits_balance");
+      if (error) return null;
+      const row = Array.isArray(data) ? data[0] : data;
+      if (!row) return null;
+      return {
+        subscription_points: Number(row.subscription_points ?? 0),
+        rollover_points: Number(row.rollover_points ?? 0),
+        bonus_points: Number(row.bonus_points ?? 0),
+        topup_points: Number(row.topup_points ?? 0),
+        total_points: Number(row.total_points ?? 0),
+        overage_enabled: Boolean(row.overage_enabled),
+        in_standard_mode: Boolean(row.in_standard_mode),
+        billing_interval: String(row.billing_interval ?? "monthly"),
+      };
     },
   });
 
@@ -345,6 +378,78 @@ export default function DashboardPage() {
                 </div>
               </motion.div>
             </div>
+
+            {/* ── AI Credits balance ────────────────────────────────────── */}
+            {credits !== undefined && credits !== null && (
+              <motion.div
+                variants={fadeUp}
+                initial="hidden"
+                animate="visible"
+                custom={0.14}
+                className="rounded-xl border border-white/[0.07] bg-[#111111] p-6 mb-8"
+              >
+                <div className="flex items-start justify-between mb-5">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Coins className="w-3.5 h-3.5 text-muted-foreground" />
+                      <p className="text-xs text-muted-foreground">AI Credits</p>
+                    </div>
+                    <p className={`text-3xl font-bold tabular-nums ${credits.total_points <= 10 ? "text-destructive" : "text-white"}`}>
+                      {credits.total_points.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">points remaining</p>
+                  </div>
+                  {credits.in_standard_mode && (
+                    <span className="text-[11px] px-2.5 py-1 rounded-full border border-yellow-500/30 bg-yellow-500/10 text-yellow-500 font-medium">
+                      Standard mode
+                    </span>
+                  )}
+                  {!credits.in_standard_mode && credits.overage_enabled && (
+                    <span className="text-[11px] px-2.5 py-1 rounded-full border border-white/[0.08] text-muted-foreground font-medium">
+                      Overage on
+                    </span>
+                  )}
+                </div>
+
+                {/* Bucket breakdown */}
+                <div className="flex items-center gap-6 flex-wrap">
+                  {credits.subscription_points > 0 && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">Subscription</p>
+                      <p className="text-sm font-semibold text-white tabular-nums">{credits.subscription_points.toLocaleString()}</p>
+                    </div>
+                  )}
+                  {credits.rollover_points > 0 && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">Rollover</p>
+                      <p className="text-sm font-semibold text-white tabular-nums">{credits.rollover_points.toLocaleString()}</p>
+                    </div>
+                  )}
+                  {credits.bonus_points > 0 && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">Bonus</p>
+                      <p className="text-sm font-semibold text-primary tabular-nums">{credits.bonus_points.toLocaleString()}</p>
+                    </div>
+                  )}
+                  {credits.topup_points > 0 && (
+                    <div>
+                      <p className="text-xs text-muted-foreground">Top-up</p>
+                      <p className="text-sm font-semibold text-white tabular-nums">{credits.topup_points.toLocaleString()}</p>
+                    </div>
+                  )}
+                </div>
+
+                {credits.total_points <= 10 && !credits.overage_enabled && (
+                  <div className="mt-4 flex items-center gap-2">
+                    <AlertTriangle className="w-3.5 h-3.5 text-destructive shrink-0" />
+                    <p className="text-xs text-destructive">
+                      Credits nearly depleted — AI generation will be blocked.{" "}
+                      <Link to="/#pricing" className="underline hover:text-destructive/80">Upgrade</Link> or enable overage.
+                    </p>
+                  </div>
+                )}
+              </motion.div>
+            )}
 
             {/* ── Provider breakdown ─────────────────────────────────────── */}
             {providers.length > 0 && (
