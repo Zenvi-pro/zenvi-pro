@@ -43,4 +43,4 @@ Update your section in `/Users/nilaygoyal/zenvi-shared/AGENTS.md`:
 - Hooks: `src/hooks/`
 - API integrations: `src/integrations/`
 - Supabase: `supabase/`
-- Deployed via Vercel: see `vercel.json`
+- Deployed via Vercel: see `vercel.json` 
