@@ -53,6 +53,14 @@ export default function CheckoutSuccessPage() {
     sessionStorage.removeItem(ACCESS_CODE_KEY);
   }, []);
 
+  // Auto-redirect to download after a short delay so the user sees the success message
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      window.location.href = "/download";
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center px-6">
       <div className="mb-12">

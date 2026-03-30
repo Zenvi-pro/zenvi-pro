@@ -112,8 +112,10 @@ Deno.serve(async (req) => {
         if (session.mode !== "subscription" || !session.subscription) break;
 
         const sub = await stripe.subscriptions.retrieve(session.subscription as string);
-        const userId = sub.metadata.supabase_user_id;
-        const accessCode = sub.metadata.access_code ?? "";
+        // Read user ID from subscription metadata first; fall back to session metadata
+        // (session metadata is also set as of the latest version of create-checkout-session)
+        const userId = sub.metadata.supabase_user_id ?? session.metadata?.supabase_user_id;
+        const accessCode = sub.metadata.access_code ?? session.metadata?.access_code ?? "";
         if (!userId) break;
 
         const { tier, interval } = priceToTierAndInterval(sub.items.data[0].price.id);

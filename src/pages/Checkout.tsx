@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Check, Loader2, ArrowLeft, ShieldCheck, KeyRound } from "lucide-react";
+import { Check, Loader2, ArrowLeft, ShieldCheck, KeyRound, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ACCESS_CODE_KEY } from "@/components/landing/AccessCodeModal";
@@ -131,6 +132,9 @@ export default function CheckoutPage() {
   const [status, setStatus] = useState<Status>("checking-auth");
   const [errorMsg, setErrorMsg] = useState("");
   const [accessCode, setAccessCode] = useState<string | null>(null);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoInput, setPromoInput] = useState("");
+  const [showPromoField, setShowPromoField] = useState(false);
 
   useEffect(() => {
     const redirectToLogin = () =>
@@ -157,7 +161,6 @@ export default function CheckoutPage() {
 
       // Check for access code in sessionStorage
       const storedCode = sessionStorage.getItem(ACCESS_CODE_KEY);
-
       if (storedCode) {
         setAccessCode(storedCode);
         setStatus("ready");
@@ -171,10 +174,34 @@ export default function CheckoutPage() {
         return;
       }
 
-      // No code, no prior access — send them back to get a code
+      // Check if user already has an active subscription → send to download
+      const { data: sub } = await supabase.rpc("get_user_subscription");
+      if (sub && sub.length > 0) {
+        navigate("/download");
+        return;
+      }
+
+      // No code, no prior access — show the promo/access-code gate
       setStatus("no-code");
     }).catch(redirectToLogin);
   }, [navigate, planKey, isUpgradeMode]);
+
+  // Apply a promo code entered on the no-code screen
+  function handlePromoSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmed = promoInput.trim();
+    if (!trimmed) return;
+    if (trimmed.toLowerCase() === "harkit") {
+      setPromoCode(trimmed);
+      setStatus("ready");
+    } else {
+      toast({
+        title: "Invalid promo code",
+        description: "That promo code isn't valid. Check the code and try again.",
+        variant: "destructive",
+      });
+    }
+  }
 
   async function handleCheckout() {
     setStatus(isUpgradeMode ? "upgrading" : "redirecting");
@@ -212,7 +239,7 @@ export default function CheckoutPage() {
         const payload = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(payload?.error ?? `Upgrade failed (HTTP ${res.status})`);
         toast({ title: "Plan upgraded!", description: `You're now on ${plan.name}.` });
-        navigate("/dashboard");
+        navigate("/download");
         return;
       }
 
@@ -228,6 +255,7 @@ export default function CheckoutPage() {
           body: JSON.stringify({
             plan: planKey,
             accessCode: accessCode ?? undefined,
+            promoCode: promoCode || undefined,
             successUrl: `${window.location.origin}/checkout/success?plan=${planKey}`,
             cancelUrl: `${window.location.origin}/#pricing`,
           }),
@@ -273,12 +301,45 @@ export default function CheckoutPage() {
           <p className="text-muted-foreground text-sm mb-8">
             Zenvi is invite-only during beta. You need a valid access code to subscribe.
           </p>
-          <Button
-            onClick={() => navigate("/#pricing")}
-            className="bg-primary hover:bg-primary/90 text-white"
-          >
-            Back to pricing
-          </Button>
+
+          {/* Promo code entry */}
+          {showPromoField ? (
+            <form onSubmit={handlePromoSubmit} className="space-y-3 mb-6 text-left">
+              <div className="flex items-center gap-2">
+                <Tag className="w-4 h-4 text-muted-foreground shrink-0" />
+                <span className="text-sm text-white font-medium">Enter promo code</span>
+              </div>
+              <Input
+                placeholder="Promo code"
+                value={promoInput}
+                onChange={(e) => setPromoInput(e.target.value)}
+                autoFocus
+                className="h-11 bg-white/[0.03] border-white/[0.06] focus:border-primary text-white placeholder:text-muted-foreground/50"
+              />
+              <Button
+                type="submit"
+                disabled={!promoInput.trim()}
+                className="w-full bg-primary hover:bg-primary/90 text-white"
+              >
+                Apply code
+              </Button>
+            </form>
+          ) : (
+            <div className="space-y-3 mb-6">
+              <Button
+                onClick={() => navigate("/#pricing")}
+                className="w-full bg-primary hover:bg-primary/90 text-white"
+              >
+                Back to pricing
+              </Button>
+              <button
+                onClick={() => setShowPromoField(true)}
+                className="text-sm text-muted-foreground hover:text-white transition-colors"
+              >
+                Have a promo code?
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -324,6 +385,11 @@ export default function CheckoutPage() {
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5">Billed {plan.price}{plan.period}</p>
                   </>
+                ) : promoCode.toLowerCase() === "harkit" && planKey === "lifetime" ? (
+                  <>
+                    <span className="text-sm text-muted-foreground line-through">{plan.price}</span>
+                    <span className="text-3xl font-bold text-green-400 ml-2">FREE</span>
+                  </>
                 ) : (
                   <>
                     <span className="text-3xl font-bold text-white">{plan.price}</span>
@@ -333,7 +399,7 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            <ul className="space-y-2.5 mb-8 border-t border-white/[0.06] pt-6">
+            <ul className="space-y-2.5 mb-6 border-t border-white/[0.06] pt-6">
               {plan.features.map((f, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
@@ -341,6 +407,49 @@ export default function CheckoutPage() {
                 </li>
               ))}
             </ul>
+
+            {/* Promo code display / toggle */}
+            {promoCode ? (
+              <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-lg bg-green-500/10 border border-green-500/20">
+                <Tag className="w-3.5 h-3.5 text-green-400 shrink-0" />
+                <span className="text-xs text-green-400 font-medium">Promo code applied: {promoCode.toUpperCase()}</span>
+              </div>
+            ) : !isUpgradeMode && (
+              showPromoField ? (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const trimmed = promoInput.trim();
+                    if (trimmed.toLowerCase() === "harkit") {
+                      setPromoCode(trimmed);
+                      setShowPromoField(false);
+                    } else {
+                      toast({ title: "Invalid promo code", description: "That code isn't valid.", variant: "destructive" });
+                    }
+                  }}
+                  className="flex gap-2 mb-4"
+                >
+                  <Input
+                    placeholder="Promo code"
+                    value={promoInput}
+                    onChange={(e) => setPromoInput(e.target.value)}
+                    autoFocus
+                    className="h-9 text-sm bg-white/[0.03] border-white/[0.06] focus:border-primary text-white placeholder:text-muted-foreground/50"
+                  />
+                  <Button type="submit" variant="outline" size="sm" className="shrink-0 border-white/[0.06] hover:bg-white/5 text-white">
+                    Apply
+                  </Button>
+                </form>
+              ) : (
+                <button
+                  onClick={() => setShowPromoField(true)}
+                  className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-white transition-colors mb-4"
+                >
+                  <Tag className="w-3 h-3" />
+                  Have a promo code?
+                </button>
+              )
+            )}
 
             <Button
               onClick={handleCheckout}
@@ -353,6 +462,8 @@ export default function CheckoutPage() {
                 <><Loader2 className="w-4 h-4 animate-spin mr-2" />Upgrading plan…</>
               ) : isUpgradeMode ? (
                 "Confirm Upgrade"
+              ) : promoCode.toLowerCase() === "harkit" && planKey === "lifetime" ? (
+                "Claim Free Lifetime Access"
               ) : (
                 "Continue to payment"
               )}

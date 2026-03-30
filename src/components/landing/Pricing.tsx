@@ -47,11 +47,11 @@ const Pricing = ({ onOpenAccessCode }: PricingProps) => {
       return <Button className={className} disabled>{defaultLabel}</Button>;
     }
 
-    // User already has this tier or better → dashboard
+    // User already has this tier or better → download dashboard
     if (userOrder > 0 && planOrder <= userOrder) {
       return (
-        <Button onClick={() => navigate("/dashboard")} className={className}>
-          Go to Dashboard
+        <Button onClick={() => navigate("/download")} className={className}>
+          Go to Download
         </Button>
       );
     }
