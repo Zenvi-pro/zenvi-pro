@@ -38,15 +38,11 @@ Deno.serve(async (req) => {
     if (authError || !user) return json({ error: "Unauthorized" }, 401);
 
     // ── Parse body ────────────────────────────────────────────────────────────
-    const { plan, accessCode, promoCode, successUrl, cancelUrl } = await req.json();
+    const { plan, accessCode, successUrl, cancelUrl } = await req.json();
     const priceId = PRICE_IDS[plan];
     if (!priceId) {
       return json({ error: `No Stripe price configured for plan: ${plan}. Set the STRIPE_PRICE_${plan.toUpperCase()} environment variable in Supabase.` }, 400);
     }
-
-    // Normalize promo code
-    const normalizedPromo = (promoCode ?? "").trim().toLowerCase();
-    const isHarkit = normalizedPromo === "harkit";
 
     // Derive tier and billing_interval from plan key
     const isLifetimePlan = plan === "lifetime";
@@ -58,10 +54,9 @@ Deno.serve(async (req) => {
     const tier = isLifetimePlan ? "lifetime" : plan.replace(/_monthly$|_annual$/, "");
 
     // ── Validate access code ─────────────────────────────────────────────────
-    // Skip if: user already has a claimed code, OR user is using the Harkit promo
     const { data: hasAccess } = await supabase.rpc("get_user_download_access");
 
-    if (!hasAccess && !isHarkit) {
+    if (!hasAccess) {
       if (!accessCode) {
         return json({ error: "An access code is required to subscribe." }, 403);
       }
@@ -98,34 +93,6 @@ Deno.serve(async (req) => {
       await supabase.from("profiles").upsert({ id: user.id, stripe_customer_id: customerId });
     }
 
-    // ── Harkit promo: create or retrieve 100% off coupon ──────────────────────
-    let harkitCouponId: string | undefined;
-    if (isHarkit && isLifetimePlan) {
-      try {
-        const existing = await stripe.coupons.retrieve("HARKIT");
-        harkitCouponId = existing.id;
-      } catch {
-        // Coupon doesn't exist yet — create it
-        try {
-          const coupon = await stripe.coupons.create({
-            id: "HARKIT",
-            percent_off: 100,
-            duration: "once",
-            name: "HARKIT — Founder Access",
-          });
-          harkitCouponId = coupon.id;
-        } catch {
-          // id "HARKIT" already taken by a deleted coupon; create without custom id
-          const coupon = await stripe.coupons.create({
-            percent_off: 100,
-            duration: "once",
-            name: "HARKIT — Founder Access",
-          });
-          harkitCouponId = coupon.id;
-        }
-      }
-    }
-
     // ── Create Checkout Session ────────────────────────────────────────────────
     const sharedMetadata = {
       supabase_user_id: user.id,
@@ -143,12 +110,8 @@ Deno.serve(async (req) => {
             mode: "payment",
             success_url: successUrl,
             cancel_url: cancelUrl,
+            allow_promotion_codes: true,
             metadata: sharedMetadata,
-            // Apply Harkit coupon directly (makes total $0, no card required).
-            // When no promo, allow Stripe-native promo code entry instead.
-            ...(harkitCouponId
-              ? { discounts: [{ coupon: harkitCouponId }] }
-              : { allow_promotion_codes: true }),
           }
         : {
             customer: customerId,
@@ -158,8 +121,6 @@ Deno.serve(async (req) => {
             success_url: successUrl,
             cancel_url: cancelUrl,
             allow_promotion_codes: true,
-            // Metadata at session level AND subscription level so the webhook
-            // can read it from either the session or the retrieved subscription.
             metadata: sharedMetadata,
             subscription_data: {
               metadata: sharedMetadata,
