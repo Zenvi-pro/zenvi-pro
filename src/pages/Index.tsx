@@ -21,6 +21,7 @@ const Index = () => {
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
   const [accessCodePlanKey, setAccessCodePlanKey] = useState<string>("pro");
   const [isAccessCodeOpen, setIsAccessCodeOpen] = useState(false);
+  const [heroRevealReady, setHeroRevealReady] = useState(false);
   const [introVisible, setIntroVisible] = useState(() => {
     if (typeof window === "undefined") return true;
     return !sessionStorage.getItem(INTRO_STORAGE_KEY);
@@ -60,11 +61,11 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-[#0A0A0A]">
       {introVisible && <IntroOverlay onComplete={handleIntroComplete} />}
-      <Navbar onOpenWaitlist={openWaitlist} onOpenAccessCode={() => openAccessCode()} />
-      <Hero onOpenAccessCode={handleHeroDownload} />
+      <Navbar onOpenWaitlist={openWaitlist} onOpenAccessCode={handleHeroDownload} />
+      <Hero onOpenAccessCode={handleHeroDownload} onRevealSequenceComplete={() => setHeroRevealReady(true)} />
+      <EditorDemo readyToPop={heroRevealReady} />
       <Features />
       <IntegrationsBeam />
-      <EditorDemo />
       <Comparison />
       <Pricing onOpenAccessCode={openAccessCode} />
       <LogoTicker />
