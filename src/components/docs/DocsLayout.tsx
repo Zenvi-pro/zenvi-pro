@@ -10,7 +10,7 @@ export default function DocsLayout() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
-    <div className="relative min-h-screen bg-[#0A0A0A] text-foreground">
+    <div className="relative min-h-screen bg-transparent text-foreground">
       <a
         href="#docs-main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:outline-none"
@@ -22,7 +22,7 @@ export default function DocsLayout() {
         aria-hidden
       />
 
-      <header className="sticky top-0 z-30 border-b border-white/[0.06] bg-[#0A0A0A]/85 backdrop-blur-xl supports-[backdrop-filter]:bg-[#0A0A0A]/70">
+      <header className="sticky top-0 z-30 border-b border-white/[0.06] bg-black/70 backdrop-blur-xl supports-[backdrop-filter]:bg-black/60">
         <div className="mx-auto flex h-14 max-w-[1600px] items-center gap-3 px-4 lg:px-8">
           <Button
             type="button"

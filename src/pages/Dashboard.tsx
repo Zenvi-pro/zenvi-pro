@@ -216,9 +216,9 @@ export default function DashboardPage() {
   const maxHistoryCost = Math.max(...history.map((h) => h.total_cost_usd), 0.01);
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
+    <div className="min-h-screen bg-transparent flex flex-col">
       {/* Nav */}
-      <nav className="border-b border-white/[0.06] px-6 py-4 sticky top-0 bg-[#0A0A0A]/95 backdrop-blur-sm z-20">
+      <nav className="border-b border-white/[0.06] px-6 py-4 sticky top-0 bg-black/65 backdrop-blur-sm z-20">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <Link to="/" className="text-lg font-bold text-white tracking-tight">
             Zenvi

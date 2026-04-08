@@ -62,7 +62,7 @@ export default function CheckoutSuccessPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen bg-transparent flex flex-col items-center justify-center px-6">
       <div className="mb-12">
         <Link
           to="/"

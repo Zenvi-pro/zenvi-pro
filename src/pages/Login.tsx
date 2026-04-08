@@ -110,7 +110,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#0A0A0A] px-4 py-0 sm:px-6 sm:py-0 lg:px-0 lg:py-0">
+    <div className="relative min-h-screen overflow-x-hidden bg-transparent px-4 py-0 sm:px-6 sm:py-0 lg:px-0 lg:py-0">
       <Link
         to="/"
         className="absolute left-5 top-6 z-30 flex items-center gap-2 text-white/90 transition-opacity hover:opacity-85 md:hidden"

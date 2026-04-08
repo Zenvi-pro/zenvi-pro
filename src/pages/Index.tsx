@@ -58,7 +58,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A]">
+    <div className="min-h-screen bg-transparent">
       {introVisible && <IntroOverlay onComplete={handleIntroComplete} />}
       <Navbar onOpenWaitlist={openWaitlist} onOpenAccessCode={() => openAccessCode()} />
       <Hero onOpenAccessCode={handleHeroDownload} />

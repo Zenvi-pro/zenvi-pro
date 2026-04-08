@@ -263,7 +263,7 @@ export default function CheckoutPage() {
 
   if (status === "checking-auth") {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+      <div className="min-h-screen bg-transparent flex items-center justify-center">
         <Loader2 className="w-5 h-5 text-primary animate-spin" />
       </div>
     );
@@ -271,7 +271,7 @@ export default function CheckoutPage() {
 
   if (status === "no-code") {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center px-6">
+      <div className="min-h-screen bg-transparent flex flex-col items-center justify-center px-6">
         <div className="w-full max-w-md text-center">
           <div className="w-12 h-12 rounded-xl border border-white/[0.07] bg-[#111] flex items-center justify-center mx-auto mb-5">
             <KeyRound className="w-5 h-5 text-muted-foreground" />
@@ -295,7 +295,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
+    <div className="min-h-screen bg-transparent flex flex-col">
       <nav className="border-b border-white/[0.06] px-6 py-4">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <Link to="/" className="text-lg font-bold text-white tracking-tight">Zenvi</Link>

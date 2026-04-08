@@ -45,7 +45,7 @@ const sections = [
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-[#0A0A0A]">
+    <div className="min-h-screen bg-transparent">
       <nav className="border-b border-white/[0.06] px-6 py-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <Link to="/" className="text-base font-bold text-white tracking-tight">Zenvi</Link>

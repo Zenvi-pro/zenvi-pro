@@ -33,7 +33,7 @@ export default function AuthSuccessPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen bg-transparent flex flex-col items-center justify-center px-6">
       <motion.div
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}

@@ -87,7 +87,7 @@ export default function SignupPage() {
 
   if (isVerifyStep) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center px-6">
+      <div className="min-h-screen bg-transparent flex flex-col items-center justify-center px-6">
         <motion.div
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
@@ -126,7 +126,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen bg-transparent flex flex-col items-center justify-center px-6">
       <motion.div
         initial={{ opacity: 0, y: 18 }}
         animate={{ opacity: 1, y: 0 }}

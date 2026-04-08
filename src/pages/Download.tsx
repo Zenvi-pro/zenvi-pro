@@ -229,7 +229,7 @@ export default function DownloadPage() {
   // ── Loading state ─────────────────────────────────────────────────────────
   if (tokenState === "loading") {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-6 h-6 text-primary animate-spin" />
       </div>
     );
@@ -238,7 +238,7 @@ export default function DownloadPage() {
   // ── No active plan ────────────────────────────────────────────────────────
   if (tokenState === "no-plan") {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
+      <div className="min-h-screen flex flex-col">
         <MinimalNav />
         <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
           <motion.div
@@ -270,7 +270,7 @@ export default function DownloadPage() {
   // ── Invalid token ─────────────────────────────────────────────────────────
   if (tokenState === "invalid") {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
+      <div className="min-h-screen flex flex-col">
         <MinimalNav />
         <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
           <motion.div
@@ -323,7 +323,7 @@ export default function DownloadPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <MinimalNav />
 
       <main className="flex-1 flex flex-col items-center px-6 py-20">
