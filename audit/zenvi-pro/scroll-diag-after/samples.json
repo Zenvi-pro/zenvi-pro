@@ -1,0 +1,449 @@
+{
+  "probe": {
+    "sectionHeight": 1980,
+    "computedHeight": "1980px",
+    "bodyScrollHeight": 8598
+  },
+  "samples": [
+    {
+      "y": 0,
+      "overlay": {
+        "transform": "none",
+        "opacity": "1",
+        "computedOp": "1"
+      }
+    },
+    {
+      "y": 40,
+      "overlay": {
+        "transform": "scale(1.22047)",
+        "opacity": "1",
+        "computedOp": "1"
+      }
+    },
+    {
+      "y": 80,
+      "overlay": {
+        "transform": "scale(1.68221)",
+        "opacity": "1",
+        "computedOp": "1"
+      }
+    },
+    {
+      "y": 120,
+      "overlay": {
+        "transform": "scale(2.18203)",
+        "opacity": "1",
+        "computedOp": "1"
+      }
+    },
+    {
+      "y": 160,
+      "overlay": {
+        "transform": "scale(2.71688)",
+        "opacity": "1",
+        "computedOp": "1"
+      }
+    },
+    {
+      "y": 200,
+      "overlay": {
+        "transform": "scale(3.36883)",
+        "opacity": "1",
+        "computedOp": "1"
+      }
+    },
+    {
+      "y": 240,
+      "overlay": {
+        "transform": "scale(4.22635)",
+        "opacity": "1",
+        "computedOp": "1"
+      }
+    },
+    {
+      "y": 280,
+      "overlay": {
+        "transform": "scale(4.62018)",
+        "opacity": "1",
+        "computedOp": "1"
+      }
+    },
+    {
+      "y": 320,
+      "overlay": {
+        "transform": "scale(5.15043)",
+        "opacity": "1",
+        "computedOp": "1"
+      }
+    },
+    {
+      "y": 360,
+      "overlay": {
+        "transform": "scale(5.82236)",
+        "opacity": "0.993647",
+        "computedOp": "0.993647"
+      }
+    },
+    {
+      "y": 400,
+      "overlay": {
+        "transform": "scale(6.31717)",
+        "opacity": "0.853077",
+        "computedOp": "0.853077"
+      }
+    },
+    {
+      "y": 440,
+      "overlay": {
+        "transform": "scale(7.08895)",
+        "opacity": "0.633822",
+        "computedOp": "0.633822"
+      }
+    },
+    {
+      "y": 480,
+      "overlay": {
+        "transform": "scale(7.44222)",
+        "opacity": "0.533461",
+        "computedOp": "0.533461"
+      }
+    },
+    {
+      "y": 520,
+      "overlay": {
+        "transform": "scale(7.89411)",
+        "opacity": "0.405083",
+        "computedOp": "0.405083"
+      }
+    },
+    {
+      "y": 560,
+      "overlay": {
+        "transform": "scale(8.35511)",
+        "opacity": "0.274115",
+        "computedOp": "0.274116"
+      }
+    },
+    {
+      "y": 600,
+      "overlay": {
+        "transform": "scale(8.89513)",
+        "opacity": "0.120702",
+        "computedOp": "0.120702"
+      }
+    },
+    {
+      "y": 640,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 680,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 720,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 760,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 800,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 840,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 880,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 920,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 960,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1000,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1040,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1080,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1120,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1160,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1200,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1240,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1280,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1320,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1360,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1400,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1440,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1480,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1520,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1560,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1600,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1640,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1680,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1720,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1760,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1800,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1840,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1880,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1920,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 1960,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 2000,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 2040,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 2080,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 2120,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    },
+    {
+      "y": 2160,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "0",
+        "computedOp": "0"
+      }
+    }
+  ]
+}

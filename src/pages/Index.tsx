@@ -1,13 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
-import Hero from "@/components/landing/Hero";
-import Features from "@/components/landing/Features";
-import IntegrationsBeam from "@/components/landing/IntegrationsBeam";
-import EditorDemo from "@/components/landing/EditorDemo";
-import Comparison from "@/components/landing/Comparison";
-import Pricing from "@/components/landing/Pricing";
-import LogoTicker from "@/components/landing/LogoTicker";
+import FloraHero from "@/components/landing/FloraHero";
+import FloraFeatures from "@/components/landing/FloraFeatures";
+import FloraWorkflows from "@/components/landing/FloraWorkflows";
+import FloraModels from "@/components/landing/FloraModels";
 import Footer from "@/components/landing/Footer";
 import WaitlistModal from "@/components/landing/WaitlistModal";
 import AccessCodeModal from "@/components/landing/AccessCodeModal";
@@ -21,7 +18,6 @@ const Index = () => {
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
   const [accessCodePlanKey, setAccessCodePlanKey] = useState<string>("pro");
   const [isAccessCodeOpen, setIsAccessCodeOpen] = useState(false);
-  const [heroRevealReady, setHeroRevealReady] = useState(false);
   const [introVisible, setIntroVisible] = useState(() => {
     if (typeof window === "undefined") return true;
     return !sessionStorage.getItem(INTRO_STORAGE_KEY);
@@ -35,8 +31,6 @@ const Index = () => {
     setIsAccessCodeOpen(true);
   };
 
-  // Hero "Download" button: if user has an active sub → go to /download,
-  // otherwise scroll to pricing so they can pick a plan.
   const handleHeroDownload = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
@@ -59,16 +53,13 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A]">
+    <div className="min-h-screen bg-black">
       {introVisible && <IntroOverlay onComplete={handleIntroComplete} />}
       <Navbar onOpenWaitlist={openWaitlist} onOpenAccessCode={handleHeroDownload} />
-      <Hero onOpenAccessCode={handleHeroDownload} onRevealSequenceComplete={() => setHeroRevealReady(true)} />
-      <EditorDemo readyToPop={heroRevealReady} />
-      <Features />
-      <IntegrationsBeam />
-      <Comparison />
-      <Pricing onOpenAccessCode={openAccessCode} />
-      <LogoTicker />
+      <FloraHero onOpenWaitlist={openWaitlist} />
+      <FloraFeatures />
+      <FloraWorkflows />
+      <FloraModels />
       <Footer />
       <WaitlistModal isOpen={isWaitlistOpen} onClose={closeWaitlist} />
       <AccessCodeModal

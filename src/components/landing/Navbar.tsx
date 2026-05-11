@@ -1,218 +1,122 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Menu, X, LogOut, LayoutDashboard, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X } from "lucide-react";
 import { ZenviLogo } from "@/components/ZenviLogo";
-import { supabase } from "@/integrations/supabase/client";
-import type { User } from "@supabase/supabase-js";
 
 interface NavbarProps {
-  onOpenWaitlist: () => void;
-  onOpenAccessCode: () => void;
+  onOpenWaitlist?: () => void;
+  onOpenAccessCode?: () => void;
 }
 
-const navLinks: { label: string; href?: string; to?: string }[] = [
-  { label: "Features", href: "#features" },
-  { label: "Showcase", href: "#demo" },
+const navLinks = [
+  { label: "Company", href: "#company" },
+  { label: "Enterprise", href: "#enterprise" },
   { label: "Pricing", href: "#pricing" },
-  { label: "Docs", to: "/docs" },
+  { label: "Techniques", href: "#techniques", isNew: true },
+  { label: "Resources", href: "#resources" },
 ];
 
 const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => setUser(session?.user ?? null),
-    );
-    return () => subscription.unsubscribe();
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-  };
 
   return (
     <>
       <motion.nav
         initial={{ y: -100 }}
         animate={{ y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="fixed top-4 left-0 right-0 z-50"
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled ? "bg-black/60 backdrop-blur-2xl border-b border-white/[0.04]" : "bg-transparent"
+        }`}
       >
-        <div className="mx-auto max-w-content px-6">
-          <div className="w-full hidden lg:grid lg:grid-cols-3 items-center">
-            <a
-              href="#"
-              data-zenvi-logo-target
-              className="justify-self-start flex items-center text-white"
-            >
-              <ZenviLogo size={42} />
-            </a>
+        <div className="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
+          
+          {/* Left: Logo */}
+          <Link to="/" className="flex items-center gap-2 z-50">
+            <ZenviLogo size={24} />
+            <span className="text-white font-medium text-lg tracking-tight">Zenvi</span>
+          </Link>
 
-            {/* Desktop center pill nav */}
-            <div className="justify-self-center flex items-center gap-2 rounded-full border border-white/10 bg-[#1A1A1A]/80 px-3 py-2 backdrop-blur-xl shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset]">
-              {navLinks.map((link) =>
-                link.to ? (
-                  <Link
-                    key={link.label}
-                    to={link.to}
-                    className="rounded-full px-3 py-1.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                ) : (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    className="rounded-full px-3 py-1.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
-                  >
-                    {link.label}
-                  </a>
-                ),
-              )}
-            </div>
-
-            {/* Desktop right pill actions */}
-            <div className="justify-self-end flex items-center gap-3 rounded-full border border-white/10 bg-[#1A1A1A]/80 px-3 py-2 backdrop-blur-xl shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset]">
-              {user ? (
-                <>
-                  <Link
-                    to="/dashboard"
-                    className="rounded-full px-3 py-1.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
-                  >
-                    Dashboard
-                  </Link>
-                  <button
-                    onClick={handleSignOut}
-                    className="rounded-full px-3 py-1.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
-                  >
-                    Sign out
-                  </button>
-                </>
-              ) : (
-                <Link
-                  to="/login"
-                  className="rounded-full px-3 py-1.5 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
-                >
-                  Log in
-                </Link>
-              )}
-              <Button
-                onClick={onOpenAccessCode}
-                size="sm"
-                className="h-10 rounded-full bg-white px-5 text-sm font-medium text-black hover:bg-white/90"
+          {/* Center: Links (Desktop) */}
+          <div className="hidden lg:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.label}
+                to={link.href}
+                className="text-[14px] text-white/70 hover:text-white transition-colors flex items-center gap-2"
               >
-                Request Access
-                <ArrowRight className="ml-1.5 h-4 w-4" />
-              </Button>
-            </div>
+                {link.label}
+                {link.isNew && (
+                  <span className="text-[10px] uppercase tracking-wider font-semibold bg-white/10 text-white px-1.5 py-0.5 rounded-sm">
+                    New
+                  </span>
+                )}
+              </Link>
+            ))}
           </div>
 
-          {/* Mobile top row */}
-          <div className="lg:hidden flex items-center justify-between rounded-full border border-white/10 bg-[#1A1A1A]/80 px-4 py-2 backdrop-blur-xl">
-            <a
-              href="#"
-              data-zenvi-logo-target
-              className="flex items-center gap-2 text-sm font-medium text-white"
+          {/* Right: CTA (Desktop) */}
+          <div className="hidden lg:flex items-center gap-6">
+            <Link to="/careers" className="text-[14px] text-white/70 hover:text-white transition-colors">
+              Careers
+            </Link>
+            <button 
+              className="text-[14px] text-white hover:text-white/80 font-medium transition-colors"
             >
-              <ZenviLogo size={20} />
-              <span>Zenvi</span>
-            </a>
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-full hover:bg-white/5 transition-colors"
-            >
-              {isMobileMenuOpen ? (
-                <X className="w-5 h-5 text-white" />
-              ) : (
-                <Menu className="w-5 h-5 text-white" />
-              )}
+              Contact sales
             </button>
           </div>
+
+          {/* Mobile Menu Toggle */}
+          <button 
+            className="lg:hidden z-50 text-white p-2 -mr-2"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </div>
       </motion.nav>
 
-      {/* Mobile menu */}
-      <motion.div
-        initial={{ opacity: 0, height: 0 }}
-        animate={{
-          opacity: isMobileMenuOpen ? 1 : 0,
-          height: isMobileMenuOpen ? "auto" : 0,
-        }}
-        className="fixed top-20 left-4 right-4 z-40 rounded-2xl border border-white/10 bg-[#161616]/95 backdrop-blur-xl shadow-[0_24px_60px_rgba(0,0,0,0.6)] lg:hidden overflow-hidden"
-      >
-        <div className="mx-auto max-w-content px-5 py-5">
-          <div className="flex flex-col gap-4">
-            {navLinks.map((link) =>
-              link.to ? (
-                <Link
-                  key={link.label}
-                  to={link.to}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-muted-foreground hover:text-white transition-colors py-2 text-base"
-                >
-                  {link.label}
-                </Link>
-              ) : (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-muted-foreground hover:text-white transition-colors py-2 text-base"
-                >
-                  {link.label}
-                </a>
-              ),
-            )}
-
-            <div className="border-t border-white/[0.06] pt-4 flex flex-col gap-3">
-              {user ? (
-                <>
-                  <Link
-                    to="/dashboard"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-white transition-colors py-1"
-                  >
-                    <LayoutDashboard className="w-4 h-4" /> Dashboard
-                  </Link>
-                  <button
-                    onClick={() => { handleSignOut(); setIsMobileMenuOpen(false); }}
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-white transition-colors py-1 text-left"
-                  >
-                    <LogOut className="w-4 h-4" /> Sign out
-                  </button>
-                </>
-              ) : (
-                <div className="flex gap-2">
-                  <Link to="/login" className="flex-1" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full border-white/[0.10] text-white hover:bg-white/5">
-                      Log in
-                    </Button>
-                  </Link>
-                  <Link to="/signup" className="flex-1" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button variant="outline" className="w-full border-white/[0.10] text-white hover:bg-white/5">
-                      Sign up
-                    </Button>
-                  </Link>
-                </div>
-              )}
-
-              <Button
-                onClick={() => { setIsMobileMenuOpen(false); onOpenAccessCode(); }}
-                className="bg-white hover:bg-white/90 text-black font-medium w-full rounded-full"
+      {/* Mobile Menu Overlay */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-3xl pt-24 px-6 flex flex-col gap-6"
+          >
+             {navLinks.map((link) => (
+              <Link
+                key={link.label}
+                to={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-2xl font-medium text-white/80 hover:text-white flex items-center justify-between"
               >
-                Request Access
-              </Button>
-            </div>
-          </div>
-        </div>
-      </motion.div>
+                {link.label}
+                {link.isNew && (
+                  <span className="text-xs uppercase tracking-wider font-semibold bg-white/10 text-white px-2 py-1 rounded-sm">
+                    New
+                  </span>
+                )}
+              </Link>
+            ))}
+            <div className="w-full h-px bg-white/10 my-4" />
+            <Link to="/careers" onClick={() => setMobileMenuOpen(false)} className="text-xl text-white/80">Careers</Link>
+            <button className="text-xl text-left text-white">Contact sales</button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };
