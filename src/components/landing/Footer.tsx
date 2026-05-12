@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Twitter, Instagram, Youtube, Linkedin, Github } from "lucide-react";
+import { motion } from "framer-motion";
+import { Twitter, Instagram, Youtube, Linkedin, Github, ArrowUpRight } from "lucide-react";
 import { ZenviLogo } from "@/components/ZenviLogo";
 
 export default function Footer() {
@@ -9,27 +10,64 @@ export default function Footer() {
     <footer id="docs" className="bg-black text-white w-full">
 
       {/* Top CTA Section */}
-      <div className="max-w-[1200px] mx-auto px-6 py-32 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 text-center md:text-left relative z-20">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight">
-          Yours be default. Early <span className="text-[#3275F8]">access</span>.
-        </h2>
-        <div className="flex items-center gap-6 shrink-0">
-          <a
-            href="https://calendly.com/nilay800/zenvi"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white hover:text-[#3275F8] text-base font-bold transition-colors"
-          >
-            Contact sales
-          </a>
-          <Link
-            to="/signup"
-            className="bg-white hover:bg-white/90 text-black px-8 py-3.5 rounded-full font-bold text-sm shadow-[0_4px_20px_rgba(255,255,255,0.25)] transition-all active:scale-95 block text-center"
-          >
-            Sign up for free
-          </Link>
+      <section
+        aria-labelledby="footer-cta-heading"
+        className="relative isolate overflow-hidden border-t border-white/[0.08]"
+      >
+        {/* Soft brand-blue glow, off-center for depth without screaming */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute left-[30%] top-1/2 h-[280px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#3275F8]/10 blur-[120px]" />
         </div>
-      </div>
+
+        <div className="relative z-20 mx-auto flex max-w-[1200px] flex-col gap-12 px-6 py-28 md:flex-row md:items-end md:justify-between md:py-36">
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="max-w-xl"
+          >
+            <h2
+              id="footer-cta-heading"
+              className="font-serif text-balance text-[44px] leading-[1.02] tracking-[-0.015em] text-white md:text-[60px] lg:text-[72px]"
+            >
+              Yours by default.
+              <span className="block italic text-white/95">Early access.</span>
+            </h2>
+            <p className="mt-5 text-[14px] leading-relaxed text-white/45 md:text-[15px]">
+              Local-first. Your footage stays on your machine until you decide otherwise.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.7, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
+            className="flex shrink-0 items-center gap-7"
+          >
+            <a
+              href="https://calendly.com/nilay800/zenvi"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative text-[13px] font-medium text-white/65 transition-colors hover:text-white"
+            >
+              Talk to us
+              <span
+                aria-hidden="true"
+                className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-white transition-transform duration-300 ease-out group-hover:scale-x-100"
+              />
+            </a>
+            <a
+              href="https://zenvi.pro/login?mode=signup"
+              className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[13px] font-semibold tracking-tight text-black shadow-[0_8px_28px_-8px_rgba(255,255,255,0.3)] transition-all duration-300 hover:shadow-[0_14px_42px_-8px_rgba(50,117,248,0.4)] active:scale-[0.98]"
+            >
+              Get early access
+              <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </a>
+          </motion.div>
+        </div>
+      </section>
 
       {/* Main Footer Block */}
       <div className="w-full relative mt-10">
