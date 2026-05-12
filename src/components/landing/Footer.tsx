@@ -118,36 +118,26 @@ export default function Footer() {
             {/* Right Column: Links Grid */}
             <div className="flex flex-wrap gap-16 md:gap-24 text-[12px]">
 
-              {/* Company */}
-              <div className="flex flex-col gap-3">
-                <h4 className="text-white font-medium mb-2">Company</h4>
-                <Link to="/blog" className="text-white/50 hover:text-white transition-colors">Blog</Link>
-                <Link to="/careers" className="text-white/50 hover:text-white transition-colors">Careers</Link>
-                <a href="#" className="text-white/50 hover:text-white transition-colors">Community</a>
-                <Link to="/manifesto" className="text-white/50 hover:text-white transition-colors">Manifesto</Link>
-              </div>
-
               {/* Product */}
               <div className="flex flex-col gap-3">
                 <h4 className="text-white font-medium mb-2">Product</h4>
-                <Link to="/updates" className="text-white/50 hover:text-white transition-colors">Updates</Link>
+                <Link to="/#features" className="text-white/50 hover:text-white transition-colors">Features</Link>
                 <Link to="/pricing" className="text-white/50 hover:text-white transition-colors">Pricing</Link>
-                <Link to="/enterprise" className="text-white/50 hover:text-white transition-colors">Teams</Link>
-                <Link to="/contact" className="text-white/50 hover:text-white transition-colors">Sales</Link>
-                <Link to="/capabilities" className="text-white/50 hover:text-white transition-colors">Capabilities</Link>
-                <Link to="/partners" className="text-white/50 hover:text-white transition-colors">Affiliates</Link>
+                <Link to="/#docs" className="text-white/50 hover:text-white transition-colors">Documentation</Link>
+                <a href="https://zenvi.pro/login?mode=signup" className="text-white/50 hover:text-white transition-colors">Download</a>
               </div>
 
-              {/* Resources */}
+              {/* Legal */}
               <div className="flex flex-col gap-3">
-                <h4 className="text-white font-medium mb-2">Resources</h4>
-                <Link to="/articles" className="text-white/50 hover:text-white transition-colors">Articles</Link>
-                <a href="https://docs.zenvi.ai" className="text-white/50 hover:text-white transition-colors">Docs</a>
-                <a href="mailto:support@zenvi.ai" className="text-white/50 hover:text-white transition-colors">Support</a>
-                <Link to="/brand" className="text-white/50 hover:text-white transition-colors">Brand</Link>
-                <a href="https://status.zenvi.ai" className="text-white/50 hover:text-white transition-colors">Status</a>
-                <Link to="/privacy-policy" className="text-white/50 hover:text-white transition-colors">Privacy Policy</Link>
-                <Link to="/terms-of-service" className="text-white/50 hover:text-white transition-colors">Terms of Service</Link>
+                <h4 className="text-white font-medium mb-2">Legal</h4>
+                <Link to="/privacy-policy" className="text-white/50 hover:text-white transition-colors">Privacy</Link>
+                <Link to="/terms-of-service" className="text-white/50 hover:text-white transition-colors">Terms</Link>
+              </div>
+
+              {/* Company */}
+              <div className="flex flex-col gap-3">
+                <h4 className="text-white font-medium mb-2">Company</h4>
+                <a href="https://calendly.com/nilay800/zenvi" target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-white transition-colors">Contact</a>
               </div>
 
             </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Info } from "lucide-react";
@@ -79,6 +79,11 @@ export default function PricingPage() {
 
   const openWaitlist = () => setIsWaitlistOpen(true);
   const closeWaitlist = () => setIsWaitlistOpen(false);
+
+  // Automatically scroll to the very top of the page whenever the user navigates here
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#050505] text-white flex flex-col selection:bg-[#3275F8]/20 selection:text-[#3275F8] relative overflow-hidden font-sans">
@@ -501,10 +506,10 @@ export default function PricingPage() {
                   <div className="lg:col-span-8 flex flex-col justify-between relative z-20">
                     <div>
                       <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight mb-3 max-w-xl bg-clip-text text-transparent bg-gradient-to-r from-white to-white/80 font-serif">
-                        We help the world's best creative teams adapt to the generative age. Let us help you.
+                        AI editing, behind your firewall.
                       </h2>
                       <p className="text-xs md:text-sm text-white/60 mb-10 max-w-lg font-normal">
-                        Bespoke workflows, dedicated support, white-glove onboarding, and more.
+                        Your hardware. Your models. Your rules.
                       </p>
 
                       {/* Liquid Glass Bentos */}
@@ -519,13 +524,13 @@ export default function PricingPage() {
                         >
                           <div className="absolute inset-0 bg-gradient-to-br from-red-500/10 via-transparent to-transparent opacity-40 group-hover:opacity-80 transition-opacity duration-500" />
                           <h4 className="text-sm font-semibold relative z-10 leading-snug">
-                            Faster production, without sacrificing quality
+                            Days into hours
                           </h4>
                           <div className="relative z-10">
                             <p className="text-[11px] text-white/70 italic leading-normal mb-2">
-                              "What would've taken me days of 3D reconstruction and rendering took me less than an hour."
+                              "We could render on our own GPUs. No queue, no per-minute meter, no upload bar. The studio runs at the speed of the rack."
                             </p>
-                            <span className="text-[10px] font-bold text-[#3275F8]">Brand Marketing Team</span>
+                            <span className="text-[10px] font-bold text-[#3275F8]">Superteam Marketing Team</span>
                           </div>
                         </div>
 
@@ -539,13 +544,13 @@ export default function PricingPage() {
                         >
                           <div className="absolute inset-0 bg-gradient-to-br from-[#3275F8]/10 via-transparent to-transparent opacity-40 group-hover:opacity-80 transition-opacity duration-500" />
                           <h4 className="text-sm font-semibold relative z-10 leading-snug">
-                            Shared creative system that scales
+                            One timeline for every project.
                           </h4>
                           <div className="relative z-10">
                             <p className="text-[11px] text-white/70 italic leading-normal mb-2">
-                              "I look at Zenvi as an operating system more than a creative tool. We run all of our agency's research, design, and advertising in it."
+                              "We could share edits across the team without sharing the footage. Our raw media never left our network."
                             </p>
-                            <span className="text-[10px] font-bold text-[#3275F8]">Creative Agency</span>
+                            <span className="text-[10px] font-bold text-[#3275F8]">Ajna</span>
                           </div>
                         </div>
 
@@ -559,13 +564,13 @@ export default function PricingPage() {
                         >
                           <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-transparent opacity-40 group-hover:opacity-80 transition-opacity duration-500" />
                           <h4 className="text-sm font-semibold relative z-10 leading-snug">
-                            Seamless collaboration across whole team
+                            Audit every frame
                           </h4>
                           <div className="relative z-10">
                             <p className="text-[11px] text-white/70 italic leading-normal mb-2">
-                              "We have really enjoyed the collaborative nature of the platform and access to such a robust collection of APIs."
+                              "SSO, RBAC, network policy, audit logs. our model calls route through our keys. Compliance became easy with a trail."
                             </p>
-                            <span className="text-[10px] font-bold text-[#3275F8]">Film Studio</span>
+                            <span className="text-[10px] font-bold text-[#3275F8]">Passport</span>
                           </div>
                         </div>
                       </div>
@@ -574,14 +579,7 @@ export default function PricingPage() {
                     {/* Logo Ticker Strip */}
                     <div className="pt-6 border-t border-white/10">
                       <div className="flex flex-wrap items-center gap-x-8 gap-y-4 opacity-50 select-none">
-                        <span className="font-serif text-sm tracking-tighter font-bold">Pentagram</span>
-                        <span className="font-mono text-xs font-black tracking-widest">!!!MSCHF</span>
-                        <span className="font-sans text-xs font-extrabold uppercase tracking-tight">Riot Games</span>
-                        <span className="font-serif text-xs font-black tracking-widest">WPP</span>
-                        <span className="font-sans text-xs font-bold tracking-tight">Anomaly</span>
-                        <span className="font-sans text-xs font-black uppercase">Supercell</span>
-                        <span className="font-mono text-xs font-bold tracking-widest">AKQA</span>
-                        <span className="font-serif text-xs italic font-bold tracking-tight">Wayfair</span>
+                        <span className="font-serif text-sm tracking-tighter font-bold"> In pilot with select studios. Reach out for our current roster.</span>
                       </div>
                     </div>
                   </div>
@@ -593,12 +591,12 @@ export default function PricingPage() {
 
                       <ul className="space-y-4 mb-8">
                         {[
-                          "Custom enterprise pricing",
-                          "SOC II Compliance",
-                          "Model access controls",
-                          "Credit usage management",
-                          "Dedicated real-time support",
-                          "Bespoke onboarding, training, and creative support",
+                          "On-prem or air-gapped deployment",
+                          "SOC 2 Type II",
+                          "Bring your own API keys for hosted models",
+                          "No usage caps. No credit systems.",
+                          "Direct line to the founding team",
+                          "Custom fine-tuning, on your data, on your hardware",
                         ].map((item, idx) => (
                           <li key={idx} className="flex items-start gap-3 text-xs text-white/90 leading-relaxed">
                             <Check className="w-4 h-4 text-[#3275F8] shrink-0 mt-0.5" />
