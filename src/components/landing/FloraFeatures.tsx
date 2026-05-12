@@ -54,21 +54,19 @@ export default function FloraFeatures() {
                 <span className="text-white text-[32px] font-medium tracking-tight">{card.title}</span>
               </div>
 
-              {/* Video Placeholder Area */}
+              {/* Video Area */}
               <div className="px-6 h-[240px] md:h-[280px] w-full relative">
                 <div className="w-full h-full bg-[#0f0f0f] rounded-t-xl border-x border-t border-white/5 relative overflow-hidden group-hover:border-white/10 transition-colors">
-                  {/* Subtle grid or gradient to simulate the canvas space */}
-                  <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:16px_16px]" />
-                  
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-white/20 text-xs font-medium tracking-widest uppercase mb-2">Video Placeholder</span>
-                    <div className="w-12 h-12 rounded-full border border-white/10 bg-white/5 flex items-center justify-center">
-                      <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[10px] border-l-white/40 border-b-[6px] border-b-transparent ml-1" />
-                    </div>
-                  </div>
-                  
-                  {/* Decorative faint glow */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  <video
+                    src="/UGC_content.MP4"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover opacity-90 transition-opacity duration-500 group-hover:opacity-100"
+                  />
+                  {/* Decorative faint glow on top of video */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-transparent opacity-80" />
                 </div>
               </div>
 

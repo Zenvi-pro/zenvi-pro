@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 import { ZenviLogo } from "@/components/ZenviLogo";
+import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
 
 interface NavbarProps {
   onOpenWaitlist?: () => void;
@@ -10,24 +11,14 @@ interface NavbarProps {
 }
 
 const navLinks = [
-  { label: "Company", href: "#company" },
-  { label: "Enterprise", href: "#enterprise" },
+  { label: "Features", href: "#features" },
+  { label: "Showcase", href: "#showcase" },
   { label: "Pricing", href: "#pricing" },
-  { label: "Techniques", href: "#techniques", isNew: true },
-  { label: "Resources", href: "#resources" },
+  { label: "Docs", href: "#docs" },
 ];
 
 const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   return (
     <>
@@ -35,51 +26,60 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-black/60 backdrop-blur-2xl border-b border-white/[0.04]" : "bg-transparent"
-        }`}
+        className="fixed top-0 left-0 right-0 z-50 pointer-events-none pt-8 px-8 md:px-12"
       >
-        <div className="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="flex items-center justify-between relative">
           
           {/* Left: Logo */}
-          <Link to="/" className="flex items-center gap-2 z-50">
-            <ZenviLogo size={24} />
-            <span className="text-white font-medium text-lg tracking-tight">Zenvi</span>
-          </Link>
-
-          {/* Center: Links (Desktop) */}
-          <div className="hidden lg:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                to={link.href}
-                className="text-[14px] text-white/70 hover:text-white transition-colors flex items-center gap-2"
-              >
-                {link.label}
-                {link.isNew && (
-                  <span className="text-[10px] uppercase tracking-wider font-semibold bg-white/10 text-white px-1.5 py-0.5 rounded-sm">
-                    New
-                  </span>
-                )}
-              </Link>
-            ))}
+          <div className="pointer-events-auto flex items-center">
+            <Link to="/" className="opacity-90 hover:opacity-100 transition-opacity">
+              <ZenviLogo size={32} />
+            </Link>
           </div>
 
-          {/* Right: CTA (Desktop) */}
-          <div className="hidden lg:flex items-center gap-6">
-            <Link to="/careers" className="text-[14px] text-white/70 hover:text-white transition-colors">
-              Careers
-            </Link>
-            <button 
-              className="text-[14px] text-white hover:text-white/80 font-medium transition-colors"
+          {/* Center: Floating Island Links (Desktop) */}
+          <div className="hidden lg:flex pointer-events-auto absolute left-1/2 -translate-x-1/2">
+            <HoverBorderGradient
+              as="div"
+              containerClassName="rounded-[32px] p-0 border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl"
+              className="flex items-center gap-8 bg-[#0F0F0F] px-8 py-3"
             >
-              Contact sales
-            </button>
+              {navLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  to={link.href}
+                  className="text-[13px] font-medium text-white/60 hover:text-white transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </HoverBorderGradient>
+          </div>
+
+          {/* Right: Floating Island CTA (Desktop) */}
+          <div className="hidden lg:flex pointer-events-auto items-center">
+            <HoverBorderGradient
+              as="div"
+              containerClassName="rounded-[32px] p-0 border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl"
+              className="flex items-center gap-5 bg-[#0F0F0F] p-1.5 pl-6"
+            >
+              <button 
+                className="text-[13px] text-white/60 hover:text-white transition-colors font-medium"
+              >
+                Log in
+              </button>
+              <button 
+                onClick={onOpenWaitlist}
+                className="bg-white text-black text-[13px] font-semibold rounded-[24px] px-5 py-2.5 flex items-center gap-2 hover:bg-white/90 transition-all active:scale-95"
+              >
+                Join Waitlist <ArrowRight size={14} className="stroke-[2.5px]" />
+              </button>
+            </HoverBorderGradient>
           </div>
 
           {/* Mobile Menu Toggle */}
           <button 
-            className="lg:hidden z-50 text-white p-2 -mr-2"
+            className="lg:hidden pointer-events-auto z-50 bg-[#0F0F0F] border border-white/10 rounded-[24px] p-3 text-white backdrop-blur-xl shadow-xl"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -94,7 +94,7 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-3xl pt-24 px-6 flex flex-col gap-6"
+            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-3xl pt-28 px-8 flex flex-col gap-6"
           >
              {navLinks.map((link) => (
               <Link
@@ -104,16 +104,16 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
                 className="text-2xl font-medium text-white/80 hover:text-white flex items-center justify-between"
               >
                 {link.label}
-                {link.isNew && (
-                  <span className="text-xs uppercase tracking-wider font-semibold bg-white/10 text-white px-2 py-1 rounded-sm">
-                    New
-                  </span>
-                )}
               </Link>
             ))}
             <div className="w-full h-px bg-white/10 my-4" />
-            <Link to="/careers" onClick={() => setMobileMenuOpen(false)} className="text-xl text-white/80">Careers</Link>
-            <button className="text-xl text-left text-white">Contact sales</button>
+            <button className="text-xl text-left text-white/80 hover:text-white">Log in</button>
+            <button 
+              onClick={() => { setMobileMenuOpen(false); onOpenWaitlist?.(); }}
+              className="text-xl text-left font-semibold text-white mt-2"
+            >
+              Join Waitlist
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

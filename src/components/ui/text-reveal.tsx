@@ -6,6 +6,7 @@ interface TextRevealProps {
   className?: string;
   strikePhrase?: string;
   strikeAtProgress?: number;
+  strikeProgress?: number;
 }
 
 export function TextReveal({
@@ -14,6 +15,7 @@ export function TextReveal({
   className,
   strikePhrase,
   strikeAtProgress = 0.99,
+  strikeProgress,
 }: TextRevealProps) {
   const chars = Array.from(text);
   const clampedProgress = Math.max(0, Math.min(1, progress));
@@ -21,6 +23,10 @@ export function TextReveal({
   const shouldStrike = clampedProgress >= strikeAtProgress && Boolean(strikePhrase);
   const strikeStart = strikePhrase ? text.indexOf(strikePhrase) : -1;
   const strikeEnd = strikeStart >= 0 && strikePhrase ? strikeStart + strikePhrase.length : -1;
+  
+  const strikeScale = strikeProgress !== undefined 
+    ? Math.max(0, Math.min(1, strikeProgress))
+    : (shouldStrike ? 1 : 0);
 
   const renderChars = (source: string, offset: number) =>
     Array.from(source).map((char, idx) => {
@@ -48,11 +54,11 @@ export function TextReveal({
           <span className="relative inline-block">
             {renderChars(text.slice(strikeStart, strikeEnd), strikeStart)}
             <span
-              className="pointer-events-none absolute left-[-6%] top-1/2 h-[14px] w-[112%] -translate-y-1/2 rounded-full bg-primary/90 shadow-[0_0_18px_hsl(var(--primary)/0.45)]"
+              className="pointer-events-none absolute left-[-4%] top-1/2 h-[3px] w-[108%] -translate-y-1/2 rounded-full bg-[#3275F8] shadow-[0_0_12px_rgba(50,117,248,0.8)]"
               style={{
-                transform: shouldStrike ? "scaleX(1)" : "scaleX(0)",
+                transform: `scaleX(${strikeScale})`,
                 transformOrigin: "left center",
-                transition: "transform 2600ms cubic-bezier(0.22, 1, 0.36, 1)",
+                transition: strikeProgress !== undefined ? "none" : "transform 2600ms cubic-bezier(0.22, 1, 0.36, 1)",
               }}
             />
           </span>

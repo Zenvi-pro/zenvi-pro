@@ -74,6 +74,9 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
   const glowOpacityMV = useTransform(progress, [0.50, 0.82], [0, 1]);
   const scrollHintOpacityMV = useTransform(progress, [0, 0.85, 0.97], [1, 1, 0]);
 
+  const desktopSubProgressMV = useTransform(progress, [0.65, 0.85], [0, 1]);
+  const desktopStrikeProgressMV = useTransform(progress, [0.85, 0.95], [0, 1]);
+
   const [overlayOpacity, setOverlayOpacity] = useState(1);
   const [vignetteOpacity, setVignetteOpacity] = useState(0.55);
   const [announcementOpacity, setAnnouncementOpacity] = useState(1);
@@ -81,6 +84,9 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
   const [heroTextY, setHeroTextY] = useState(42);
   const [glowOpacity, setGlowOpacity] = useState(0);
   const [scrollHintOpacity, setScrollHintOpacity] = useState(1);
+  
+  const [desktopSubProgress, setDesktopSubProgress] = useState(0);
+  const [desktopStrikeProgress, setDesktopStrikeProgress] = useState(0);
 
   useMotionValueEvent(overlayOpacityMV, "change", (v) => setOverlayOpacity(v));
   useMotionValueEvent(vignetteOpacityMV, "change", (v) => setVignetteOpacity(v));
@@ -89,22 +95,30 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
   useMotionValueEvent(heroTextYMV, "change", (v) => setHeroTextY(v));
   useMotionValueEvent(glowOpacityMV, "change", (v) => setGlowOpacity(v));
   useMotionValueEvent(scrollHintOpacityMV, "change", (v) => setScrollHintOpacity(v));
+  useMotionValueEvent(desktopSubProgressMV, "change", (v) => setDesktopSubProgress(v));
+  useMotionValueEvent(desktopStrikeProgressMV, "change", (v) => setDesktopStrikeProgress(v));
 
-  // Strike-through sub-line reveal on mount
-  const [subProgress, setSubProgress] = useState(0);
+  // Strike-through sub-line reveal on mount (for mobile)
+  const [mobileSubProgress, setMobileSubProgress] = useState(0);
+  const [mobileStrikeProgress, setMobileStrikeProgress] = useState(0);
   useEffect(() => {
     const start = performance.now();
-    const duration = 1900;
-    const delay = 500;
+    const revealDuration = 1500;
+    const strikeDelay = 1800;
+    const strikeDuration = 1000;
     let raf = 0;
     const tick = (now: number) => {
-      const elapsed = now - start - delay;
-      if (elapsed < 0) { raf = requestAnimationFrame(tick); return; }
-      const p = Math.min(1, elapsed / duration);
-      setSubProgress(p);
-      if (p < 1) raf = requestAnimationFrame(tick);
+      const elapsed = now - start - 500;
+      if (elapsed >= 0) {
+        setMobileSubProgress(Math.min(1, elapsed / revealDuration));
+      }
+      const strikeElapsed = now - start - strikeDelay;
+      if (strikeElapsed >= 0) {
+        setMobileStrikeProgress(Math.min(1, strikeElapsed / strikeDuration));
+      }
+      if (strikeElapsed < strikeDuration) raf = requestAnimationFrame(tick);
     };
-    const id = setTimeout(() => { raf = requestAnimationFrame(tick); }, delay);
+    const id = setTimeout(() => { raf = requestAnimationFrame(tick); }, 500);
     return () => { clearTimeout(id); cancelAnimationFrame(raf); };
   }, []);
 
@@ -144,36 +158,26 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
 
         {/* === ZENVI letter-mask overlay (desktop) === */}
         <motion.div
-          className="pointer-events-none absolute inset-0 z-[2] hidden sm:block"
+          className="pointer-events-none absolute inset-0 z-[2] hidden sm:flex items-center justify-center bg-black text-white"
           style={{
             scale: overlayScale,
             opacity: overlayOpacity,
-            transformOrigin: "58% 50%",
+            mixBlendMode: "multiply",
+            transformOrigin: "50% 50%",
             willChange: "transform, opacity",
           }}
         >
-          <svg
-            viewBox="0 0 1400 700"
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-full w-full"
-            preserveAspectRatio="xMidYMid slice"
+          <div 
+            className="font-bold text-center"
+            style={{ 
+              fontFamily: "Geist, system-ui, sans-serif", 
+              fontSize: "min(15vw, 242px)", 
+              letterSpacing: "0.05em",
+              transform: "translateX(2%)" // slightly shift to center the optical weight
+            }}
           >
-            <defs>
-              <mask id="zenvi-letter-mask">
-                <rect width="1400" height="700" fill="white" />
-                <text
-                  x="700" y="360"
-                  textAnchor="middle" dominantBaseline="middle"
-                  fontSize="242" fontWeight="700"
-                  style={{ fontFamily: "Geist, system-ui, sans-serif", letterSpacing: "10px" }}
-                  fill="black"
-                >
-                  ZENVI
-                </text>
-              </mask>
-            </defs>
-            <rect width="1400" height="700" fill="#0A0A0A" mask="url(#zenvi-letter-mask)" />
-          </svg>
+            ZENVI
+          </div>
         </motion.div>
 
         {/* Soft cool-white halo behind the post-reveal headline */}
@@ -226,9 +230,9 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
             <div className="mx-auto mb-9 max-w-2xl">
               <TextReveal
                 text={SUB_TEXT}
-                progress={subProgress}
+                progress={desktopSubProgress}
                 strikePhrase="not cloud speed"
-                strikeAtProgress={0.92}
+                strikeProgress={desktopStrikeProgress}
                 className="mx-auto text-base font-medium text-white/85 drop-shadow-[0_2px_14px_rgba(0,0,0,0.55)] md:text-lg"
               />
             </div>
@@ -286,9 +290,9 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
             <div className="mx-auto mb-7 max-w-md">
               <TextReveal
                 text={SUB_TEXT}
-                progress={subProgress}
+                progress={mobileSubProgress}
                 strikePhrase="not cloud speed"
-                strikeAtProgress={0.92}
+                strikeProgress={mobileStrikeProgress}
                 className="text-sm text-white/85"
               />
             </div>
