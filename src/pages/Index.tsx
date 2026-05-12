@@ -6,7 +6,6 @@ import FloraFeatures from "@/components/landing/FloraFeatures";
 import FloraWorkflows from "@/components/landing/FloraWorkflows";
 import FloraModels from "@/components/landing/FloraModels";
 import Footer from "@/components/landing/Footer";
-import WaitlistModal from "@/components/landing/WaitlistModal";
 import AccessCodeModal from "@/components/landing/AccessCodeModal";
 import { IntroOverlay } from "@/components/landing/IntroOverlay";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,7 +14,6 @@ const INTRO_STORAGE_KEY = "zenvi-intro-done";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
   const [accessCodePlanKey, setAccessCodePlanKey] = useState<string>("pro");
   const [isAccessCodeOpen, setIsAccessCodeOpen] = useState(false);
   const [introVisible, setIntroVisible] = useState(() => {
@@ -23,8 +21,10 @@ const Index = () => {
     return !sessionStorage.getItem(INTRO_STORAGE_KEY);
   });
 
-  const openWaitlist = () => setIsWaitlistOpen(true);
-  const closeWaitlist = () => setIsWaitlistOpen(false);
+  // Signup CTAs link out to https://zenvi.pro/login?mode=signup directly — no in-page modal.
+  const openWaitlist = () => {
+    window.location.href = "https://zenvi.pro/login?mode=signup";
+  };
 
   const openAccessCode = (planKey?: string) => {
     setAccessCodePlanKey(planKey ?? "pro");
@@ -61,7 +61,6 @@ const Index = () => {
       <FloraWorkflows />
       <FloraModels />
       <Footer />
-      <WaitlistModal isOpen={isWaitlistOpen} onClose={closeWaitlist} />
       <AccessCodeModal
         isOpen={isAccessCodeOpen}
         onClose={() => setIsAccessCodeOpen(false)}
