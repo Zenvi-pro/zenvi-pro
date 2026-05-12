@@ -11,10 +11,10 @@ interface NavbarProps {
 }
 
 const navLinks = [
-  { label: "Features", href: "#features" },
-  { label: "Showcase", href: "#showcase" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "Docs", href: "#docs" },
+  { label: "Features", href: "/#features" },
+  { label: "Showcase", href: "/#showcase" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Docs", href: "/#docs" },
 ];
 
 const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
@@ -63,17 +63,18 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
               containerClassName="rounded-[32px] p-0 border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl"
               className="flex items-center gap-5 bg-[#0F0F0F] p-1.5 pl-6"
             >
-              <button 
+              <Link 
+                to="/login"
                 className="text-[13px] text-white/60 hover:text-white transition-colors font-medium"
               >
                 Log in
-              </button>
-              <button 
-                onClick={onOpenWaitlist}
+              </Link>
+              <Link 
+                to="/signup"
                 className="bg-white text-black text-[13px] font-semibold rounded-[24px] px-5 py-2.5 flex items-center gap-2 hover:bg-white/90 transition-all active:scale-95"
               >
                 Join Waitlist <ArrowRight size={14} className="stroke-[2.5px]" />
-              </button>
+              </Link>
             </HoverBorderGradient>
           </div>
 
@@ -107,13 +108,20 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
               </Link>
             ))}
             <div className="w-full h-px bg-white/10 my-4" />
-            <button className="text-xl text-left text-white/80 hover:text-white">Log in</button>
-            <button 
-              onClick={() => { setMobileMenuOpen(false); onOpenWaitlist?.(); }}
-              className="text-xl text-left font-semibold text-white mt-2"
+            <Link 
+              to="/login" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-xl text-left text-white/80 hover:text-white block"
+            >
+              Log in
+            </Link>
+            <Link 
+              to="/signup" 
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-xl text-left font-semibold text-white mt-2 block"
             >
               Join Waitlist
-            </button>
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>

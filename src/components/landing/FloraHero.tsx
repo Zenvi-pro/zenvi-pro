@@ -19,6 +19,7 @@
  */
 
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   motion,
   useMotionValueEvent,
@@ -52,6 +53,7 @@ const scrollToDemo = () => {
  *   0.85–0.97   | Scroll hint fades out
  */
 const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
+  const navigate = useNavigate();
   const sectionRef = useRef<HTMLElement | null>(null);
 
   const { scrollYProgress } = useScroll({
@@ -198,7 +200,7 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
         >
           <button
             type="button"
-            onClick={scrollToDemo}
+            onClick={() => navigate("/login?mode=signup")}
             className="pointer-events-auto group inline-flex items-center gap-2 rounded-[12px] border border-white/10 bg-white/[0.06] py-1.5 pl-1.5 pr-3 text-sm backdrop-blur-md transition-colors hover:bg-white/[0.10] active:scale-[0.985]"
           >
             <span className="rounded-[8px] bg-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-black">
@@ -241,7 +243,7 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
             <div className="flex flex-col items-center justify-center gap-2.5 sm:flex-row sm:gap-3">
               <button
                 type="button"
-                onClick={onOpenWaitlist}
+                onClick={() => navigate("/login?mode=signup")}
                 className="inline-flex h-10 items-center gap-1.5 rounded-[12px] bg-white px-5 text-sm font-medium text-black transition-all hover:bg-white/90 active:scale-[0.98]"
               >
                 Get Started Free
@@ -277,10 +279,14 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
         {/* === MOBILE: content visible immediately, no scroll choreography === */}
         <div className="relative z-10 mx-auto flex h-full max-w-[1240px] flex-col items-center justify-center px-6 text-center sm:hidden">
           <div className="w-full max-w-md">
-            <p className="mb-4 inline-flex items-center gap-2 rounded-[12px] border border-white/10 bg-white/[0.06] py-1.5 pl-1.5 pr-3 text-xs backdrop-blur-md">
+            <button
+              type="button"
+              onClick={() => navigate("/login?mode=signup")}
+              className="mb-4 inline-flex items-center gap-2 rounded-[12px] border border-white/10 bg-white/[0.06] py-1.5 pl-1.5 pr-3 text-xs backdrop-blur-md active:scale-95 transition-all"
+            >
               <span className="rounded-[8px] bg-white px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-black">New</span>
               <span className="text-white/85">Zenvi for Mac · Early access</span>
-            </p>
+            </button>
             <h2
               aria-hidden="true"
               className="mb-3 text-balance font-serif text-[2.25rem] font-normal leading-[1.05] tracking-[-0.01em] text-white"
@@ -299,7 +305,7 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
             <div className="flex flex-col items-center justify-center gap-2.5">
               <button
                 type="button"
-                onClick={onOpenWaitlist}
+                onClick={() => navigate("/login?mode=signup")}
                 className="inline-flex h-11 w-full items-center justify-center gap-1.5 rounded-[12px] bg-white px-5 text-sm font-medium text-black transition-all hover:bg-white/90 active:scale-[0.98]"
               >
                 Get Started Free

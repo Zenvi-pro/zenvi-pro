@@ -3,60 +3,60 @@ import { motion, useInView, AnimatePresence } from "framer-motion";
 import { N8nWorkflowBlock } from "@/components/ui/n8n-workflow-block-shadcnui";
 
 const categories = [
-  { 
-    id: "vfx", 
-    name: "Story Telling", 
-    title: "Character & Background Swaps", 
-    desc: "Test environments, add or remove objects, and reimagine entire scenes.",
+  {
+    id: "vfx",
+    name: "Story Telling",
+    title: "Canvas",
+    desc: "Restructure your edit on an infinite canvas. Every beat visible, every cut moveable.",
     bg: "from-blue-900/40"
   },
-  { 
-    id: "fashion", 
-    name: "Branding", 
-    title: "Garment Try-Ons", 
-    desc: "Try on multiple outfits and generate consistent videos, all from a single image.",
+  {
+    id: "fashion",
+    name: "Branding",
+    title: "Business DNA",
+    desc: "Feed Zenvi your brand. Every export inherits your fonts, colors, and look.",
     bg: "from-purple-900/40"
   },
-  { 
-    id: "advertising", 
-    name: "Directors", 
-    title: "Commercial Shoots", 
-    desc: "Create virtual shoots with consistent products.",
+  {
+    id: "advertising",
+    name: "Directors",
+    title: "Don't Start from Scratch",
+    desc: "Editing styles as prompts. Pick a director, get a cut in their voice.",
     bg: "from-amber-900/40"
   },
-  { 
-    id: "photography", 
-    name: "Motion Graphics", 
-    title: "Campaign Previz", 
-    desc: "Mock up products, signage, and deliverables for entire campaigns.",
+  {
+    id: "photography",
+    name: "Motion Graphics",
+    title: "Animation at Your Fingertips",
+    desc: "Type the title. Get the animation. Your fonts, your motion, exported clean.",
     bg: "from-emerald-900/40"
   },
-  { 
-    id: "concepting", 
-    name: "Camera Motion", 
-    title: "Sketch to Render", 
-    desc: "Rapidly explore materials, lighting, and composition.",
+  {
+    id: "concepting",
+    name: "Camera Motion",
+    title: "Shoot First Direct Later",
+    desc: "Add pans, pushes, and dollies to static shots. Direct after the shoot.",
     bg: "from-rose-900/40"
   },
-  { 
-    id: "branding", 
-    name: "3D Motion", 
-    title: "Icon Brand System", 
-    desc: "Generate on-brand iconography at scale.",
+  {
+    id: "branding",
+    name: "3D Motion",
+    title: "New Enviornments",
+    desc: "3D scenes from 2D footage. Move the camera without a reshoot.",
     bg: "from-indigo-900/40"
   },
-  { 
-    id: "motion", 
-    name: "Colorization", 
-    title: "3D Logo Animation", 
-    desc: "Restyle 2D logos into animated 3D motion graphics.",
+  {
+    id: "motion",
+    name: "Colorization",
+    title: "Cinematic Color Grading",
+    desc: "AI grades across shots. You keep the dials.",
     bg: "from-fuchsia-900/40"
   },
-  { 
-    id: "architecture", 
-    name: "Teams", 
-    title: "Archviz Renders", 
-    desc: "Instant renders, light studies, and mockups.",
+  {
+    id: "architecture",
+    name: "Teams",
+    title: "Work Together Anywhere",
+    desc: "Share projects without uploading footage. Cloud is opt-in, not default.",
     bg: "from-slate-900/40"
   },
 ];
@@ -75,8 +75,8 @@ function CategoryTitle({ category, index, activeIndex, setActiveIndex }: { categ
 
   return (
     <div ref={ref} className="h-[25vh] md:h-[30vh] flex items-center">
-      <motion.h2 
-        animate={{ 
+      <motion.h2
+        animate={{
           color: isActive ? "rgba(255, 255, 255, 1)" : "rgba(255, 255, 255, 0.15)",
           scale: isActive ? 1 : 0.95,
           x: isActive ? 0 : -10
@@ -95,13 +95,13 @@ export default function FloraWorkflows() {
 
   return (
     <section className="relative bg-black w-full" style={{ height: `${categories.length * 30 + 100}vh` }}>
-      
+
       {/* Sticky Background & Right Side */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex">
-        
+
         {/* Dynamic Background */}
         <AnimatePresence mode="wait">
-          <motion.div 
+          <motion.div
             key={activeIndex}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -113,13 +113,13 @@ export default function FloraWorkflows() {
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.1)_0%,transparent_70%)]" />
           </motion.div>
         </AnimatePresence>
-        
+
         {/* Dark overlay to ensure text readability */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
 
         {/* Content Grid */}
         <div className="absolute inset-0 max-w-[1400px] mx-auto px-6 md:px-12 flex pt-24 md:pt-32 pointer-events-none">
-          
+
           {/* Left Column Spacer */}
           <div className="w-[45%] lg:w-1/2" />
 
@@ -128,7 +128,7 @@ export default function FloraWorkflows() {
             <div className="bg-black/80 backdrop-blur-xl rounded-[24px] w-full aspect-[16/10] border border-white/5 relative overflow-hidden shadow-2xl flex items-center justify-center">
               {/* Dot Grid inside the black rectangle */}
               <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.15)_1px,transparent_1px)] [background-size:20px_20px] opacity-30" />
-              
+
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeIndex}
@@ -164,7 +164,7 @@ export default function FloraWorkflows() {
                 </motion.div>
               </AnimatePresence>
             </div>
-            
+
             {/* Right Column Sticky Footer */}
             <div className="mt-8">
               <AnimatePresence mode="wait">
@@ -193,14 +193,14 @@ export default function FloraWorkflows() {
         <div className="max-w-[1400px] mx-auto px-6 md:px-12 flex h-full">
           {/* Left Column Native Scrolling List */}
           <div className="w-[45%] lg:w-1/2 pointer-events-auto">
-            
+
             {/* Left Column Intro Header (Scrolls naturally) */}
             <div className="pt-24 md:pt-32 pb-8 md:pb-16 flex flex-col">
               <h2 className="text-[24px] md:text-[28px] text-white font-medium tracking-tight">
-                Generative workflows that scale.
+                One Timeline. Every Tool.
               </h2>
               <p className="text-white/60 text-[15px] max-w-sm mt-3 leading-relaxed">
-                Teams from <span className="text-white font-medium">Pentagram</span> to <span className="text-white font-medium">Lionsgate</span> use Zenvi to explore possibilities and amplify their creative output.
+                Swap an environment. Remove an object. Recast an actor. The shoot you couldn't afford, after the shoot.
               </p>
               <div className="flex items-center gap-6 mt-6">
                 <button className="bg-white/10 hover:bg-white/20 transition-colors border border-white/10 text-white/90 px-5 py-2 rounded-full text-[13px] font-medium backdrop-blur-sm">

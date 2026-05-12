@@ -92,26 +92,37 @@ const GROUP_1 = ALL_PROVIDERS.slice(0, 3).map(p => ({ ...p, id: p.company }));
 const GROUP_2 = ALL_PROVIDERS.slice(3, 6).map(p => ({ ...p, id: p.company }));
 const GROUP_3 = ALL_PROVIDERS.slice(6, 9).map(p => ({ ...p, id: p.company }));
 
+import { useNavigate } from "react-router-dom";
+
 export default function FloraModels() {
+  const navigate = useNavigate();
   return (
     <section className="bg-black py-32 border-t border-white/5 overflow-hidden">
       <div className="max-w-[1240px] mx-auto px-6">
-        
+
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between md:items-end mb-16 gap-6">
           <div>
             <h2 className="text-[28px] md:text-[36px] font-medium text-white tracking-tight mb-3">
-              One subscription to rule them all.
+              Run yours. Or ours.
             </h2>
             <p className="text-[17px] text-white/50 max-w-xl">
-              One plan. 50+ models. Stay on the creative edge without chasing licenses.
+              The only subscription that adapts to your tools, not the other way around. Open-weights stay on your machine. Hosted models stay one click away.
             </p>
           </div>
           <div className="flex items-center gap-6">
-            <button className="text-white/60 hover:text-white transition-colors text-[14px] font-medium flex items-center gap-2">
-              Contact sales <span className="rotate-[-45deg]">&rarr;</span>
-            </button>
-            <button className="bg-white/10 hover:bg-white/20 border border-white/10 text-white h-11 px-6 rounded-full font-medium text-[14px] transition-colors">
+            <a
+              href="https://calendly.com/nilay800/zenvi"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/60 hover:text-white transition-colors text-[14px] font-medium"
+            >
+              Contact sales
+            </a>
+            <button
+              onClick={() => navigate("/login?mode=signup")}
+              className="bg-white/10 hover:bg-white/20 border border-white/10 text-white h-11 px-6 rounded-full font-medium text-[14px] transition-colors"
+            >
               Sign up for free
             </button>
           </div>

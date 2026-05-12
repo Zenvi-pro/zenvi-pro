@@ -18,6 +18,7 @@ import NotFound from "./pages/NotFound";
 import DocsLayout from "./components/docs/DocsLayout";
 import DocsHome from "./pages/DocsHome";
 import DocsPage from "./pages/DocsPage";
+import PricingPage from "./pages/PricingPage";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
+          <Route path="/pricing" element={<PricingPage />} />
           <Route path="/docs" element={<DocsLayout />}>
             <Route index element={<DocsHome />} />
             <Route path=":slug" element={<DocsPage />} />

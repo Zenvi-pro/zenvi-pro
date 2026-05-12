@@ -7,32 +7,40 @@ export default function Footer() {
 
   return (
     <footer className="bg-black text-white w-full">
-      
+
       {/* Top CTA Section */}
-      <div className="max-w-[1200px] mx-auto px-6 py-32 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 text-center md:text-left">
-        <h2 className="text-[24px] md:text-[28px] text-white/80">
-          A <span className="text-white font-medium">new medium</span> needs a <span className="text-white font-medium">new canvas</span>.
+      <div className="max-w-[1200px] mx-auto px-6 py-32 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 text-center md:text-left relative z-20">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight">
+          Yours be default. Early <span className="text-[#3275F8]">access</span>.
         </h2>
-        <div className="flex items-center gap-6">
-          <button className="text-white/60 hover:text-white text-[13px] font-medium flex items-center gap-2 transition-colors">
-            Contact sales <span className="text-[10px]">&nearr;</span>
-          </button>
-          <button className="bg-white/10 hover:bg-white/20 border border-white/10 text-white h-10 px-5 rounded-xl font-medium text-[13px] backdrop-blur-md transition-colors">
+        <div className="flex items-center gap-6 shrink-0">
+          <a
+            href="https://calendly.com/nilay800/zenvi"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white hover:text-[#3275F8] text-base font-bold transition-colors"
+          >
+            Contact sales
+          </a>
+          <Link
+            to="/signup"
+            className="bg-white hover:bg-white/90 text-black px-8 py-3.5 rounded-full font-bold text-sm shadow-[0_4px_20px_rgba(255,255,255,0.25)] transition-all active:scale-95 block text-center"
+          >
             Sign up for free
-          </button>
+          </Link>
         </div>
       </div>
 
       {/* Main Footer Block */}
       <div className="w-full relative mt-10">
-        
+
         {/* Outer Rounded Container with Background Image/Video Placeholder */}
         <div className="relative w-full min-h-[500px] rounded-t-[40px] overflow-hidden border-t border-x border-white/10 bg-[#050505]">
-          
+
           {/* Background Video Placeholder */}
           <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-black opacity-30" />
           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop')] bg-cover bg-center opacity-30 mix-blend-luminosity" />
-          
+
           {/* Dark Overlay (Black transparent cover) */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/40" />
 
@@ -45,7 +53,7 @@ export default function Footer() {
 
           {/* Footer Content */}
           <div className="relative z-10 max-w-[1200px] mx-auto px-6 py-20 flex flex-col md:flex-row justify-between gap-16">
-            
+
             {/* Left Column: Logo, Copyright, Socials */}
             <div className="flex flex-col gap-8">
               <div className="flex items-center gap-4">
@@ -55,14 +63,14 @@ export default function Footer() {
                   <p>All rights reserved.</p>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-5 text-white/40">
                 <a href="#" className="hover:text-white transition-colors"><Twitter size={16} /></a>
                 <a href="#" className="hover:text-white transition-colors"><Instagram size={16} /></a>
                 <a href="#" className="hover:text-white transition-colors"><Youtube size={16} /></a>
                 {/* TikTok icon placeholder */}
                 <a href="#" className="hover:text-white transition-colors">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" /></svg>
                 </a>
                 <a href="#" className="hover:text-white transition-colors"><Linkedin size={16} /></a>
                 <a href="#" className="hover:text-white transition-colors"><Github size={16} /></a>
@@ -71,7 +79,7 @@ export default function Footer() {
 
             {/* Right Column: Links Grid */}
             <div className="flex flex-wrap gap-16 md:gap-24 text-[12px]">
-              
+
               {/* Company */}
               <div className="flex flex-col gap-3">
                 <h4 className="text-white font-medium mb-2">Company</h4>

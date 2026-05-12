@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   motion,
   useMotionValueEvent,
@@ -38,6 +39,7 @@ const scrollToDemo = () => {
  * mouse-wheel ticks feel continuous when smoothed by useSpring.
  */
 const Hero = ({ onOpenWaitlist, onRevealSequenceComplete }: HeroProps) => {
+  const navigate = useNavigate();
   const sectionRef = useRef<HTMLElement | null>(null);
 
   const { scrollYProgress } = useScroll({
@@ -234,7 +236,7 @@ const Hero = ({ onOpenWaitlist, onRevealSequenceComplete }: HeroProps) => {
 
             <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
               <Button
-                onClick={onOpenWaitlist}
+                onClick={() => navigate("/signup")}
                 size="lg"
                 className="h-12 rounded-full bg-white px-8 text-base font-semibold text-black shadow-[0_8px_40px_rgba(120,210,255,0.18)] hover:bg-white/90"
               >
@@ -274,7 +276,7 @@ const Hero = ({ onOpenWaitlist, onRevealSequenceComplete }: HeroProps) => {
             </div>
             <div className="flex flex-col items-center justify-center gap-3">
               <Button
-                onClick={onOpenWaitlist}
+                onClick={() => navigate("/signup")}
                 size="lg"
                 className="h-12 w-full rounded-full bg-white px-8 text-base font-semibold text-black hover:bg-white/90"
               >

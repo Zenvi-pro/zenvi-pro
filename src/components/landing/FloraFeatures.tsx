@@ -31,14 +31,14 @@ export default function FloraFeatures() {
   return (
     <section className="bg-black text-white py-24">
       <div className="max-w-[1240px] mx-auto px-6">
-        
+
         {/* Header */}
         <div className="mb-12">
           <h2 className="text-[32px] md:text-[40px] font-medium tracking-tight mb-4 text-white">
-            Never let a good idea go unexplored.
+            Made for EVERYTHING you shoot.
           </h2>
           <p className="text-[17px] text-white/50 max-w-3xl leading-relaxed">
-            Meet Zenvi, the creative agent inside Zenvi that thinks with you, builds with you, and never runs out of directions to try.
+            Vlogs and features. Brand spots and music videos. Shorts, podcasts, commercials, cuts you haven't named yet. The cloud was a workaround. Your machine is the studio now..
           </p>
         </div>
 
@@ -47,7 +47,7 @@ export default function FloraFeatures() {
           {cards.map((card, i) => {
             const isHovered = hoveredIndex === i;
             const isAnyHovered = hoveredIndex !== null;
-            
+
             return (
               <motion.div
                 key={i}
@@ -73,7 +73,7 @@ export default function FloraFeatures() {
                   />
                   {/* Subtle Grid Overlay */}
                   <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
-                  
+
                   {/* Vignette Gradients for Text Readability */}
                   <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/80 opacity-90 pointer-events-none" />
                 </div>
@@ -91,7 +91,7 @@ export default function FloraFeatures() {
                     <h3 className="text-white text-[20px] font-medium tracking-tight mb-2">
                       {card.subtitle}
                     </h3>
-                    <motion.p 
+                    <motion.p
                       animate={{ opacity: isHovered ? 1 : 0.6 }}
                       transition={{ duration: 0.4 }}
                       className="text-white/60 text-[15px] leading-relaxed whitespace-pre-line max-w-[300px]"

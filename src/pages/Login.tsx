@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle, Eye, EyeOff, Loader2 } from "lucide-react";
@@ -32,7 +32,18 @@ export default function LoginPage() {
   const next = searchParams.get("next");
   const isDesktop = !!state;
 
-  const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
+  const modeParam = searchParams.get("mode");
+  const [authMode, setAuthMode] = useState<"signin" | "signup">(
+    modeParam === "signup" ? "signup" : "signin"
+  );
+
+  useEffect(() => {
+    if (modeParam === "signup") {
+      setAuthMode("signup");
+    } else if (modeParam === "signin") {
+      setAuthMode("signin");
+    }
+  }, [modeParam]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
