@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { ZenviLogo } from "@/components/ZenviLogo";
@@ -19,6 +19,23 @@ const navLinks = [
 
 const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // For "/#anchor" links: if we're already on home, smooth-scroll to the section.
+  // Otherwise navigate home with the hash — Index.tsx scrolls on mount.
+  const handleAnchorClick = (href: string) => (e: React.MouseEvent) => {
+    if (!href.startsWith("/#")) return;
+    const id = href.slice(2);
+    setMobileMenuOpen(false);
+    if (location.pathname === "/") {
+      e.preventDefault();
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      e.preventDefault();
+      navigate(href);
+    }
+  };
 
   return (
     <>
@@ -48,6 +65,7 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
                 <Link
                   key={link.label}
                   to={link.href}
+                  onClick={handleAnchorClick(link.href)}
                   className="text-[13px] font-medium text-white/60 hover:text-white transition-colors"
                 >
                   {link.label}
@@ -101,7 +119,7 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
               <Link
                 key={link.label}
                 to={link.href}
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={handleAnchorClick(link.href)}
                 className="text-2xl font-medium text-white/80 hover:text-white flex items-center justify-between"
               >
                 {link.label}

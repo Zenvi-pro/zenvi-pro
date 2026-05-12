@@ -2,62 +2,77 @@ import { useRef, useState, useEffect } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { N8nWorkflowBlock } from "@/components/ui/n8n-workflow-block-shadcnui";
 
-const categories = [
+const categories: Array<{
+  id: string;
+  name: string;
+  title: string;
+  desc: string;
+  bg: string;
+  video?: string;
+}> = [
   {
     id: "vfx",
     name: "Story Telling",
     title: "Canvas",
     desc: "Restructure your edit on an infinite canvas. Every beat visible, every cut moveable.",
-    bg: "from-blue-900/40"
+    bg: "from-blue-900/40",
+    video: "/5408604_Coll_wavebreak_People.mp4",
   },
   {
     id: "fashion",
     name: "Branding",
     title: "Business DNA",
     desc: "Feed Zenvi your brand. Every export inherits your fonts, colors, and look.",
-    bg: "from-purple-900/40"
+    bg: "from-purple-900/40",
+    video: "/6010454_4k_Beautiful_3840x2160.mp4",
   },
   {
     id: "advertising",
     name: "Directors",
     title: "Don't Start from Scratch",
     desc: "Editing styles as prompts. Pick a director, get a cut in their voice.",
-    bg: "from-amber-900/40"
+    bg: "from-amber-900/40",
+    video: "/6034682_Business_Up_3840x2160.mp4",
   },
   {
     id: "photography",
     name: "Motion Graphics",
     title: "Animation at Your Fingertips",
     desc: "Type the title. Get the animation. Your fonts, your motion, exported clean.",
-    bg: "from-emerald-900/40"
+    bg: "from-emerald-900/40",
+    video: "/190317-887815641.mp4",
   },
   {
     id: "concepting",
     name: "Camera Motion",
     title: "Shoot First Direct Later",
     desc: "Add pans, pushes, and dollies to static shots. Direct after the shoot.",
-    bg: "from-rose-900/40"
+    bg: "from-rose-900/40",
+    video: "/15181254_1920_1080_25fps.mp4",
   },
   {
     id: "branding",
     name: "3D Motion",
     title: "New Enviornments",
     desc: "3D scenes from 2D footage. Move the camera without a reshoot.",
-    bg: "from-indigo-900/40"
+    bg: "from-indigo-900/40",
+    video: "/157022-813913004_medium.mp4",
   },
   {
     id: "motion",
     name: "Colorization",
     title: "Cinematic Color Grading",
     desc: "AI grades across shots. You keep the dials.",
-    bg: "from-fuchsia-900/40"
+    bg: "from-fuchsia-900/40",
+    video: "/0_Whale_Shark_Shark_3840x2160.mp4",
   },
   {
     id: "architecture",
     name: "Teams",
     title: "Work Together Anywhere",
     desc: "Share projects without uploading footage. Cloud is opt-in, not default.",
-    bg: "from-slate-900/40"
+    bg: "from-slate-900/40",
+    video: "/205193-926528071_small.mp4",
   },
 ];
 
@@ -94,28 +109,50 @@ export default function FloraWorkflows() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <section className="relative bg-black w-full" style={{ height: `${categories.length * 30 + 100}vh` }}>
+    <section id="features" className="relative bg-black w-full" style={{ height: `${categories.length * 30 + 100}vh` }}>
 
       {/* Sticky Background & Right Side */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex">
 
-        {/* Dynamic Background */}
+        {/* Dynamic Background — full-bleed video for categories that have one,
+            gradient fallback (matches original look) for those that don't. */}
         <AnimatePresence mode="wait">
-          <motion.div
-            key={activeIndex}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8 }}
-            className={`absolute inset-0 bg-gradient-to-br ${categories[activeIndex].bg} to-black opacity-60`}
-          >
-            {/* Adding a generic placeholder pattern to simulate the images */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.1)_0%,transparent_70%)]" />
-          </motion.div>
+          {categories[activeIndex].video ? (
+            <motion.div
+              key={`video-${activeIndex}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8 }}
+              className="absolute inset-0"
+            >
+              <video
+                key={categories[activeIndex].video}
+                src={categories[activeIndex].video}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key={`gradient-${activeIndex}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.8 }}
+              className={`absolute inset-0 bg-gradient-to-br ${categories[activeIndex].bg} to-black opacity-60`}
+            >
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.1)_0%,transparent_70%)]" />
+            </motion.div>
+          )}
         </AnimatePresence>
 
-        {/* Dark overlay to ensure text readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
+        {/* Dark overlay to ensure text readability — left stays solid black, right fades to reveal video */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-black/30" />
 
         {/* Content Grid */}
         <div className="absolute inset-0 max-w-[1400px] mx-auto px-6 md:px-12 flex pt-24 md:pt-32 pointer-events-none">

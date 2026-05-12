@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
 import FloraHero from "@/components/landing/FloraHero";
 import FloraFeatures from "@/components/landing/FloraFeatures";
@@ -14,12 +14,25 @@ const INTRO_STORAGE_KEY = "zenvi-intro-done";
 
 const Index = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [accessCodePlanKey, setAccessCodePlanKey] = useState<string>("pro");
   const [isAccessCodeOpen, setIsAccessCodeOpen] = useState(false);
   const [introVisible, setIntroVisible] = useState(() => {
     if (typeof window === "undefined") return true;
     return !sessionStorage.getItem(INTRO_STORAGE_KEY);
   });
+
+  // When navigating in with a hash (e.g. /pricing → /#features), scroll to the target
+  // once the intro overlay is gone and the section has mounted.
+  useEffect(() => {
+    if (!location.hash || introVisible) return;
+    const id = location.hash.slice(1);
+    // Defer one frame so the section is in the DOM and the layout has settled.
+    const t = window.setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
+    return () => window.clearTimeout(t);
+  }, [location.hash, introVisible]);
 
   // Signup CTAs link out to https://zenvi.pro/login?mode=signup directly — no in-page modal.
   const openWaitlist = () => {

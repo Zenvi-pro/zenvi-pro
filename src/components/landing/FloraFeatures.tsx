@@ -29,7 +29,7 @@ export default function FloraFeatures() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
-    <section className="bg-black text-white py-24">
+    <section id="showcase" className="bg-black text-white py-24">
       <div className="max-w-[1240px] mx-auto px-6">
 
         {/* Header */}

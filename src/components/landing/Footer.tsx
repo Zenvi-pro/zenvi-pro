@@ -6,7 +6,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-black text-white w-full">
+    <footer id="docs" className="bg-black text-white w-full">
 
       {/* Top CTA Section */}
       <div className="max-w-[1200px] mx-auto px-6 py-32 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 text-center md:text-left relative z-20">
