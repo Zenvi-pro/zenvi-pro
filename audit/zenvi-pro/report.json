@@ -1,0 +1,946 @@
+{
+  "home": {
+    "url": "https://zenvi.pro/",
+    "status": 200,
+    "meta": {
+      "title": "Zenvi — AI Video Editing, Locally Powered",
+      "description": "Edit smarter, publish faster. Zenvi is AI-powered video editing that runs entirely on your device. No uploads, no latency, no compromises.",
+      "ogImage": null,
+      "url": "https://zenvi.pro/",
+      "bodyLen": 2674,
+      "scrollHeight": 8606
+    },
+    "headlines": [
+      {
+        "tag": "H2",
+        "text": "A professional workspace, zero latency"
+      },
+      {
+        "tag": "H2",
+        "text": "Everythingyouneedtoeditlikeapro"
+      },
+      {
+        "tag": "H2",
+        "text": "Why local beats cloud"
+      },
+      {
+        "tag": "H4",
+        "text": "Processing Speed"
+      },
+      {
+        "tag": "H4",
+        "text": "Privacy"
+      },
+      {
+        "tag": "H4",
+        "text": "File Size Limit"
+      },
+      {
+        "tag": "H4",
+        "text": "Internet Required"
+      },
+      {
+        "tag": "H4",
+        "text": "Latency"
+      },
+      {
+        "tag": "H4",
+        "text": "Cost Model"
+      },
+      {
+        "tag": "H2",
+        "text": "Simple, predictable pricing"
+      },
+      {
+        "tag": "H3",
+        "text": "Creator"
+      },
+      {
+        "tag": "H3",
+        "text": "Pro"
+      },
+      {
+        "tag": "H3",
+        "text": "Studio"
+      },
+      {
+        "tag": "H3",
+        "text": "Lifetime Access"
+      },
+      {
+        "tag": "H3",
+        "text": "Zenvi"
+      },
+      {
+        "tag": "H4",
+        "text": "Product"
+      },
+      {
+        "tag": "H4",
+        "text": "Legal"
+      },
+      {
+        "tag": "H4",
+        "text": "Company"
+      }
+    ],
+    "ctas": [
+      {
+        "text": "Features",
+        "href": "#features",
+        "role": null
+      },
+      {
+        "text": "Showcase",
+        "href": "#demo",
+        "role": null
+      },
+      {
+        "text": "Pricing",
+        "href": "#pricing",
+        "role": null
+      },
+      {
+        "text": "Docs",
+        "href": "/docs",
+        "role": null
+      },
+      {
+        "text": "Log in",
+        "href": "/login",
+        "role": null
+      },
+      {
+        "text": "Request Access",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Zenvi",
+        "href": "#",
+        "role": null
+      },
+      {
+        "text": "Features",
+        "href": "#features",
+        "role": null
+      },
+      {
+        "text": "Showcase",
+        "href": "#demo",
+        "role": null
+      },
+      {
+        "text": "Pricing",
+        "href": "#pricing",
+        "role": null
+      },
+      {
+        "text": "Docs",
+        "href": "/docs",
+        "role": null
+      },
+      {
+        "text": "Log in",
+        "href": "/login",
+        "role": null
+      },
+      {
+        "text": "Log in",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Sign up",
+        "href": "/signup",
+        "role": null
+      },
+      {
+        "text": "Sign up",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Request Access",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Download for Mac",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Watch Demo",
+        "href": "https://www.youtube.com/watch?v=5Nc7iPDJ4tw",
+        "role": null
+      },
+      {
+        "text": "Watch Demo",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Download for Mac",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Watch Demo",
+        "href": "https://www.youtube.com/watch?v=5Nc7iPDJ4tw",
+        "role": null
+      },
+      {
+        "text": "Watch Demo",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Monthly",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Annual Save 28%",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Get Started",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Go Pro",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Get Studio",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Claim Lifetime Access",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Superteam Canada",
+        "href": "https://superteam.ca/",
+        "role": null
+      },
+      {
+        "text": "Ajna Materials",
+        "href": "https://www.ajnamaterials.com/",
+        "role": null
+      },
+      {
+        "text": "Passport",
+        "href": "https://www.passportanywhere.co/",
+        "role": null
+      },
+      {
+        "text": "Superteam Canada",
+        "href": "https://superteam.ca/",
+        "role": null
+      },
+      {
+        "text": "Ajna Materials",
+        "href": "https://www.ajnamaterials.com/",
+        "role": null
+      },
+      {
+        "text": "Passport",
+        "href": "https://www.passportanywhere.co/",
+        "role": null
+      },
+      {
+        "text": "Superteam Canada",
+        "href": "https://superteam.ca/",
+        "role": null
+      },
+      {
+        "text": "Ajna Materials",
+        "href": "https://www.ajnamaterials.com/",
+        "role": null
+      },
+      {
+        "text": "Passport",
+        "href": "https://www.passportanywhere.co/",
+        "role": null
+      },
+      {
+        "text": "Superteam Canada",
+        "href": "https://superteam.ca/",
+        "role": null
+      },
+      {
+        "text": "Ajna Materials",
+        "href": "https://www.ajnamaterials.com/",
+        "role": null
+      },
+      {
+        "text": "Passport",
+        "href": "https://www.passportanywhere.co/",
+        "role": null
+      },
+      {
+        "text": "Features",
+        "href": "#features",
+        "role": null
+      },
+      {
+        "text": "Pricing",
+        "href": "#pricing",
+        "role": null
+      },
+      {
+        "text": "Documentation",
+        "href": "/docs",
+        "role": null
+      },
+      {
+        "text": "Download",
+        "href": "/login",
+        "role": null
+      },
+      {
+        "text": "Privacy",
+        "href": "/privacy",
+        "role": null
+      },
+      {
+        "text": "Terms",
+        "href": "/terms",
+        "role": null
+      },
+      {
+        "text": "Contact",
+        "href": "https://x.com/pro_zenvi",
+        "role": null
+      }
+    ],
+    "paragraphs": [
+      "Premier-grade AI editing. Local processing. Zero latency.",
+      "Premier-grade AI editing. Local processing. Zero latency.",
+      "Edit video at machine speed,\nnot cloud speed\n.",
+      "Edit, enhance, and export with AI assistance—all running on your machine.",
+      "Professional-grade AI tools that run entirely on your device.",
+      "Cloud editors make you wait. Zenvi makes you faster.",
+      "No per-minute fees. No token limits. No cloud costs. Flat rate, unlimited use.",
+      "For indie creators & solo editors",
+      "1,500 AI credits/month",
+      "60 min video indexing",
+      "For freelancers & marketing teams",
+      "5,000 AI credits/month",
+      "250 min video indexing",
+      "Morph & transition generation",
+      "25% rollover + brand kit",
+      "For agencies & creative teams",
+      "12,000 shared credits across 3 seats",
+      "600 min video indexing",
+      "Team analytics dashboard",
+      "Pay once. Yours forever.",
+      "1,000 AI credits/month, forever",
+      "No subscription, no renewals",
+      "Locked in at today's price",
+      "Access code required. Invite-only during beta.",
+      "Professional video editing powered by on-device AI. Your footage never leaves your machine.",
+      "© 2026 Zenvi, Inc. All rights reserved.",
+      "Built for creators who value privacy and speed."
+    ]
+  },
+  "download": {
+    "url": "https://zenvi.pro/download",
+    "status": 200,
+    "meta": {
+      "title": "Zenvi — AI Video Editing, Locally Powered",
+      "description": "Edit smarter, publish faster. Zenvi is AI-powered video editing that runs entirely on your device. No uploads, no latency, no compromises.",
+      "ogImage": null,
+      "url": "https://zenvi.pro/download",
+      "bodyLen": 171,
+      "scrollHeight": 900
+    },
+    "headlines": [
+      {
+        "tag": "H1",
+        "text": "Invalid access link"
+      }
+    ],
+    "ctas": [
+      {
+        "text": "Zenvi",
+        "href": "/",
+        "role": null
+      },
+      {
+        "text": "Back to site",
+        "href": "/",
+        "role": null
+      },
+      {
+        "text": "Back to Zenvi",
+        "href": "/",
+        "role": null
+      },
+      {
+        "text": "Back to Zenvi",
+        "href": null,
+        "role": null
+      }
+    ],
+    "paragraphs": [
+      "This link doesn't look right, or may have expired. Check your invite email or join the waitlist to get early access."
+    ]
+  },
+  "login": {
+    "url": "https://zenvi.pro/login",
+    "status": 200,
+    "meta": {
+      "title": "Zenvi — AI Video Editing, Locally Powered",
+      "description": "Edit smarter, publish faster. Zenvi is AI-powered video editing that runs entirely on your device. No uploads, no latency, no compromises.",
+      "ogImage": null,
+      "url": "https://zenvi.pro/login",
+      "bodyLen": 252,
+      "scrollHeight": 900
+    },
+    "headlines": [
+      {
+        "tag": "H1",
+        "text": "Welcome back"
+      }
+    ],
+    "ctas": [
+      {
+        "text": "Zenvi",
+        "href": "/",
+        "role": null
+      },
+      {
+        "text": "Zenvi",
+        "href": "/",
+        "role": null
+      },
+      {
+        "text": "Sign up",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Continue",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Continue with GitHub",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Continue with Google",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Sign up",
+        "href": null,
+        "role": null
+      }
+    ],
+    "paragraphs": [
+      "Zenvi sees the frame before you do.",
+      "A video taken by Jashan (Cofounder, Zenvi) in 2020",
+      "Sign in to continue editing.",
+      "Don’t have an account? Sign up"
+    ]
+  },
+  "signup": {
+    "url": "https://zenvi.pro/signup",
+    "status": 200,
+    "meta": {
+      "title": "Zenvi — AI Video Editing, Locally Powered",
+      "description": "Edit smarter, publish faster. Zenvi is AI-powered video editing that runs entirely on your device. No uploads, no latency, no compromises.",
+      "ogImage": null,
+      "url": "https://zenvi.pro/signup",
+      "bodyLen": 217,
+      "scrollHeight": 900
+    },
+    "headlines": [
+      {
+        "tag": "H1",
+        "text": "Create your account"
+      }
+    ],
+    "ctas": [
+      {
+        "text": "Zenvi",
+        "href": "/",
+        "role": null
+      },
+      {
+        "text": "Continue with GitHub",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Continue with Google",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Create account",
+        "href": null,
+        "role": null
+      },
+      {
+        "text": "Sign in",
+        "href": "/login",
+        "role": null
+      }
+    ],
+    "paragraphs": [
+      "Get early access to Zenvi",
+      "By continuing, you agree to our Terms of Service and Privacy Policy.",
+      "Already have an account? Sign in"
+    ]
+  },
+  "docs": {
+    "url": "https://zenvi.pro/docs",
+    "status": 200,
+    "meta": {
+      "title": "Zenvi — AI Video Editing, Locally Powered",
+      "description": "Edit smarter, publish faster. Zenvi is AI-powered video editing that runs entirely on your device. No uploads, no latency, no compromises.",
+      "ogImage": null,
+      "url": "https://zenvi.pro/docs",
+      "bodyLen": 1015,
+      "scrollHeight": 1489
+    },
+    "headlines": [
+      {
+        "tag": "H1",
+        "text": "Learn Zenvi without the guesswork"
+      },
+      {
+        "tag": "H2",
+        "text": "BROWSE TOPICS"
+      }
+    ],
+    "ctas": [
+      {
+        "text": "Skip to content",
+        "href": "#docs-main",
+        "role": null
+      },
+      {
+        "text": "Zenvi",
+        "href": "/",
+        "role": null
+      },
+      {
+        "text": "Docs",
+        "href": "/docs",
+        "role": null
+      },
+      {
+        "text": "Download",
+        "href": "/download",
+        "role": null
+      },
+      {
+        "text": "Welcome",
+        "href": "/docs/start-here",
+        "role": null
+      },
+      {
+        "text": "Install and setup",
+        "href": "/docs/install",
+        "role": null
+      },
+      {
+        "text": "Account and sign out",
+        "href": "/docs/account-and-sign-out",
+        "role": null
+      },
+      {
+        "text": "Models and API keys",
+        "href": "/docs/assistant-and-models",
+        "role": null
+      },
+      {
+        "text": "How to prompt",
+        "href": "/docs/how-to-prompt",
+        "role": null
+      },
+      {
+        "text": "Clips and timeline",
+        "href": "/docs/clips-and-timeline",
+        "role": null
+      },
+      {
+        "text": "Transitions",
+        "href": "/docs/transitions",
+        "role": null
+      },
+      {
+        "text": "Scene search and smart cuts",
+        "href": "/docs/scene-search",
+        "role": null
+      },
+      {
+        "text": "Video generation",
+        "href": "/docs/video-generation",
+        "role": null
+      },
+      {
+        "text": "Text to speech",
+        "href": "/docs/tts",
+        "role": null
+      },
+      {
+        "text": "Export",
+        "href": "/docs/export",
+        "role": null
+      },
+      {
+        "text": "Remotion",
+        "href": "/docs/remotion",
+        "role": null
+      },
+      {
+        "text": "Manim",
+        "href": "/docs/manim",
+        "role": null
+      },
+      {
+        "text": "Director analysis",
+        "href": "/docs/director-analysis",
+        "role": null
+      },
+      {
+        "text": "Troubleshooting",
+        "href": "/docs/troubleshooting",
+        "role": null
+      },
+      {
+        "text": "Open source",
+        "href": "/docs/open-source",
+        "role": null
+      },
+      {
+        "text": "Start reading",
+        "href": "/docs/start-here",
+        "role": null
+      },
+      {
+        "text": "Download Zenvi",
+        "href": "/download",
+        "role": null
+      },
+      {
+        "text": "START HERE\nWelcome",
+        "href": "/docs/start-here",
+        "role": null
+      },
+      {
+        "text": "START HERE\nInstall and setup",
+        "href": "/docs/install",
+        "role": null
+      },
+      {
+        "text": "START HERE\nAccount and sign out",
+        "href": "/docs/account-and-sign-out",
+        "role": null
+      },
+      {
+        "text": "ASSISTANT\nModels and API keys",
+        "href": "/docs/assistant-and-models",
+        "role": null
+      },
+      {
+        "text": "ASSISTANT\nHow to prompt",
+        "href": "/docs/how-to-prompt",
+        "role": null
+      },
+      {
+        "text": "EDITING\nClips and timeline",
+        "href": "/docs/clips-and-timeline",
+        "role": null
+      },
+      {
+        "text": "EDITING\nTransitions",
+        "href": "/docs/transitions",
+        "role": null
+      },
+      {
+        "text": "EDITING\nScene search and smart cuts",
+        "href": "/docs/scene-search",
+        "role": null
+      },
+      {
+        "text": "EDITING\nVideo generation",
+        "href": "/docs/video-generation",
+        "role": null
+      },
+      {
+        "text": "EDITING\nText to speech",
+        "href": "/docs/tts",
+        "role": null
+      },
+      {
+        "text": "EDITING\nExport",
+        "href": "/docs/export",
+        "role": null
+      },
+      {
+        "text": "ADVANCED\nRemotion",
+        "href": "/docs/remotion",
+        "role": null
+      },
+      {
+        "text": "ADVANCED\nManim",
+        "href": "/docs/manim",
+        "role": null
+      },
+      {
+        "text": "ADVANCED\nDirector analysis",
+        "href": "/docs/director-analysis",
+        "role": null
+      },
+      {
+        "text": "MORE\nTroubleshooting",
+        "href": "/docs/troubleshooting",
+        "role": null
+      },
+      {
+        "text": "MORE\nOpen source",
+        "href": "/docs/open-source",
+        "role": null
+      },
+      {
+        "text": "GitHub",
+        "href": "https://github.com/Zenvi-pro/zenvi-core",
+        "role": null
+      }
+    ],
+    "paragraphs": [
+      "Scene search and smart cuts",
+      "We are a tiny team. These guides are written to match how the app actually behaves, from the timeline to the assistant and the rough edges we are still smoothing out.",
+      "START HERE\nInstall and setup",
+      "START HERE\nAccount and sign out",
+      "ASSISTANT\nModels and API keys",
+      "ASSISTANT\nHow to prompt",
+      "EDITING\nClips and timeline",
+      "EDITING\nScene search and smart cuts",
+      "EDITING\nVideo generation",
+      "EDITING\nText to speech",
+      "ADVANCED\nDirector analysis",
+      "Something missing? Open an issue on GitHub."
+    ]
+  },
+  "privacy": {
+    "url": "https://zenvi.pro/privacy",
+    "status": 200,
+    "meta": {
+      "title": "Zenvi — AI Video Editing, Locally Powered",
+      "description": "Edit smarter, publish faster. Zenvi is AI-powered video editing that runs entirely on your device. No uploads, no latency, no compromises.",
+      "ogImage": null,
+      "url": "https://zenvi.pro/privacy",
+      "bodyLen": 2824,
+      "scrollHeight": 1844
+    },
+    "headlines": [
+      {
+        "tag": "H1",
+        "text": "Privacy Policy"
+      },
+      {
+        "tag": "H2",
+        "text": "1. Information We Collect"
+      },
+      {
+        "tag": "H2",
+        "text": "2. How We Use Your Information"
+      },
+      {
+        "tag": "H2",
+        "text": "3. Payments"
+      },
+      {
+        "tag": "H2",
+        "text": "4. Data Sharing"
+      },
+      {
+        "tag": "H2",
+        "text": "5. Data Retention"
+      },
+      {
+        "tag": "H2",
+        "text": "6. Security"
+      },
+      {
+        "tag": "H2",
+        "text": "7. Your Rights"
+      },
+      {
+        "tag": "H2",
+        "text": "8. Children"
+      },
+      {
+        "tag": "H2",
+        "text": "9. Changes to This Policy"
+      },
+      {
+        "tag": "H2",
+        "text": "10. Contact"
+      }
+    ],
+    "ctas": [
+      {
+        "text": "Zenvi",
+        "href": "/",
+        "role": null
+      },
+      {
+        "text": "← Back to site",
+        "href": "/",
+        "role": null
+      },
+      {
+        "text": "Privacy",
+        "href": "/privacy",
+        "role": null
+      },
+      {
+        "text": "Terms",
+        "href": "/terms",
+        "role": null
+      }
+    ],
+    "paragraphs": [
+      "Last Updated: March 29, 2026",
+      "Zenvi, Inc. (\"Zenvi\", \"we\", \"us\", or \"our\") is committed to protecting your privacy. This policy explains how we collect, use, and share information about you when you use our services.",
+      "We collect information you provide directly, such as your name, email address, and payment details when you create an account or subscribe to a plan. We also collect usage data automatically, including your IP address, device type, browser, and how you interact with our services. We do not collect or store your video footage — all AI processing happens locally on your machine.",
+      "We use your information to provide and improve our services, process payments, send transactional emails (such as receipts and account notifications), and respond to your support requests. We do not sell your personal information to third parties.",
+      "Payments are processed securely by Stripe. We do not store your full credit card details on our servers. Stripe's privacy policy governs the handling of your payment information.",
+      "We share your information only with service providers necessary to operate our services (e.g., Stripe for payments, Supabase for authentication and data storage, Resend for email). We do not share your data with advertisers or data brokers.",
+      "We retain your account information for as long as your account is active. If you delete your account, we will delete or anonymize your personal data within 30 days, unless we are required to retain it by law.",
+      "We implement industry-standard security measures including encrypted connections (HTTPS), secure authentication, and access controls. No method of transmission over the internet is 100% secure, and we cannot guarantee absolute security.",
+      "You may request access to, correction of, or deletion of your personal data at any time by contacting us. You may also unsubscribe from marketing communications at any time. Depending on your jurisdiction, you may have additional rights under applicable privacy laws.",
+      "Our services are not directed at children under the age of 13. We do not knowingly collect personal information from children. If you believe we have collected information from a child, please contact us immediately.",
+      "We may update this Privacy Policy from time to time. We will notify you of material changes by updating the date at the top of this page or by email. Continued use of our services after changes constitutes acceptance of the updated policy.",
+      "Questions about this policy? Reach us on X at @pro_zenvi or via the contact link in the footer.",
+      "© 2026 Zenvi, Inc. All rights reserved."
+    ]
+  },
+  "terms": {
+    "url": "https://zenvi.pro/terms",
+    "status": 200,
+    "meta": {
+      "title": "Zenvi — AI Video Editing, Locally Powered",
+      "description": "Edit smarter, publish faster. Zenvi is AI-powered video editing that runs entirely on your device. No uploads, no latency, no compromises.",
+      "ogImage": null,
+      "url": "https://zenvi.pro/terms",
+      "bodyLen": 3763,
+      "scrollHeight": 2254
+    },
+    "headlines": [
+      {
+        "tag": "H1",
+        "text": "Terms of Service"
+      },
+      {
+        "tag": "H2",
+        "text": "1. Acceptance of Terms"
+      },
+      {
+        "tag": "H2",
+        "text": "2. Description of Service"
+      },
+      {
+        "tag": "H2",
+        "text": "3. Accounts"
+      },
+      {
+        "tag": "H2",
+        "text": "4. Access Codes & Beta"
+      },
+      {
+        "tag": "H2",
+        "text": "5. Subscriptions & Payments"
+      },
+      {
+        "tag": "H2",
+        "text": "6. Cancellation"
+      },
+      {
+        "tag": "H2",
+        "text": "7. Acceptable Use"
+      },
+      {
+        "tag": "H2",
+        "text": "8. Intellectual Property"
+      },
+      {
+        "tag": "H2",
+        "text": "9. Disclaimer of Warranties"
+      },
+      {
+        "tag": "H2",
+        "text": "10. Limitation of Liability"
+      },
+      {
+        "tag": "H2",
+        "text": "11. Changes to Terms"
+      },
+      {
+        "tag": "H2",
+        "text": "12. Governing Law"
+      },
+      {
+        "tag": "H2",
+        "text": "13. Contact"
+      }
+    ],
+    "ctas": [
+      {
+        "text": "Zenvi",
+        "href": "/",
+        "role": null
+      },
+      {
+        "text": "← Back to site",
+        "href": "/",
+        "role": null
+      },
+      {
+        "text": "Privacy",
+        "href": "/privacy",
+        "role": null
+      },
+      {
+        "text": "Terms",
+        "href": "/terms",
+        "role": null
+      }
+    ],
+    "paragraphs": [
+      "Last Updated: March 29, 2026",
+      "Please read these Terms of Service carefully before using Zenvi. These terms govern your access to and use of our services.",
+      "By accessing or using Zenvi (\"the Service\"), you agree to be bound by these Terms of Service. If you do not agree to these terms, do not use the Service. These terms apply to all users, including visitors, registered users, and subscribers.",
+      "Zenvi is a desktop AI video editing application. The Service includes the Zenvi desktop application, our website at zenvi.pro, and any related services. All AI processing occurs locally on your device — your footage is never uploaded to our servers.",
+      "You must create an account to access certain features. You are responsible for maintaining the confidentiality of your account credentials and for all activity under your account. You must provide accurate and complete information when creating your account. You must be at least 13 years old to use the Service.",
+      "During the beta period, access to Zenvi requires a valid invite code. Access codes are personal, non-transferable, and may only be used once. Zenvi reserves the right to revoke access codes at any time.",
+      "Paid plans are billed in advance on a monthly or annual basis. Lifetime access is a one-time payment. All payments are processed by Stripe. Subscription fees are non-refundable except where required by law or as described in our refund policy. We reserve the right to change pricing with reasonable notice.",
+      "You may cancel your subscription at any time through your account dashboard or by contacting us. Upon cancellation, your subscription will remain active until the end of the current billing period. Lifetime access is non-cancellable and non-refundable after purchase.",
+      "You agree not to use the Service to create content that is illegal, harmful, defamatory, infringing, or otherwise objectionable. You may not reverse-engineer, decompile, or attempt to extract the source code of our software. You may not use the Service to violate any applicable law or regulation.",
+      "Zenvi and its licensors own all rights in the Service, including all software, design, trademarks, and content provided by Zenvi. You retain ownership of all video content you create using the Service. By using the Service, you do not acquire any ownership rights in Zenvi's intellectual property.",
+      "The Service is provided \"as is\" and \"as available\" without warranty of any kind. We do not warrant that the Service will be uninterrupted, error-free, or free of harmful components. Your use of the Service is at your sole risk.",
+      "To the maximum extent permitted by law, Zenvi's total liability to you for any claim arising from or related to the Service shall not exceed the amount you paid to Zenvi in the twelve months preceding the claim. We are not liable for indirect, incidental, consequential, or punitive damages.",
+      "We may update these Terms from time to time. We will notify you of material changes by email or by posting a notice on our website. Continued use of the Service after changes take effect constitutes acceptance of the revised Terms.",
+      "These Terms are governed by the laws of the Province of Ontario, Canada, without regard to conflict of law principles. Any disputes shall be resolved in the courts of Ontario, Canada.",
+      "Questions about these Terms? Reach us on X at @pro_zenvi or via the contact link in the footer.",
+      "© 2026 Zenvi, Inc. All rights reserved."
+    ]
+  }
+}

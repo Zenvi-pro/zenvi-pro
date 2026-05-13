@@ -1,15 +1,11 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
-import Hero from "@/components/landing/Hero";
-import Features from "@/components/landing/Features";
-import IntegrationsBeam from "@/components/landing/IntegrationsBeam";
-import EditorDemo from "@/components/landing/EditorDemo";
-import Comparison from "@/components/landing/Comparison";
-import Pricing from "@/components/landing/Pricing";
-import LogoTicker from "@/components/landing/LogoTicker";
+import FloraHero from "@/components/landing/FloraHero";
+import FloraFeatures from "@/components/landing/FloraFeatures";
+import FloraWorkflows from "@/components/landing/FloraWorkflows";
+import FloraModels from "@/components/landing/FloraModels";
 import Footer from "@/components/landing/Footer";
-import WaitlistModal from "@/components/landing/WaitlistModal";
 import AccessCodeModal from "@/components/landing/AccessCodeModal";
 import { IntroOverlay } from "@/components/landing/IntroOverlay";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,25 +14,36 @@ const INTRO_STORAGE_KEY = "zenvi-intro-done";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
+  const location = useLocation();
   const [accessCodePlanKey, setAccessCodePlanKey] = useState<string>("pro");
   const [isAccessCodeOpen, setIsAccessCodeOpen] = useState(false);
-  const [heroRevealReady, setHeroRevealReady] = useState(false);
   const [introVisible, setIntroVisible] = useState(() => {
     if (typeof window === "undefined") return true;
     return !sessionStorage.getItem(INTRO_STORAGE_KEY);
   });
 
-  const openWaitlist = () => setIsWaitlistOpen(true);
-  const closeWaitlist = () => setIsWaitlistOpen(false);
+  // When navigating in with a hash (e.g. /pricing → /#features), scroll to the target
+  // once the intro overlay is gone and the section has mounted.
+  useEffect(() => {
+    if (!location.hash || introVisible) return;
+    const id = location.hash.slice(1);
+    // Defer one frame so the section is in the DOM and the layout has settled.
+    const t = window.setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
+    return () => window.clearTimeout(t);
+  }, [location.hash, introVisible]);
+
+  // Signup CTAs link out to https://zenvi.pro/login?mode=signup directly — no in-page modal.
+  const openWaitlist = () => {
+    window.location.href = "https://zenvi.pro/login?mode=signup";
+  };
 
   const openAccessCode = (planKey?: string) => {
     setAccessCodePlanKey(planKey ?? "pro");
     setIsAccessCodeOpen(true);
   };
 
-  // Hero "Download" button: if user has an active sub → go to /download,
-  // otherwise scroll to pricing so they can pick a plan.
   const handleHeroDownload = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
@@ -59,18 +66,14 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A]">
+    <div className="min-h-screen bg-black">
       {introVisible && <IntroOverlay onComplete={handleIntroComplete} />}
       <Navbar onOpenWaitlist={openWaitlist} onOpenAccessCode={handleHeroDownload} />
-      <Hero onOpenAccessCode={handleHeroDownload} onRevealSequenceComplete={() => setHeroRevealReady(true)} />
-      <EditorDemo readyToPop={heroRevealReady} />
-      <Features />
-      <IntegrationsBeam />
-      <Comparison />
-      <Pricing onOpenAccessCode={openAccessCode} />
-      <LogoTicker />
+      <FloraHero onOpenWaitlist={openWaitlist} />
+      <FloraFeatures />
+      <FloraWorkflows />
+      <FloraModels />
       <Footer />
-      <WaitlistModal isOpen={isWaitlistOpen} onClose={closeWaitlist} />
       <AccessCodeModal
         isOpen={isAccessCodeOpen}
         onClose={() => setIsAccessCodeOpen(false)}

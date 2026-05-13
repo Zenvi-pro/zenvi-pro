@@ -1,3 +1,5 @@
+/* Fonts loaded via <link> in index.html — Geist, Instrument Serif, Inter. */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,50 +12,50 @@
 @layer base {
   :root {
     /* Near-black base */
-    --background: 0 0% 4%;
+    --background: 0 0% 0%;
     --foreground: 0 0% 100%;
 
     /* Cards */
-    --card: 0 0% 7%;
+    --card: 0 0% 4%;
     --card-foreground: 0 0% 100%;
 
-    --popover: 0 0% 7%;
+    --popover: 0 0% 4%;
     --popover-foreground: 0 0% 100%;
 
-    /* Electric blue accent as primary */
-    --primary: 216 100% 50%;
-    --primary-foreground: 0 0% 100%;
+    /* Neon green accent (Flora.ai style) */
+    --primary: 83 77% 55%;
+    --primary-foreground: 0 0% 0%;
 
-    /* Secondary (muted blue) */
-    --secondary: 0 0% 10%;
+    /* Secondary (muted dark) */
+    --secondary: 0 0% 8%;
     --secondary-foreground: 0 0% 100%;
 
     /* Muted grays */
-    --muted: 0 0% 10%;
+    --muted: 0 0% 12%;
     --muted-foreground: 0 0% 63%;
 
     /* Accent */
-    --accent: 0 0% 10%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 83 77% 55%;
+    --accent-foreground: 0 0% 0%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 0 0% 12%;
     --input: 0 0% 10%;
-    --ring: 216 100% 50%;
+    --ring: 83 77% 55%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
 
-    /* Sidebar (keep for shadcn compat) */
-    --sidebar-background: 0 0% 4%;
+    /* Sidebar */
+    --sidebar-background: 0 0% 0%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 216 100% 50%;
-    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-primary: 83 77% 55%;
+    --sidebar-primary-foreground: 0 0% 0%;
     --sidebar-accent: 0 0% 8%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 0 0% 12%;
-    --sidebar-ring: 216 100% 50%;
+    --sidebar-ring: 83 77% 55%;
   }
 }
 

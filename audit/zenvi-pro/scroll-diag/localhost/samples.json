@@ -1,0 +1,786 @@
+{
+  "probe": {
+    "scrollHeight": 9678,
+    "viewportHeight": 900,
+    "heroFound": true,
+    "heroRect": {
+      "top": 0,
+      "height": 3060
+    },
+    "heroComputedHeight": "3060px",
+    "overlayHasInlineTransform": "none",
+    "overlayClasses": "pointer-events-none absolute inset-0 z-[2] hidden sm:block"
+  },
+  "samples": [
+    {
+      "scrollY": 0,
+      "local": 0,
+      "overlay": {
+        "transform": "none",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 50,
+      "local": 0.023148148148148147,
+      "overlay": {
+        "transform": "scale(1.2849)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 100,
+      "local": 0.046296296296296294,
+      "overlay": {
+        "transform": "scale(1.5698)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 150,
+      "local": 0.06944444444444445,
+      "overlay": {
+        "transform": "scale(1.8547)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 200,
+      "local": 0.09259259259259259,
+      "overlay": {
+        "transform": "scale(2.1396)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 250,
+      "local": 0.11574074074074074,
+      "overlay": {
+        "transform": "scale(2.4245)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 300,
+      "local": 0.1388888888888889,
+      "overlay": {
+        "transform": "scale(2.7094)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 350,
+      "local": 0.16203703703703703,
+      "overlay": {
+        "transform": "scale(2.9943)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 400,
+      "local": 0.18518518518518517,
+      "overlay": {
+        "transform": "scale(3.2792)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 450,
+      "local": 0.20833333333333334,
+      "overlay": {
+        "transform": "scale(3.5641)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 500,
+      "local": 0.23148148148148148,
+      "overlay": {
+        "transform": "scale(3.849)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 550,
+      "local": 0.25462962962962965,
+      "overlay": {
+        "transform": "scale(4.1339)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 600,
+      "local": 0.2777777777777778,
+      "overlay": {
+        "transform": "scale(4.4188)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 650,
+      "local": 0.30092592592592593,
+      "overlay": {
+        "transform": "scale(4.7037)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 700,
+      "local": 0.32407407407407407,
+      "overlay": {
+        "transform": "scale(4.9886)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 750,
+      "local": 0.3472222222222222,
+      "overlay": {
+        "transform": "scale(5.2735)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 800,
+      "local": 0.37037037037037035,
+      "overlay": {
+        "transform": "scale(5.5584)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 850,
+      "local": 0.39351851851851855,
+      "overlay": {
+        "transform": "scale(5.8433)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 900,
+      "local": 0.4166666666666667,
+      "overlay": {
+        "transform": "scale(6.12821)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 950,
+      "local": 0.4398148148148148,
+      "overlay": {
+        "transform": "scale(6.41311)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1000,
+      "local": 0.46296296296296297,
+      "overlay": {
+        "transform": "scale(6.69801)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1050,
+      "local": 0.4861111111111111,
+      "overlay": {
+        "transform": "scale(6.98291)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1100,
+      "local": 0.5092592592592593,
+      "overlay": {
+        "transform": "scale(7.26781)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1150,
+      "local": 0.5324074074074074,
+      "overlay": {
+        "transform": "scale(7.55271)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1200,
+      "local": 0.5555555555555556,
+      "overlay": {
+        "transform": "scale(7.83761)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1250,
+      "local": 0.5787037037037037,
+      "overlay": {
+        "transform": "scale(8.12251)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1300,
+      "local": 0.6018518518518519,
+      "overlay": {
+        "transform": "scale(8.40741)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1350,
+      "local": 0.625,
+      "overlay": {
+        "transform": "scale(8.69231)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1400,
+      "local": 0.6481481481481481,
+      "overlay": {
+        "transform": "scale(8.97721)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1450,
+      "local": 0.6712962962962963,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1500,
+      "local": 0.6944444444444444,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1550,
+      "local": 0.7175925925925926,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1600,
+      "local": 0.7407407407407407,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1650,
+      "local": 0.7638888888888888,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1700,
+      "local": 0.7870370370370371,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1750,
+      "local": 0.8101851851851852,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1800,
+      "local": 0.8333333333333334,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1850,
+      "local": 0.8564814814814815,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1900,
+      "local": 0.8796296296296297,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 1950,
+      "local": 0.9027777777777778,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2000,
+      "local": 0.9259259259259259,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2050,
+      "local": 0.9490740740740741,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2100,
+      "local": 0.9722222222222222,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2150,
+      "local": 0.9953703703703703,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2200,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2250,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2300,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2350,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2400,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2450,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2500,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2550,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2600,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2650,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2700,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2750,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2800,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2850,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2900,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 2950,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 3000,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 3050,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 3100,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 3150,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 3200,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 3250,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 3300,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 3350,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 3400,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    },
+    {
+      "scrollY": 3450,
+      "local": 1,
+      "overlay": {
+        "transform": "scale(9)",
+        "opacity": "1"
+      },
+      "vignette": {
+        "opacity": "0.5"
+      }
+    }
+  ]
+}

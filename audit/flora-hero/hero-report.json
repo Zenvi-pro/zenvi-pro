@@ -1,0 +1,1437 @@
+{
+  "url": "https://flora.ai/",
+  "viewport": {
+    "w": 1440,
+    "h": 900
+  },
+  "rootBg": "rgba(0, 0, 0, 0)",
+  "rootColor": "rgb(0, 0, 0)",
+  "rootFontFamily": "Times",
+  "bodyBg": "rgb(0, 0, 0)",
+  "bodyColor": "rgb(0, 0, 0)",
+  "bodyFontFamily": "sans-serif",
+  "heroBg": {
+    "selector": "DIV.framer-bL7ox.framer-x300l",
+    "bg": "rgb(0, 0, 0)"
+  },
+  "headings": [
+    {
+      "tag": "H6",
+      "text": "Through July 1: Nano Banana 2 + Pro usage is on us. Pro/Max plans only.",
+      "classes": "framer-text framer-styles-preset-1nf1e4x",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "20px",
+        "letter-spacing": "normal",
+        "color": "rgb(0, 0, 0)",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "H5",
+      "text": "Trusted by the world's top creatives",
+      "classes": "framer-text framer-styles-preset-cqvlx3",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "16px",
+        "font-weight": "500",
+        "line-height": "22.4px",
+        "letter-spacing": "normal",
+        "color": "rgba(238, 238, 238, 0.35)",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "H1",
+      "text": "Your",
+      "classes": "framer-text",
+      "style": {
+        "font-family": "\"Redaction 10 Regular\", \"Redaction 10 Regular Placeholder\", sans-serif",
+        "font-size": "50px",
+        "font-weight": "400",
+        "line-height": "55px",
+        "letter-spacing": "-1.5px",
+        "color": "rgb(238, 238, 238)",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "H1",
+      "text": "environment.",
+      "classes": "framer-text",
+      "style": {
+        "font-family": "\"Redaction 10 Regular\", \"Redaction 10 Regular Placeholder\", sans-serif",
+        "font-size": "50px",
+        "font-weight": "400",
+        "line-height": "55px",
+        "letter-spacing": "-1.5px",
+        "color": "rgb(238, 238, 238)",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "H3",
+      "text": "Bring your ideas to life faster than ever before. \nEvery creative AI tool, one unified process.",
+      "classes": "framer-text framer-styles-preset-h59khr",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "20px",
+        "font-weight": "500",
+        "line-height": "27.4px",
+        "letter-spacing": "-0.2px",
+        "color": "rgb(180, 180, 180)",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "H2",
+      "text": "Never let a good idea go unexplored.",
+      "classes": "framer-text framer-styles-preset-1fxshdl",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "30px",
+        "font-weight": "500",
+        "line-height": "41.1px",
+        "letter-spacing": "-0.5px",
+        "color": "rgb(238, 238, 238)",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "H3",
+      "text": "Meet FAUNA, the creative agent inside FLORA that thinks with you, builds with you, and never runs out of directions to try.",
+      "classes": "framer-text framer-styles-preset-h59khr",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "20px",
+        "font-weight": "500",
+        "line-height": "27.4px",
+        "letter-spacing": "-0.2px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "H1",
+      "text": "01",
+      "classes": "framer-text framer-styles-preset-66ofp3",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "60px",
+        "font-weight": "500",
+        "line-height": "66px",
+        "letter-spacing": "-1.5px",
+        "color": "rgba(238, 238, 238, 0.33)",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "H1",
+      "text": "Ideate",
+      "classes": "framer-text framer-styles-preset-66ofp3",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "60px",
+        "font-weight": "500",
+        "line-height": "66px",
+        "letter-spacing": "-1.5px",
+        "color": "rgb(238, 238, 238)",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "H1",
+      "text": "02",
+      "classes": "framer-text framer-styles-preset-66ofp3",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "60px",
+        "font-weight": "500",
+        "line-height": "66px",
+        "letter-spacing": "-1.5px",
+        "color": "rgba(238, 238, 238, 0.33)",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "H1",
+      "text": "Iterate",
+      "classes": "framer-text framer-styles-preset-66ofp3",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "60px",
+        "font-weight": "500",
+        "line-height": "66px",
+        "letter-spacing": "-1.5px",
+        "color": "rgb(238, 238, 238)",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "H1",
+      "text": "03",
+      "classes": "framer-text framer-styles-preset-66ofp3",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "60px",
+        "font-weight": "500",
+        "line-height": "66px",
+        "letter-spacing": "-1.5px",
+        "color": "rgba(238, 238, 238, 0.33)",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "H1",
+      "text": "Scale",
+      "classes": "framer-text framer-styles-preset-66ofp3",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "60px",
+        "font-weight": "500",
+        "line-height": "66px",
+        "letter-spacing": "-1.5px",
+        "color": "rgb(238, 238, 238)",
+        "text-transform": "none"
+      }
+    }
+  ],
+  "texts": [
+    {
+      "tag": "P",
+      "text": "Learn More",
+      "classes": "framer-text",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "14px",
+        "color": "rgb(0, 0, 0)",
+        "text-transform": "none",
+        "letter-spacing": "-0.28px"
+      }
+    },
+    {
+      "tag": "P",
+      "text": "New",
+      "classes": "framer-text",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "12px",
+        "font-weight": "500",
+        "line-height": "12px",
+        "color": "rgb(113, 208, 131)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Get started for free",
+      "classes": "",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "14px",
+        "color": "rgba(0, 0, 0, 0.8)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "P",
+      "text": "Copyright ©",
+      "classes": "framer-text",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "12px",
+        "font-weight": "400",
+        "line-height": "12px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "P",
+      "text": "2026",
+      "classes": "",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "12px",
+        "font-weight": "400",
+        "line-height": "12px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "P",
+      "text": "All rights reserved.",
+      "classes": "framer-text",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "12px",
+        "font-weight": "400",
+        "line-height": "12px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Blog",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.18px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Careers",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.18px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Community",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.18px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Manifesto",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.18px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Updates",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.18px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Pricing",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.18px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Teams",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.18px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Sales",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.18px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Capabilities",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.18px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Affiliates",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.18px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Articles",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.18px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Docs",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.18px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Support",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.18px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Brand",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.18px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Status",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.18px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Privacy Policy",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.18px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Terms of Service",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "19.18px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "P",
+      "text": "Star Shoe",
+      "classes": "framer-text framer-styles-preset-191pqip",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "12px",
+        "font-weight": "500",
+        "line-height": "16.44px",
+        "color": "rgb(180, 180, 180)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "P",
+      "text": "Nano Pro",
+      "classes": "framer-text framer-styles-preset-191pqip",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "12px",
+        "font-weight": "500",
+        "line-height": "16.44px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "P",
+      "text": "Model Running",
+      "classes": "framer-text framer-styles-preset-191pqip",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "12px",
+        "font-weight": "500",
+        "line-height": "16.44px",
+        "color": "rgb(180, 180, 180)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "P",
+      "text": "Nano",
+      "classes": "framer-text framer-styles-preset-191pqip",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "12px",
+        "font-weight": "500",
+        "line-height": "16.44px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "P",
+      "text": "Sneaker Showcase",
+      "classes": "framer-text framer-styles-preset-191pqip",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "12px",
+        "font-weight": "500",
+        "line-height": "16.44px",
+        "color": "rgb(180, 180, 180)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "P",
+      "text": "Veo 3.1",
+      "classes": "framer-text framer-styles-preset-191pqip",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "12px",
+        "font-weight": "500",
+        "line-height": "16.44px",
+        "color": "rgb(123, 123, 123)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "DIV",
+      "text": "creative",
+      "classes": "",
+      "style": {
+        "font-family": "\"Redaction 50 Italic\", \"Redaction 50 Italic Placeholder\", sans-serif",
+        "font-size": "50px",
+        "font-weight": "400",
+        "line-height": "50px",
+        "color": "rgb(238, 238, 238)",
+        "text-transform": "none",
+        "letter-spacing": "-1px"
+      }
+    },
+    {
+      "tag": "DIV",
+      "text": "creative",
+      "classes": "",
+      "style": {
+        "font-family": "\"Redaction 50 Italic\", \"Redaction 50 Italic Placeholder\", sans-serif",
+        "font-size": "50px",
+        "font-weight": "400",
+        "line-height": "50px",
+        "color": "rgb(0, 0, 0)",
+        "text-transform": "none",
+        "letter-spacing": "-1px"
+      }
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Get started for free",
+      "classes": "",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "line-height": "14px",
+        "color": "rgba(0, 0, 0, 0.95)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "P",
+      "text": "Explore 100s of possibilities",
+      "classes": "framer-text",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "22px",
+        "font-weight": "600",
+        "line-height": "26.4px",
+        "color": "rgb(238, 238, 238)",
+        "text-transform": "none",
+        "letter-spacing": "-0.66px"
+      }
+    },
+    {
+      "tag": "P",
+      "text": "Text, image, and video models in one place. No tab-switching, no limits.",
+      "classes": "framer-text",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "16.8px",
+        "color": "rgb(180, 180, 180)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "P",
+      "text": "Get to \"final\" faster",
+      "classes": "framer-text",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "22px",
+        "font-weight": "600",
+        "line-height": "26.4px",
+        "color": "rgb(238, 238, 238)",
+        "text-transform": "none",
+        "letter-spacing": "-0.66px"
+      }
+    },
+    {
+      "tag": "P",
+      "text": "Iterate in real-time with the whole team.",
+      "classes": "framer-text",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "16.8px",
+        "color": "rgb(180, 180, 180)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    },
+    {
+      "tag": "P",
+      "text": "Create scalable workflows",
+      "classes": "framer-text",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "22px",
+        "font-weight": "600",
+        "line-height": "26.4px",
+        "color": "rgb(238, 238, 238)",
+        "text-transform": "none",
+        "letter-spacing": "-0.66px"
+      }
+    },
+    {
+      "tag": "P",
+      "text": "Turn a single concept into hundreds of production-grade assets.",
+      "classes": "framer-text",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "500",
+        "line-height": "16.8px",
+        "color": "rgb(180, 180, 180)",
+        "text-transform": "none",
+        "letter-spacing": "normal"
+      }
+    }
+  ],
+  "ctas": [
+    {
+      "tag": "A",
+      "text": "Learn More",
+      "href": "./blog/a-new-pricing-model-for-flora-plus-nano-banana-on-us",
+      "classes": "framer-q00xsp framer-1jlnwu6",
+      "style": {
+        "font-family": "sans-serif",
+        "font-size": "12px",
+        "font-weight": "400",
+        "color": "rgb(0, 0, 238)",
+        "background-color": "rgba(255, 255, 255, 0.5)",
+        "border": "0px none rgb(0, 0, 238)",
+        "border-radius": "12px",
+        "padding": "8px 10px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Company",
+      "href": null,
+      "classes": "framer-M8URD framer-3oy31z framer-v-3oy31z framer-x99ybu",
+      "style": {
+        "font-family": "sans-serif",
+        "font-size": "12px",
+        "font-weight": "400",
+        "color": "rgb(0, 0, 0)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(0, 0, 0)",
+        "border-radius": "12px",
+        "padding": "10px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Enterprise",
+      "href": "./enterprise",
+      "classes": "framer-M8URD framer-3oy31z framer-v-1cly6s0 framer-x99ybu",
+      "style": {
+        "font-family": "sans-serif",
+        "font-size": "12px",
+        "font-weight": "400",
+        "color": "rgb(0, 0, 238)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(0, 0, 238)",
+        "border-radius": "12px",
+        "padding": "10px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Pricing",
+      "href": "./pricing",
+      "classes": "framer-M8URD framer-3oy31z framer-v-1cly6s0 framer-x99ybu",
+      "style": {
+        "font-family": "sans-serif",
+        "font-size": "12px",
+        "font-weight": "400",
+        "color": "rgb(0, 0, 238)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(0, 0, 238)",
+        "border-radius": "12px",
+        "padding": "10px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Techniques\n\nNew",
+      "href": "./techniques",
+      "classes": "framer-M8URD framer-3oy31z framer-v-1cly6s0 framer-x99ybu",
+      "style": {
+        "font-family": "sans-serif",
+        "font-size": "12px",
+        "font-weight": "400",
+        "color": "rgb(0, 0, 238)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(0, 0, 238)",
+        "border-radius": "12px",
+        "padding": "10px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Resources",
+      "href": null,
+      "classes": "framer-M8URD framer-3oy31z framer-v-3oy31z framer-x99ybu",
+      "style": {
+        "font-family": "sans-serif",
+        "font-size": "12px",
+        "font-weight": "400",
+        "color": "rgb(0, 0, 0)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(0, 0, 0)",
+        "border-radius": "12px",
+        "padding": "10px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Careers",
+      "href": "./careers",
+      "classes": "framer-M8URD framer-3oy31z framer-v-1cly6s0 framer-x99ybu",
+      "style": {
+        "font-family": "sans-serif",
+        "font-size": "12px",
+        "font-weight": "400",
+        "color": "rgb(0, 0, 238)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(0, 0, 238)",
+        "border-radius": "12px",
+        "padding": "10px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Contact sales",
+      "href": "./contact",
+      "classes": "framer-wx3tZ framer-tbUH9 framer-lnhep1 framer-v-6s0dou framer-1c22a1h",
+      "style": {
+        "font-family": "sans-serif",
+        "font-size": "12px",
+        "font-weight": "400",
+        "color": "rgb(0, 0, 238)",
+        "background-color": "rgba(255, 255, 255, 0.1)",
+        "border": "0px none rgb(0, 0, 238)",
+        "border-radius": "12px",
+        "padding": "10px 12px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "BUTTON",
+      "text": "Get started for free",
+      "href": null,
+      "classes": "",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "500",
+        "color": "rgba(0, 0, 0, 0.8)",
+        "background-color": "rgb(255, 255, 255)",
+        "border": "1px solid rgba(255, 255, 255, 0)",
+        "border-radius": "12px",
+        "padding": "9px 11px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Blog",
+      "href": "./blog",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "color": "rgb(123, 123, 123)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(123, 123, 123)",
+        "border-radius": "0px",
+        "padding": "0px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Careers",
+      "href": "./careers",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "color": "rgb(123, 123, 123)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(123, 123, 123)",
+        "border-radius": "0px",
+        "padding": "0px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Community",
+      "href": "https://app.florafauna.ai/community",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "color": "rgb(123, 123, 123)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(123, 123, 123)",
+        "border-radius": "0px",
+        "padding": "0px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Manifesto",
+      "href": "./blog/manifesto",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "color": "rgb(123, 123, 123)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(123, 123, 123)",
+        "border-radius": "0px",
+        "padding": "0px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Updates",
+      "href": "./updates",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "color": "rgb(123, 123, 123)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(123, 123, 123)",
+        "border-radius": "0px",
+        "padding": "0px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Pricing",
+      "href": "./pricing",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "color": "rgb(123, 123, 123)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(123, 123, 123)",
+        "border-radius": "0px",
+        "padding": "0px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Teams",
+      "href": "./enterprise",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "color": "rgb(123, 123, 123)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(123, 123, 123)",
+        "border-radius": "0px",
+        "padding": "0px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Sales",
+      "href": "./contact",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "color": "rgb(123, 123, 123)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(123, 123, 123)",
+        "border-radius": "0px",
+        "padding": "0px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Capabilities",
+      "href": "./capabilities",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "color": "rgb(123, 123, 123)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(123, 123, 123)",
+        "border-radius": "0px",
+        "padding": "0px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Affiliates",
+      "href": "./partners",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "color": "rgb(123, 123, 123)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(123, 123, 123)",
+        "border-radius": "0px",
+        "padding": "0px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Articles",
+      "href": "./articles",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "color": "rgb(123, 123, 123)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(123, 123, 123)",
+        "border-radius": "0px",
+        "padding": "0px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Docs",
+      "href": "https://docs.florafauna.ai",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "color": "rgb(123, 123, 123)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(123, 123, 123)",
+        "border-radius": "0px",
+        "padding": "0px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Support",
+      "href": "mailto:support@florafauna.ai?subject=FLORA%20Support$20Request",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "color": "rgb(123, 123, 123)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(123, 123, 123)",
+        "border-radius": "0px",
+        "padding": "0px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Brand",
+      "href": "./brand",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "color": "rgb(123, 123, 123)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(123, 123, 123)",
+        "border-radius": "0px",
+        "padding": "0px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    },
+    {
+      "tag": "A",
+      "text": "Status",
+      "href": "https://status.flora.ai",
+      "classes": "framer-text framer-styles-preset-12odoay",
+      "style": {
+        "font-family": "Geist, \"Geist Placeholder\", sans-serif",
+        "font-size": "14px",
+        "font-weight": "400",
+        "color": "rgb(123, 123, 123)",
+        "background-color": "rgba(0, 0, 0, 0)",
+        "border": "0px none rgb(123, 123, 123)",
+        "border-radius": "0px",
+        "padding": "0px",
+        "box-shadow": "none",
+        "text-transform": "none"
+      }
+    }
+  ],
+  "containers": [
+    {
+      "tag": "DIV",
+      "classes": "",
+      "style": {
+        "max-width": "none",
+        "padding-left": "0px",
+        "padding-right": "0px",
+        "padding-top": "0px",
+        "padding-bottom": "0px",
+        "margin-left": "0px",
+        "margin-right": "0px",
+        "display": "block",
+        "grid-template-columns": "none"
+      },
+      "width": 1440
+    },
+    {
+      "tag": "DIV",
+      "classes": "framer-bL7ox framer-x300l framer-1y9emc0",
+      "style": {
+        "max-width": "none",
+        "padding-left": "0px",
+        "padding-right": "0px",
+        "padding-top": "0px",
+        "padding-bottom": "0px",
+        "margin-left": "0px",
+        "margin-right": "0px",
+        "display": "flex",
+        "grid-template-columns": "none"
+      },
+      "width": 1440
+    },
+    {
+      "tag": "DIV",
+      "classes": "framer-1hqhlmy",
+      "style": {
+        "max-width": "none",
+        "padding-left": "20px",
+        "padding-right": "20px",
+        "padding-top": "16px",
+        "padding-bottom": "16px",
+        "margin-left": "0px",
+        "margin-right": "0px",
+        "display": "flex",
+        "grid-template-columns": "none"
+      },
+      "width": 1440
+    },
+    {
+      "tag": "DIV",
+      "classes": "framer-1mki1xv",
+      "style": {
+        "max-width": "1240px",
+        "padding-left": "0px",
+        "padding-right": "0px",
+        "padding-top": "0px",
+        "padding-bottom": "0px",
+        "margin-left": "0px",
+        "margin-right": "0px",
+        "display": "flex",
+        "grid-template-columns": "none"
+      },
+      "width": 1240
+    },
+    {
+      "tag": "DIV",
+      "classes": "framer-kCaeO framer-qt8Ss framer-z00NY framer-rb547v framer-v-rb547v",
+      "style": {
+        "max-width": "none",
+        "padding-left": "0px",
+        "padding-right": "0px",
+        "padding-top": "64px",
+        "padding-bottom": "0px",
+        "margin-left": "0px",
+        "margin-right": "0px",
+        "display": "flex",
+        "grid-template-columns": "none"
+      },
+      "width": 1440
+    },
+    {
+      "tag": "DIV",
+      "classes": "framer-tlblr4",
+      "style": {
+        "max-width": "1240px",
+        "padding-left": "0px",
+        "padding-right": "0px",
+        "padding-top": "0px",
+        "padding-bottom": "0px",
+        "margin-left": "0px",
+        "margin-right": "0px",
+        "display": "flex",
+        "grid-template-columns": "none"
+      },
+      "width": 1240
+    },
+    {
+      "tag": "DIV",
+      "classes": "framer-l022vm hidden-6rcd9l",
+      "style": {
+        "max-width": "none",
+        "padding-left": "0px",
+        "padding-right": "0px",
+        "padding-top": "0px",
+        "padding-bottom": "0px",
+        "margin-left": "0px",
+        "margin-right": "0px",
+        "display": "flex",
+        "grid-template-columns": "none"
+      },
+      "width": 1440
+    },
+    {
+      "tag": "DIV",
+      "classes": "framer-1xq38yc",
+      "style": {
+        "max-width": "none",
+        "padding-left": "0px",
+        "padding-right": "0px",
+        "padding-top": "0px",
+        "padding-bottom": "0px",
+        "margin-left": "0px",
+        "margin-right": "0px",
+        "display": "flex",
+        "grid-template-columns": "none"
+      },
+      "width": 1440
+    }
+  ],
+  "media": [
+    {
+      "tag": "IMG",
+      "src": "data:image/svg+xml,<svg display=\"block\" role=\"presentation\" viewBox=\"0 0 1167 256\" xmlns=\"http://www.w3.org/2000/svg\"><defs ><linearGradient id=\"k7ftP17bN-2050371890-linear-gradient\" x1=\"0.49936786716754067\" x2=\"0.5024875621890548\" y1=\"0.37294130067567566\" y2=\"1\"><stop offset=\"0\" stop-color=\"rgb(32, 32, 32)\"/><stop offset=\"1\" stop-color=\"rgba(15, 15, 15, 0)\"/></linearGradient></defs><path d=\"M 899.729 124.429 L 931.177 124.429 L 931.177 108.467 L 946.905 108.467 L 946.905 44.616 L 884.001 44.616 L 884.001 92.504 L 868.274 92.504 L 868.274 124.429 L 852.554 124.429 L 852.554 140.392 L 836.826 140.392 L 836.826 156.355 L 852.554 156.355 L 852.554 172.317 L 836.826 172.317 L 836.826 204.242 L 821.098 204.242 L 821.098 236.168 L 852.554 236.168 L 852.554 252.129 L 758.2 252.129 L 758.2 236.167 L 789.65 236.167 L 789.65 204.241 L 805.378 204.241 L 805.378 172.316 L 821.098 172.316 L 821.098 124.428 L 836.826 124.428 L 836.826 92.504 L 852.554 92.504 L 852.554 44.616 L 836.826 44.616 L 836.826 28.654 L 962.625 28.654 L 962.625 44.616 L 978.353 44.616 L 978.353 60.579 L 994.081 60.579 L 994.081 76.541 L 978.353 76.541 L 978.353 124.429 L 946.905 124.429 L 946.905 140.392 L 931.177 140.392 L 931.177 156.355 L 946.905 156.355 L 946.905 236.168 L 978.417 236.168 L 978.417 220.205 L 994.145 220.205 L 994.145 204.242 L 1009.865 204.242 L 1009.865 188.28 L 1025.593 188.28 L 1025.593 204.242 L 1009.865 204.242 L 1009.865 220.205 L 994.145 220.205 L 994.145 236.168 L 1025.593 236.168 L 1025.593 252.13 L 915.449 252.13 L 915.449 156.355 L 899.729 156.355 Z M 1135.672 172.317 L 1119.944 172.317 L 1119.944 76.541 L 1104.216 76.541 L 1104.216 92.504 L 1088.496 92.504 L 1088.496 108.467 L 1072.768 108.467 L 1072.768 92.504 L 1088.496 92.504 L 1088.496 76.541 L 1104.216 76.541 L 1104.216 60.579 L 1119.944 60.579 L 1119.944 28.654 L 1135.672 28.654 L 1135.672 60.579 L 1151.392 60.579 L 1151.392 236.168 L 1167.12 236.168 L 1167.12 252.13 L 1104.216 252.13 L 1104.216 236.168 L 1119.944 236.168 L 1119.944 188.28 L 1135.672 188.28 Z M 1072.768 124.429 L 1072.768 140.392 L 1057.041 140.392 L 1057.041 156.355 L 1041.321 156.355 L 1041.321 172.317 L 1025.593 172.317 L 1025.593 156.355 L 1041.321 156.355 L 1041.321 140.392 L 1057.041 140.392 L 1057.041 124.429 Z M 176.61 25.988 C 124.406 25.988 78.864 38.954 68.867 80.108 C 64.424 102.095 70.533 130.282 105.522 145.504 C 107.678 146.379 109.332 146.83 110.516 147.152 C 112.382 147.661 113.082 147.852 112.742 148.886 C 112.186 150.577 106.633 150.014 102.19 148.323 C 69.424 136.484 51.65 107.168 54.983 77.289 C 60.536 35.572 109.966 -1.636 179.387 0.056 C 202.713 0.056 238.812 5.692 273.246 15.276 C 293.795 20.914 321.009 28.243 346.555 34.444 C 369.881 24.86 392.096 18.659 411.534 18.659 C 425.628 18.659 438.846 21.919 444.414 28.654 L 537.86 28.654 L 537.86 44.616 L 506.41 44.616 L 506.41 60.579 L 490.685 60.579 L 490.685 92.504 L 474.959 92.504 L 474.959 124.429 L 459.233 124.429 L 459.233 172.317 L 443.508 172.317 L 443.508 220.205 L 427.783 220.205 L 427.783 236.168 L 522.135 236.168 L 522.135 220.205 L 537.86 220.205 L 537.86 204.242 L 553.586 204.242 L 553.586 172.317 L 569.311 172.317 L 569.311 204.242 L 553.586 204.242 L 553.586 236.168 L 537.86 236.168 L 537.86 252.13 L 364.881 252.13 L 364.881 236.168 L 396.332 236.168 L 396.332 220.205 L 412.058 220.205 L 412.058 172.317 L 427.783 172.317 L 427.783 140.392 L 443.508 140.392 L 443.508 92.504 L 459.234 92.504 L 459.234 44.616 L 444.157 44.616 C 437.338 52.415 419.206 55.303 394.318 55.303 C 379.323 55.303 357.108 53.048 349.333 51.92 C 337.67 63.196 325.452 77.853 314.9 90.82 C 305.307 102.032 297.996 111.856 290.818 121.501 C 284.281 130.284 277.855 138.919 269.914 148.323 C 283.798 148.886 298.794 147.759 309.901 143.812 C 320.454 129.155 333.783 122.39 342.669 124.645 C 351.554 126.9 350.444 135.92 337.67 145.504 C 335.4 147.26 333.256 148.887 331.193 150.453 C 322.659 156.932 315.515 162.356 306.569 171.436 C 304.66 173.374 302.994 175.312 301.571 176.968 C 299.269 179.646 297.602 181.584 296.572 181.584 C 293.24 182.148 294.351 172 296.572 166.363 C 299.349 159.597 302.126 154.524 304.903 150.577 C 295.462 153.396 284.91 154.524 266.026 154.524 C 264.938 155.812 263.791 157.222 262.545 158.751 C 259.978 161.904 256.993 165.569 253.253 169.745 C 204.381 225.557 123.85 256 71.645 256 C 29.993 256 0 239.087 0 212.591 C 0 193.987 12.774 175.947 34.99 175.947 C 53.317 175.947 61.092 188.349 60.537 200.188 C 59.981 208.644 57.204 213.718 51.651 219.92 C 47.763 224.429 44.431 228.376 44.431 234.013 C 44.431 243.597 52.762 249.798 68.867 250.362 C 111.631 253.181 142.177 234.013 176.61 195.678 C 190.494 180.456 200.491 168.054 210.488 153.96 C 198.27 153.96 186.607 153.96 179.943 154.524 C 172.902 154.799 168.37 155.744 165.639 156.313 C 162.768 156.912 161.886 157.096 162.17 155.652 C 162.726 153.396 167.724 149.45 184.385 148.323 C 188.537 147.94 196.791 148.077 204.443 148.204 C 208.052 148.264 211.528 148.323 214.375 148.323 C 222.151 137.611 231.037 125.772 242.7 113.37 C 264.915 89.128 294.35 65.451 323.23 47.411 C 307.124 45.719 281.021 40.645 263.804 37.263 C 239.923 32.753 203.268 25.988 177.166 25.988 L 176.61 25.988 Z M 365.438 39.518 C 386.542 45.156 403.204 46.847 413.2 46.847 C 427.64 46.847 440.969 42.336 441.524 36.136 C 442.08 29.37 428.751 24.296 410.979 24.296 L 410.423 24.296 C 394.317 24.296 375.435 32.753 365.438 39.518 Z M 711.023 252.129 L 616.672 252.129 L 616.672 236.167 L 600.946 236.167 L 600.946 220.204 L 585.221 220.204 L 585.221 108.466 L 600.946 108.466 L 600.946 76.54 L 616.672 76.54 L 616.672 60.578 L 632.396 60.578 L 632.396 44.616 L 663.847 44.616 L 663.847 28.654 L 758.2 28.654 L 758.2 44.616 L 773.924 44.616 L 773.924 60.579 L 789.65 60.579 L 789.65 172.317 L 773.924 172.317 L 773.924 188.28 L 758.2 188.28 L 758.2 220.205 L 742.474 220.205 L 742.474 236.168 L 711.023 236.168 Z M 663.847 44.616 L 663.847 60.579 L 648.122 60.579 L 648.122 76.541 L 632.396 76.541 L 632.396 108.467 L 616.672 108.467 L 616.672 220.205 L 632.396 220.205 L 632.396 236.168 L 695.298 236.168 L 695.298 220.205 L 711.023 220.205 L 711.023 204.242 L 726.749 204.242 L 726.749 188.28 L 742.474 188.28 L 742.474 156.355 L 758.2 156.355 L 758.2 60.579 L 742.474 60.579 L 742.474 44.616 Z\" fill=\"url(%23k7ftP17bN-2050371890-linear-gradient)\" height=\"255.9995555606772px\" id=\"k7ftP17bN\" width=\"1167.1199228535695px\"/></svg>",
+      "rect": {
+        "w": 1440,
+        "h": 316
+      },
+      "classes": "framer-TTMN7 framer-uszx8k"
+    },
+    {
+      "tag": "VIDEO",
+      "src": "https://ik.imagekit.io/ff5bkg98p/framer-website-assets/Videos/footer.webm/ik-video.mp4",
+      "rect": {
+        "w": 1440,
+        "h": 947
+      },
+      "classes": ""
+    },
+    {
+      "tag": "IMG",
+      "src": "https://ik.imagekit.io/ff5bkg98p/framer-website-assets/Bolter%20Design.webp?updatedAt=1759805491501",
+      "rect": {
+        "w": 142,
+        "h": 24
+      },
+      "classes": ""
+    },
+    {
+      "tag": "IMG",
+      "src": "https://ik.imagekit.io/ff5bkg98p/framer-website-assets/Little%20Plains.png?updatedAt=1759805505476",
+      "rect": {
+        "w": 109,
+        "h": 24
+      },
+      "classes": ""
+    },
+    {
+      "tag": "IMG",
+      "src": "https://ik.imagekit.io/ff5bkg98p/framer-website-assets/Salz.png?updatedAt=1759805492222",
+      "rect": {
+        "w": 14,
+        "h": 24
+      },
+      "classes": ""
+    },
+    {
+      "tag": "IMG",
+      "src": "https://ik.imagekit.io/ff5bkg98p/node-inputs/2026/1/23/refactor-me-soon/54866b80-aa1e-4afd-bccf-418fb6b24b25_qzPW7aibR.png",
+      "rect": {
+        "w": 232,
+        "h": 160
+      },
+      "classes": ""
+    },
+    {
+      "tag": "IMG",
+      "src": "https://ik.imagekit.io/ff5bkg98p/node-inputs/2026/1/26/refactor-me-soon/72b05bbe-019c-447e-9010-669afc711309_4BFOJ4GLLK.png",
+      "rect": {
+        "w": 204,
+        "h": 255
+      },
+      "classes": ""
+    },
+    {
+      "tag": "VIDEO",
+      "src": "https://ik.imagekit.io/ff5bkg98p/node-inputs/2026/1/26/refactor-me-soon/2d5fb692-11e9-4e5b-867e-f69a163fef77_roZL1HxKg.mp4",
+      "rect": {
+        "w": 430,
+        "h": 242
+      },
+      "classes": ""
+    },
+    {
+      "tag": "VIDEO",
+      "src": "https://ik.imagekit.io/ff5bkg98p/framer-website-assets/ideate%20poster.png?updatedAt=1761547858255",
+      "rect": {
+        "w": 420,
+        "h": 608
+      },
+      "classes": ""
+    },
+    {
+      "tag": "VIDEO",
+      "src": "https://ik.imagekit.io/ff5bkg98p/framer-website-assets/iterate%20poster.png?updatedAt=1761547950131",
+      "rect": {
+        "w": 420,
+        "h": 608
+      },
+      "classes": ""
+    },
+    {
+      "tag": "VIDEO",
+      "src": "https://ik.imagekit.io/ff5bkg98p/framer-website-assets/scale%20poster.png?updatedAt=1761548037818",
+      "rect": {
+        "w": 420,
+        "h": 608
+      },
+      "classes": ""
+    }
+  ],
+  "fontFiles": [
+    {
+      "url": "https://framerusercontent.com/third-party-assets/fontshare/wf/LAFFD4SDUCDVQEXFPDC7C53EQ4ZELWQI/PXCT3G6LO6ICM5I3NTYENYPWJAECAWDD/GHM6WVH6MILNYOOCXHXB5GTSGNTMGXZR.woff2",
+      "contentType": "application/octet-stream",
+      "status": 200
+    },
+    {
+      "url": "https://framerusercontent.com/assets/kqyAfMmZA5vP4G3u2iu7WJdY.woff2",
+      "contentType": "application/octet-stream",
+      "status": 200
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/geist/v4/gyBhhwUxId8gMGYQMKR3pzfaWI_RnOM4mJPby1QNtA.woff2",
+      "contentType": "font/woff2",
+      "status": 200
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/geist/v4/gyBhhwUxId8gMGYQMKR3pzfaWI_RruM4mJPby1QNtA.woff2",
+      "contentType": "font/woff2",
+      "status": 200
+    },
+    {
+      "url": "https://framerusercontent.com/assets/qf6DB7WGDdEjcTvrw5e5SlRp4w.woff2",
+      "contentType": "application/octet-stream",
+      "status": 200
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/geist/v4/gyByhwUxId8gMEwcGFU.woff2",
+      "contentType": "font/woff2",
+      "status": 200
+    },
+    {
+      "url": "https://fonts.gstatic.com/s/geist/v4/gyBhhwUxId8gMGYQMKR3pzfaWI_RQuQ4mJPby1QNtA.woff2",
+      "contentType": "font/woff2",
+      "status": 200
+    }
+  ]
+}

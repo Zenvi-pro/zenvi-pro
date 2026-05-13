@@ -76,7 +76,10 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
+        sans: ["Geist", "Inter", "system-ui", "sans-serif"],
+        mono: ["Geist Mono", "monospace"],
+        serif: ['"Instrument Serif"', "Cormorant Garamond", "Georgia", "serif"],
+        display: ['"Instrument Serif"', "Cormorant Garamond", "Georgia", "serif"],
       },
       fontSize: {
         hero: [
