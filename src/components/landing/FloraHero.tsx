@@ -28,6 +28,8 @@ import {
 } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Play } from "lucide-react";
 import { TextReveal } from "@/components/ui/text-reveal";
+import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface FloraHeroProps {
   onOpenWaitlist: () => void;
@@ -53,6 +55,16 @@ const scrollToDemo = () => {
  */
 const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
   const sectionRef = useRef<HTMLElement | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setIsLoggedIn(!!data.session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, s) => setIsLoggedIn(!!s));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const ctaHref = isLoggedIn ? "/dashboard/download" : "/login?mode=signup";
+  const ctaLabel = isLoggedIn ? "Download Now" : "Get Started Free";
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -196,8 +208,8 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
           className="pointer-events-none absolute inset-x-0 top-24 z-[15] flex items-center justify-center px-6 sm:top-28"
           style={{ opacity: announcementOpacity }}
         >
-          <a
-            href="https://zenvi.pro/login?mode=signup"
+          <Link
+            to={ctaHref}
             className="pointer-events-auto group inline-flex items-center gap-2 rounded-[12px] border border-white/10 bg-white/[0.06] py-1.5 pl-1.5 pr-3 text-sm backdrop-blur-md transition-colors hover:bg-white/[0.10] active:scale-[0.985]"
           >
             <span className="rounded-[8px] bg-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-black">
@@ -205,7 +217,7 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
             </span>
             <span className="text-white/85">Zenvi for Mac is in early access</span>
             <ArrowUpRight className="h-3.5 w-3.5 text-white/55 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-          </a>
+          </Link>
         </div>
 
         {/* === DESKTOP post-reveal content === */}
@@ -238,13 +250,13 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
 
             {/* CTAs */}
             <div className="flex flex-col items-center justify-center gap-2.5 sm:flex-row sm:gap-3">
-              <a
-                href="https://zenvi.pro/login?mode=signup"
+              <Link
+                to={ctaHref}
                 className="inline-flex h-10 items-center gap-1.5 rounded-[12px] bg-white px-5 text-sm font-medium text-black transition-all hover:bg-white/90 active:scale-[0.98]"
               >
-                Get Started Free
+                {ctaLabel}
                 <ArrowRight className="h-3.5 w-3.5" />
-              </a>
+              </Link>
               <button
                 type="button"
                 onClick={scrollToDemo}
@@ -275,13 +287,13 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
         {/* === MOBILE: content visible immediately, no scroll choreography === */}
         <div className="relative z-10 mx-auto flex h-full max-w-[1240px] flex-col items-center justify-center px-6 text-center sm:hidden">
           <div className="w-full max-w-md">
-            <a
-              href="https://zenvi.pro/login?mode=signup"
+            <Link
+              to={ctaHref}
               className="mb-4 inline-flex items-center gap-2 rounded-[12px] border border-white/10 bg-white/[0.06] py-1.5 pl-1.5 pr-3 text-xs backdrop-blur-md active:scale-95 transition-all"
             >
               <span className="rounded-[8px] bg-white px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-black">New</span>
               <span className="text-white/85">Zenvi for Mac · Early access</span>
-            </a>
+            </Link>
             <h2
               aria-hidden="true"
               className="mb-3 text-balance font-serif text-[2.25rem] font-normal leading-[1.05] tracking-[-0.01em] text-white"
@@ -298,13 +310,13 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
               />
             </div>
             <div className="flex flex-col items-center justify-center gap-2.5">
-              <a
-                href="https://zenvi.pro/login?mode=signup"
+              <Link
+                to={ctaHref}
                 className="inline-flex h-11 w-full items-center justify-center gap-1.5 rounded-[12px] bg-white px-5 text-sm font-medium text-black transition-all hover:bg-white/90 active:scale-[0.98]"
               >
-                Get Started Free
+                {ctaLabel}
                 <ArrowRight className="h-3.5 w-3.5" />
-              </a>
+              </Link>
               <button
                 type="button"
                 onClick={scrollToDemo}

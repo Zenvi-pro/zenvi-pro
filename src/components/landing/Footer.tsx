@@ -1,10 +1,22 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Twitter, Instagram, Youtube, Linkedin, Github, ArrowUpRight } from "lucide-react";
 import { ZenviLogo } from "@/components/ZenviLogo";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setIsLoggedIn(!!data.session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, s) => setIsLoggedIn(!!s));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const ctaHref = isLoggedIn ? "/dashboard/download" : "/login?mode=signup";
+  const ctaLabel = isLoggedIn ? "Download Now" : "Get early access";
 
   return (
     <footer id="docs" className="bg-black text-white w-full">
@@ -58,13 +70,13 @@ export default function Footer() {
                 className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-white transition-transform duration-300 ease-out group-hover:scale-x-100"
               />
             </a>
-            <a
-              href="https://zenvi.pro/login?mode=signup"
+            <Link
+              to={ctaHref}
               className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[13px] font-semibold tracking-tight text-black shadow-[0_8px_28px_-8px_rgba(255,255,255,0.3)] transition-all duration-300 hover:shadow-[0_14px_42px_-8px_rgba(50,117,248,0.4)] active:scale-[0.98]"
             >
-              Get early access
+              {ctaLabel}
               <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-            </a>
+            </Link>
           </motion.div>
         </div>
       </section>
@@ -123,15 +135,17 @@ export default function Footer() {
                 <h4 className="text-white font-medium mb-2">Product</h4>
                 <Link to="/#features" className="text-white/50 hover:text-white transition-colors">Features</Link>
                 <Link to="/pricing" className="text-white/50 hover:text-white transition-colors">Pricing</Link>
-                <Link to="/#docs" className="text-white/50 hover:text-white transition-colors">Documentation</Link>
-                <a href="https://zenvi.pro/login?mode=signup" className="text-white/50 hover:text-white transition-colors">Download</a>
+                <Link to="/docs" className="text-white/50 hover:text-white transition-colors">Documentation</Link>
+                <Link to={ctaHref} className="text-white/50 hover:text-white transition-colors">
+                  {isLoggedIn ? "Dashboard" : "Download"}
+                </Link>
               </div>
 
               {/* Legal */}
               <div className="flex flex-col gap-3">
                 <h4 className="text-white font-medium mb-2">Legal</h4>
-                <Link to="/privacy-policy" className="text-white/50 hover:text-white transition-colors">Privacy</Link>
-                <Link to="/terms-of-service" className="text-white/50 hover:text-white transition-colors">Terms</Link>
+                <Link to="/privacy" className="text-white/50 hover:text-white transition-colors">Privacy</Link>
+                <Link to="/terms" className="text-white/50 hover:text-white transition-colors">Terms</Link>
               </div>
 
               {/* Company */}

@@ -90,7 +90,7 @@ export default function LoginPage() {
         });
         navigate("/auth/success");
       } else {
-        navigate(next ?? "/");
+        navigate(next ?? "/download");
       }
     } catch (err: unknown) {
       const msg =

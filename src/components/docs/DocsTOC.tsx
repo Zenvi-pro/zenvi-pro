@@ -13,30 +13,37 @@ export function DocsTOC({ headings, activeId }: DocsTOCProps) {
   return (
     <nav
       aria-label="On this page"
-      className="hidden xl:block w-52 shrink-0 pl-2"
+      className="hidden w-56 shrink-0 pl-2 xl:block"
     >
-      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-white/40 mb-4">
-        On this page
-      </p>
-      <ul className="space-y-2.5 text-sm border-l border-white/[0.08] pl-4">
-        {headings.map((h) => (
-          <li
-            key={h.id}
-            style={{ paddingLeft: h.level >= 3 ? 8 : 0 }}
-            className={cn("-ml-px border-l-2 border-transparent", activeId === h.id && "border-primary")}
-          >
-            <a
-              href={`#${h.id}`}
+      <div className="sticky top-24">
+        <p className="mb-4 text-[10.5px] font-semibold uppercase tracking-[0.18em] text-white/40">
+          On this page
+        </p>
+        <ul className="space-y-2 border-l border-white/[0.07] pl-4 text-[13px]">
+          {headings.map((h) => (
+            <li
+              key={h.id}
+              style={{ paddingLeft: h.level >= 3 ? 10 : 0 }}
               className={cn(
-                "block py-0.5 leading-snug transition-colors focus-visible:outline-none focus-visible:text-primary",
-                activeId === h.id ? "text-white font-medium" : "text-white/45 hover:text-white/80",
+                "-ml-[17px] border-l-2 border-transparent pl-[13px] transition-colors",
+                activeId === h.id && "border-primary shadow-[inset_2px_0_8px_-2px_rgba(50,117,248,0.55)]",
               )}
             >
-              {h.text}
-            </a>
-          </li>
-        ))}
-      </ul>
+              <a
+                href={`#${h.id}`}
+                className={cn(
+                  "block py-0.5 leading-snug transition-colors focus-visible:outline-none focus-visible:text-primary",
+                  activeId === h.id
+                    ? "text-white font-medium"
+                    : "text-white/45 hover:text-white/85",
+                )}
+              >
+                {h.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </nav>
   );
 }

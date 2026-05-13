@@ -50,8 +50,8 @@ const Pricing = ({ onOpenAccessCode }: PricingProps) => {
     // User already has this tier or better → download dashboard
     if (userOrder > 0 && planOrder <= userOrder) {
       return (
-        <Button onClick={() => navigate("/download")} className={className}>
-          Go to Download
+        <Button onClick={() => navigate("/dashboard/download")} className={className}>
+          Download Now
         </Button>
       );
     }
@@ -64,6 +64,15 @@ const Pricing = ({ onOpenAccessCode }: PricingProps) => {
           className={className}
         >
           Upgrade
+        </Button>
+      );
+    }
+
+    // No subscription but logged in → download dashboard (or choice)
+    if (userTier !== "none" && userTier !== null) {
+      return (
+        <Button onClick={() => navigate("/dashboard/download")} className={className}>
+          Download Now
         </Button>
       );
     }
