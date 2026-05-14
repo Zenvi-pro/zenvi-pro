@@ -85,6 +85,9 @@ const ALL_PROVIDERS = [
   }
 ];
 
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import FluidExpandingGrid from "@/components/ui/fluid-expanding-grid";
 
 // Chunk the array into sizes of 3, 3, 3 for the rotating pods
@@ -93,6 +96,17 @@ const GROUP_2 = ALL_PROVIDERS.slice(3, 6).map(p => ({ ...p, id: p.company }));
 const GROUP_3 = ALL_PROVIDERS.slice(6, 9).map(p => ({ ...p, id: p.company }));
 
 export default function FloraModels() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setIsLoggedIn(!!data.session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, s) => setIsLoggedIn(!!s));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const ctaHref = isLoggedIn ? "/dashboard/download" : "/login?mode=signup";
+  const ctaLabel = isLoggedIn ? "Download Now" : "Sign up for free";
+
   return (
     <section className="bg-black py-24 md:py-28 border-t border-white/5 overflow-hidden">
       <div className="max-w-[1240px] mx-auto px-6">
@@ -116,12 +130,12 @@ export default function FloraModels() {
             >
               Contact sales
             </a>
-            <a
-              href="https://zenvi.pro/login?mode=signup"
+            <Link
+              to={ctaHref}
               className="bg-white/10 hover:bg-white/15 border border-white/10 text-white h-10 inline-flex items-center px-5 rounded-full font-medium text-[13px] transition-colors active:scale-[0.98]"
             >
-              Sign up for free
-            </a>
+              {ctaLabel}
+            </Link>
           </div>
         </div>
 

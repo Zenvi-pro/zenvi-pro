@@ -6,6 +6,7 @@ import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import WaitlistModal from "@/components/landing/WaitlistModal";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 type TabType = "monthly" | "annual" | "enterprise";
 
@@ -79,6 +80,25 @@ export default function PricingPage() {
 
   const openWaitlist = () => setIsWaitlistOpen(true);
   const closeWaitlist = () => setIsWaitlistOpen(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setIsLoggedIn(!!data.session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, s) => setIsLoggedIn(!!s));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleTierClick = (planHref: string) => {
+    if (isLoggedIn) {
+      navigate("/dashboard/download");
+    } else {
+      navigate(planHref);
+    }
+  };
+
+  const getButtonLabel = (defaultLabel: string) => {
+    return isLoggedIn ? "Download Now" : defaultLabel;
+  };
 
   // Automatically scroll to the very top of the page whenever the user navigates here
   useEffect(() => {
@@ -257,10 +277,10 @@ export default function PricingPage() {
                       </div>
 
                       <button
-                        onClick={() => navigate("/login?mode=signup")}
+                        onClick={() => handleTierClick("/login?mode=signup")}
                         className="mt-8 w-full py-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-white text-xs font-semibold transition-all duration-200 backdrop-blur-md active:scale-95"
                       >
-                        Get Free
+                        {getButtonLabel("Get Free")}
                       </button>
                     </div>
                   </LiquidGlassCard>
@@ -322,10 +342,10 @@ export default function PricingPage() {
                       </div>
 
                       <button
-                        onClick={() => navigate(`/checkout?plan=${activeTab === "annual" ? "creator_annual" : "creator_monthly"}`)}
+                        onClick={() => handleTierClick(`/checkout?plan=${activeTab === "annual" ? "creator_annual" : "creator_monthly"}`)}
                         className="mt-8 w-full py-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-white text-xs font-semibold transition-all duration-200 backdrop-blur-md active:scale-95"
                       >
-                        Get Starter
+                        {getButtonLabel("Get Starter")}
                       </button>
                     </div>
                   </LiquidGlassCard>
@@ -398,10 +418,10 @@ export default function PricingPage() {
                       </div>
 
                       <button
-                        onClick={() => navigate(`/checkout?plan=${activeTab === "annual" ? "pro_annual" : "pro_monthly"}`)}
+                        onClick={() => handleTierClick(`/checkout?plan=${activeTab === "annual" ? "pro_annual" : "pro_monthly"}`)}
                         className="mt-8 w-full py-3 rounded-xl bg-[#3275F8] hover:bg-[#2563eb] text-white text-xs font-bold transition-all duration-200 shadow-[0_4px_20px_rgba(50,117,248,0.4)] active:scale-95"
                       >
-                        Get Pro
+                        {getButtonLabel("Get Pro")}
                       </button>
                     </div>
                   </LiquidGlassCard>
@@ -466,10 +486,10 @@ export default function PricingPage() {
                       </div>
 
                       <button
-                        onClick={() => navigate("/checkout?plan=studio_monthly")}
+                        onClick={() => handleTierClick("/checkout?plan=studio_monthly")}
                         className="mt-8 w-full py-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-white text-xs font-semibold transition-all duration-200 backdrop-blur-md active:scale-95"
                       >
-                        Get Max
+                        {getButtonLabel("Get Max")}
                       </button>
                     </div>
                   </LiquidGlassCard>

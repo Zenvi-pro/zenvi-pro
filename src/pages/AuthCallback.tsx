@@ -13,7 +13,7 @@ export default function AuthCallbackPage() {
     const getNext = () => {
       const n = sessionStorage.getItem("auth_next");
       sessionStorage.removeItem("auth_next");
-      return n ?? "/";
+      return n ?? "/download";
     };
 
     const getState = () => {

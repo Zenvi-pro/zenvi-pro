@@ -10,15 +10,18 @@ export default function DocsLayout() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
-    <div className="relative min-h-screen bg-[#0A0A0A] text-foreground">
+    <div
+      className="relative min-h-screen bg-[#0A0A0A] text-foreground [--primary:220_94%_58%] [--primary-foreground:0_0%_100%]"
+    >
       <a
         href="#docs-main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:outline-none"
       >
         Skip to content
       </a>
+      {/* Ambient brand-blue glow at the top — refined Flora touch */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-[min(480px,55vh)] bg-[radial-gradient(ellipse_75%_45%_at_50%_-10%,rgba(0,102,255,0.16),transparent_65%)]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[min(520px,60vh)] bg-[radial-gradient(ellipse_70%_45%_at_50%_-8%,rgba(50,117,248,0.18),transparent_68%)]"
         aria-hidden
       />
 
@@ -51,12 +54,20 @@ export default function DocsLayout() {
             Docs
           </Link>
           <div className="min-w-4 flex-1" />
-          <Link
-            to="/download"
-            className="text-sm text-white/55 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded px-1"
+          <a
+            href="https://github.com/Zenvi-pro"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden text-sm text-white/55 transition-colors hover:text-white sm:inline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded px-1"
           >
-            Download
-          </Link>
+            GitHub
+          </a>
+          <a
+            href="/login?mode=signup"
+            className="inline-flex h-8 items-center gap-1.5 rounded-full bg-white px-4 text-[12.5px] font-semibold text-black transition-all hover:bg-white/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            Get early access
+          </a>
         </div>
       </header>
 
@@ -75,8 +86,8 @@ export default function DocsLayout() {
         </SheetContent>
       </Sheet>
 
-      <div className="mx-auto flex max-w-[1600px] gap-0 px-4 pb-24 pt-8 lg:gap-8 lg:px-8 lg:pt-12">
-        <aside className="hidden w-56 shrink-0 border-r border-white/[0.06] pr-6 lg:block xl:w-60 xl:pr-8">
+      <div className="relative z-10 mx-auto flex max-w-[1600px] gap-0 px-4 pb-24 pt-10 lg:gap-10 lg:px-8 lg:pt-14">
+        <aside className="hidden w-56 shrink-0 border-r border-white/[0.06] pr-6 lg:block xl:w-64 xl:pr-8">
           <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pb-8">
             <DocsSidebar />
           </div>

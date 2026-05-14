@@ -92,19 +92,31 @@ export default function DocsPage() {
   return (
     <div className="flex w-full gap-10 xl:gap-14">
       <div className="min-w-0 flex-1">
-        <nav className="mb-8 flex flex-wrap items-center gap-1.5 text-sm text-white/45" aria-label="Breadcrumb">
+        <nav
+          className="mb-7 flex flex-wrap items-center gap-1.5 text-[12.5px] text-white/45"
+          aria-label="Breadcrumb"
+        >
           <Link
             to="/docs"
             className="transition-colors hover:text-white focus-visible:outline-none focus-visible:text-primary"
           >
             Docs
           </Link>
-          <ChevronRight className="h-3.5 w-3.5 shrink-0 text-white/25" aria-hidden />
-          <span className="text-white/80 font-medium">{title}</span>
+          <ChevronRight className="h-3 w-3 shrink-0 text-white/20" aria-hidden />
+          <span className="font-medium text-white/80">{title}</span>
         </nav>
 
-        <header className="mb-10 border-b border-white/[0.06] pb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">{title}</h1>
+        <header className="relative mb-10 border-b border-white/[0.06] pb-8">
+          <p className="mb-3 inline-flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-[0.22em] text-primary">
+            <span
+              className="h-1 w-1 rounded-full bg-primary shadow-[0_0_10px_2px_rgba(50,117,248,0.6)]"
+              aria-hidden
+            />
+            Guide
+          </p>
+          <h1 className="text-balance font-serif text-[34px] font-normal leading-[1.04] tracking-[-0.015em] text-white sm:text-[44px]">
+            {title}
+          </h1>
         </header>
 
         <DocsMarkdown ref={articleRef} content={content} />

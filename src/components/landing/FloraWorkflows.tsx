@@ -1,5 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { VideoNodesWorkflowBuilder } from "@/components/ui/video-nodes-workflow-builder";
 import { ImageComparisonSlider } from "@/components/ui/image-comparison-slider-horizontal";
 import { SplineScene } from "@/components/ui/splite";
@@ -110,6 +112,16 @@ function CategoryTitle({ category, index, activeIndex, setActiveIndex }: { categ
 
 export default function FloraWorkflows() {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setIsLoggedIn(!!data.session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, s) => setIsLoggedIn(!!s));
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const ctaHref = isLoggedIn ? "/dashboard/download" : "/login?mode=signup";
+  const ctaLabel = isLoggedIn ? "Download Now" : "Get started for free";
 
   return (
     <section id="features" className="relative bg-black w-full" style={{ height: `${categories.length * 30 + 100}vh` }}>
@@ -373,9 +385,12 @@ export default function FloraWorkflows() {
                 Swap an environment. Remove an object. Recast an actor. The shoot you couldn't afford, after the shoot.
               </p>
               <div className="flex items-center gap-6 mt-6">
-                <button className="bg-white/10 hover:bg-white/20 transition-colors border border-white/10 text-white/90 px-5 py-2 rounded-full text-[13px] font-medium backdrop-blur-sm">
-                  Get started for free
-                </button>
+                <Link
+                  to={ctaHref}
+                  className="bg-white/10 hover:bg-white/20 transition-colors border border-white/10 text-white/90 px-5 py-2 rounded-full text-[13px] font-medium backdrop-blur-sm"
+                >
+                  {ctaLabel}
+                </Link>
                 <button className="text-white/60 hover:text-white transition-colors text-[13px] font-medium">
                   See all workflows
                 </button>
