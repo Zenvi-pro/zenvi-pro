@@ -51,36 +51,63 @@ export const DocsMarkdown = forwardRef<HTMLElement, DocsMarkdownProps>(function 
       },
       h1: ({ className: c, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
         <h1
-          className={cn("font-bold tracking-tight text-3xl text-white mb-6 mt-2", c)}
+          className={cn(
+            "font-serif text-[30px] font-normal leading-[1.1] tracking-[-0.01em] text-white mb-6 mt-2",
+            c,
+          )}
           {...props}
         />
       ),
       h2: ({ className: c, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
         <h2
           className={cn(
-            "scroll-mt-28 font-semibold text-xl text-white mt-12 mb-4 pb-2 border-b border-white/[0.08]",
+            "scroll-mt-28 font-serif text-[24px] font-normal leading-[1.15] tracking-[-0.01em] text-white mt-14 mb-4 pb-2.5 border-b border-white/[0.07]",
             c,
           )}
           {...props}
         />
       ),
       h3: ({ className: c, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-        <h3 className={cn("scroll-mt-28 font-semibold text-lg text-white mt-8 mb-3", c)} {...props} />
+        <h3
+          className={cn(
+            "scroll-mt-28 font-semibold text-[17px] tracking-tight text-white mt-9 mb-3",
+            c,
+          )}
+          {...props}
+        />
       ),
       h4: ({ className: c, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-        <h4 className={cn("font-semibold text-base text-white mt-6 mb-2", c)} {...props} />
+        <h4
+          className={cn(
+            "font-semibold text-[14.5px] uppercase tracking-[0.08em] text-white/85 mt-6 mb-2",
+            c,
+          )}
+          {...props}
+        />
       ),
       p: ({ className: c, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
-        <p className={cn("text-white/80 leading-relaxed my-4", c)} {...props} />
+        <p className={cn("text-[15px] text-white/75 leading-[1.7] my-4", c)} {...props} />
       ),
       ul: ({ className: c, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
-        <ul className={cn("my-4 list-disc pl-6 text-white/80 space-y-2", c)} {...props} />
+        <ul
+          className={cn(
+            "my-5 list-disc pl-6 text-[15px] text-white/75 space-y-2 marker:text-white/30",
+            c,
+          )}
+          {...props}
+        />
       ),
       ol: ({ className: c, ...props }: React.HTMLAttributes<HTMLOListElement>) => (
-        <ol className={cn("my-4 list-decimal pl-6 text-white/80 space-y-2", c)} {...props} />
+        <ol
+          className={cn(
+            "my-5 list-decimal pl-6 text-[15px] text-white/75 space-y-2 marker:text-white/30 marker:font-medium",
+            c,
+          )}
+          {...props}
+        />
       ),
       li: ({ className: c, ...props }: React.HTMLAttributes<HTMLLIElement>) => (
-        <li className={cn("leading-relaxed", c)} {...props} />
+        <li className={cn("leading-[1.7] pl-1", c)} {...props} />
       ),
       blockquote: ({ children }: { children?: React.ReactNode }) => <DocsCallout>{children}</DocsCallout>,
       hr: () => <hr className="my-10 border-white/[0.08]" />,
@@ -112,7 +139,7 @@ export const DocsMarkdown = forwardRef<HTMLElement, DocsMarkdownProps>(function 
         if (inline) {
           return (
             <code
-              className="rounded-md bg-white/[0.08] px-1.5 py-0.5 font-mono text-[0.8125rem] text-primary-foreground"
+              className="rounded-md border border-white/[0.06] bg-white/[0.06] px-1.5 py-0.5 font-mono text-[0.82em] text-[#7DA8FF]"
               {...props}
             >
               {children}

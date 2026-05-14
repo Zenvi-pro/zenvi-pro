@@ -9,14 +9,14 @@ import {
   XCircle,
   ChevronRight,
   AlertCircle,
+  Sparkles,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
-// ---------------------------------------------------------------------------
-// GitHub release types & fetch
-// ---------------------------------------------------------------------------
+// ───────── GitHub release types ─────────
+
 interface GithubAsset {
   name: string;
   browser_download_url: string;
@@ -37,14 +37,13 @@ async function fetchLatestRelease(): Promise<GithubRelease | null> {
     "https://api.github.com/repos/Zenvi-pro/zenvi-core/releases/latest",
     { headers: { Accept: "application/vnd.github+json" } },
   );
-  if (res.status === 404) return null; // no releases yet
+  if (res.status === 404) return null;
   if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
   return res.json();
 }
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
+// ───────── Helpers ─────────
+
 function formatBytes(bytes: number): string {
   return `${(bytes / 1024 / 1024).toFixed(0)} MB`;
 }
@@ -61,46 +60,8 @@ function findAsset(assets: GithubAsset[], ext: string): GithubAsset | undefined 
   return assets.find((a) => a.name.endsWith(ext));
 }
 
-// ---------------------------------------------------------------------------
-// Platform metadata (static display info only — URLs come from GitHub API)
-// ---------------------------------------------------------------------------
-type Platform = "mac" | "windows" | "linux";
+// ───────── Inline platform icons ─────────
 
-const PLATFORM_META: Record<
-  Platform,
-  { label: string; sublabel: string; icon: React.FC<{ className?: string }>; ext: string }
-> = {
-  mac: {
-    label: "macOS",
-    sublabel: "macOS 12 Monterey or later",
-    icon: MacOSIcon,
-    ext: ".dmg",
-  },
-  windows: {
-    label: "Windows",
-    sublabel: "Windows 10 / 11 (64-bit)",
-    icon: WindowsIcon,
-    ext: ".exe",
-  },
-  linux: {
-    label: "Linux",
-    sublabel: "Ubuntu 20.04+ / Debian-based",
-    icon: LinuxIcon,
-    ext: ".AppImage",
-  },
-};
-
-// Extra entry for .deb (Linux secondary)
-const DEB_META = {
-  label: "Linux (Debian)",
-  sublabel: "Ubuntu 20.04+ / Debian-based",
-  icon: LinuxIcon,
-  ext: ".deb",
-};
-
-// ---------------------------------------------------------------------------
-// Inline SVG platform icons (geometry only — no trademarked logos)
-// ---------------------------------------------------------------------------
 function MacOSIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -148,9 +109,41 @@ function LinuxIcon({ className }: { className?: string }) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// OS detection
-// ---------------------------------------------------------------------------
+// ───────── Platform meta ─────────
+
+type Platform = "mac" | "windows" | "linux";
+
+const PLATFORM_META: Record<
+  Platform,
+  { label: string; sublabel: string; icon: React.FC<{ className?: string }>; ext: string }
+> = {
+  mac: {
+    label: "macOS",
+    sublabel: "macOS 12 Monterey or later",
+    icon: MacOSIcon,
+    ext: ".dmg",
+  },
+  windows: {
+    label: "Windows",
+    sublabel: "Windows 10 / 11 (64-bit)",
+    icon: WindowsIcon,
+    ext: ".exe",
+  },
+  linux: {
+    label: "Linux",
+    sublabel: "Ubuntu 20.04+ / Debian-based",
+    icon: LinuxIcon,
+    ext: ".AppImage",
+  },
+};
+
+const DEB_META = {
+  label: "Linux (Debian)",
+  sublabel: "Ubuntu 20.04+ / Debian-based",
+  icon: LinuxIcon,
+  ext: ".deb",
+};
+
 function detectPlatform(): Platform {
   const ua = navigator.userAgent;
   if (ua.includes("Mac OS X") || ua.includes("Macintosh")) return "mac";
@@ -158,26 +151,24 @@ function detectPlatform(): Platform {
   return "linux";
 }
 
-// ---------------------------------------------------------------------------
-// Token validation states
-// ---------------------------------------------------------------------------
+// ───────── Local motion + glass kit ─────────
+
 type TokenState = "loading" | "valid" | "invalid" | "no-plan";
 
-// ---------------------------------------------------------------------------
-// Fade-in variants
-// ---------------------------------------------------------------------------
 const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 14 },
   visible: (delay = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1], delay },
+    transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1], delay },
   }),
 };
 
-// ---------------------------------------------------------------------------
-// Main component
-// ---------------------------------------------------------------------------
+const glass =
+  "rounded-2xl border border-white/[0.07] bg-gradient-to-br from-white/[0.045] via-white/[0.018] to-white/[0.005] backdrop-blur-xl";
+
+// ───────── Main component ─────────
+
 export default function DownloadPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
@@ -186,423 +177,397 @@ export default function DownloadPage() {
   const [detectedPlatform, setDetectedPlatform] = useState<Platform>("mac");
   const [downloadStarted, setDownloadStarted] = useState(false);
 
-  // Detect OS on mount
   useEffect(() => {
     setDetectedPlatform(detectPlatform());
   }, []);
 
-  // Check subscription access
   useEffect(() => {
     (async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         if (!session) {
           setTokenState("invalid");
           return;
         }
-
-        // Require an active subscription to access downloads
         const { data: sub } = await supabase.rpc("get_user_subscription");
-        if (sub && sub.length > 0) {
-          setTokenState("valid");
-        } else {
-          setTokenState("no-plan");
-        }
+        if (sub && sub.length > 0) setTokenState("valid");
+        else setTokenState("no-plan");
       } catch {
         setTokenState("invalid");
       }
     })();
   }, [token]);
 
-  // Fetch latest GitHub release (runs regardless of token state)
-  const {
-    data: release,
-    isError: releaseError,
-  } = useQuery<GithubRelease | null>({
+  const { data: release, isError: releaseError } = useQuery<GithubRelease | null>({
     queryKey: ["zenvi-latest-release"],
     queryFn: fetchLatestRelease,
     staleTime: 5 * 60 * 1000,
     retry: 1,
   });
 
-  // ── Loading state ─────────────────────────────────────────────────────────
+  // ── Loading ──────────────────────────────────────────────────────────────
   if (tokenState === "loading") {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-primary animate-spin" />
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-5 w-5 animate-spin text-primary" />
       </div>
     );
   }
 
-  // ── No active plan ────────────────────────────────────────────────────────
+  // ── No plan ──────────────────────────────────────────────────────────────
   if (tokenState === "no-plan") {
-    return (
-      <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
-        <MinimalNav />
-        <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
-            className="max-w-sm"
-          >
-            <div className="w-14 h-14 rounded-full border border-white/[0.08] flex items-center justify-center mx-auto mb-6">
-              <XCircle className="w-7 h-7 text-muted-foreground" />
-            </div>
-            <h1 className="text-2xl font-semibold text-white mb-3">
-              No active plan
-            </h1>
-            <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
-              You need an active Zenvi subscription to download the app.
-            </p>
-            <Link to="/#pricing">
-              <Button className="bg-primary hover:bg-primary/90 text-white">
-                View plans
-              </Button>
-            </Link>
-          </motion.div>
-        </div>
-      </div>
-    );
+    return <StateScreen kind="no-plan" />;
   }
 
-  // ── Invalid token ─────────────────────────────────────────────────────────
+  // ── Invalid token ────────────────────────────────────────────────────────
   if (tokenState === "invalid") {
-    return (
-      <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
-        <MinimalNav />
-        <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
-            className="max-w-sm"
-          >
-            <div className="w-14 h-14 rounded-full border border-white/[0.08] flex items-center justify-center mx-auto mb-6">
-              <XCircle className="w-7 h-7 text-destructive" />
-            </div>
-            <h1 className="text-2xl font-semibold text-white mb-3">
-              Invalid access link
-            </h1>
-            <p className="text-sm text-muted-foreground mb-8 leading-relaxed">
-              This link doesn't look right, or may have expired. Check your
-              invite email or join the waitlist to get early access.
-            </p>
-            <Link to="/">
-              <Button
-                variant="outline"
-                className="border-white/[0.08] hover:bg-white/5 text-white"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Zenvi
-              </Button>
-            </Link>
-          </motion.div>
-        </div>
-      </div>
-    );
+    return <StateScreen kind="invalid" />;
   }
 
-  // ── Valid token — Download page ───────────────────────────────────────────
+  // ── Valid ────────────────────────────────────────────────────────────────
   const primaryMeta = PLATFORM_META[detectedPlatform];
   const others = (Object.keys(PLATFORM_META) as Platform[]).filter(
     (p) => p !== detectedPlatform,
   );
-
   const getAsset = (ext: string): GithubAsset | null =>
     release?.assets ? (findAsset(release.assets, ext) ?? null) : null;
-
   const primaryAsset = getAsset(primaryMeta.ext);
 
-  // Build secondary cards list
-  const secondaryCards = others.map((p) => ({ meta: PLATFORM_META[p], asset: getAsset(PLATFORM_META[p].ext) }));
-  // If Linux is primary, also add .deb as a secondary option
+  const secondaryCards = others.map((p) => ({
+    meta: PLATFORM_META[p],
+    asset: getAsset(PLATFORM_META[p].ext),
+  }));
   if (detectedPlatform === "linux") {
     secondaryCards.push({ meta: DEB_META, asset: getAsset(".deb") });
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
-      <MinimalNav />
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Ambient blue glow */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[460px] bg-[radial-gradient(ellipse_60%_44%_at_50%_-6%,rgba(50,117,248,0.18),transparent_70%)]"
+      />
 
-      <main className="flex-1 flex flex-col items-center px-6 py-20">
-        <div className="w-full max-w-2xl">
-          {/* Badge */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            custom={0}
-            className="flex justify-center mb-8"
-          >
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 text-xs font-medium text-primary">
-              <CheckCircle className="w-3 h-3" />
-              Early Access Confirmed
-            </span>
-          </motion.div>
-
-          {/* Headline */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            custom={0.06}
-            className="text-center mb-4"
-          >
-            <h1 className="text-5xl md:text-6xl font-bold text-white tracking-tight leading-none">
-              You're in.
-            </h1>
-          </motion.div>
-
-          <motion.p
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            custom={0.12}
-            className="text-center text-muted-foreground text-base mb-14 max-w-md mx-auto leading-relaxed"
-          >
+      <main className="relative mx-auto w-full max-w-3xl px-6 py-14 lg:px-10">
+        {/* ───────── Header ───────── */}
+        <motion.header variants={fadeUp} initial="hidden" animate="visible">
+          <p className="inline-flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-[0.22em] text-primary">
+            <CheckCircle className="h-3 w-3" />
+            Early access · confirmed
+          </p>
+          <h1 className="mt-4 text-balance font-serif text-[44px] font-normal leading-[1.04] tracking-[-0.015em] text-white md:text-[60px]">
+            You&apos;re in. <em className="italic text-white/95">Welcome.</em>
+          </h1>
+          <p className="mt-4 max-w-md text-[14.5px] leading-relaxed text-white/55">
             Download Zenvi for{" "}
-            <span className="text-white font-medium">{primaryMeta.label}</span>{" "}
-            and start editing with AI.
-          </motion.p>
+            <span className="text-white">{primaryMeta.label}</span> and start editing
+            with AI — locally, on your hardware.
+          </p>
+        </motion.header>
 
-          {/* Primary download card */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            custom={0.18}
-          >
-            <div className="rounded-xl border border-white/[0.08] bg-[#111111] p-6 mb-4">
-              <div className="flex items-start justify-between mb-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-lg border border-white/[0.06] bg-white/[0.03] flex items-center justify-center text-white">
-                    <primaryMeta.icon className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-white font-semibold text-base">
-                      Zenvi for {primaryMeta.label}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {primaryMeta.sublabel}
-                    </p>
-                  </div>
+        {/* ───────── Primary download ───────── */}
+        <motion.section
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={0.08}
+          className={`relative mt-10 overflow-hidden p-7 md:p-8 ${glass}`}
+        >
+          {/* Top edge highlight */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent"
+          />
+          {/* Subtle dot pattern */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-[0.04] [background-image:radial-gradient(rgba(255,255,255,0.85)_1px,transparent_1px)] [background-size:14px_14px]"
+          />
+
+          <div className="relative">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.025] text-white">
+                  <primaryMeta.icon className="h-6 w-6" />
                 </div>
-                <span className="text-[11px] px-2 py-1 rounded border border-primary/20 text-primary bg-primary/5 font-medium">
-                  {release?.tag_name ?? "Beta"}
-                </span>
+                <div>
+                  <p className="font-serif text-[22px] leading-tight text-white">
+                    Zenvi for {primaryMeta.label}
+                  </p>
+                  <p className="mt-1 text-[12.5px] text-white/50">{primaryMeta.sublabel}</p>
+                </div>
               </div>
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-wider text-primary tabular-nums">
+                {release?.tag_name ?? "Beta"}
+              </span>
+            </div>
 
+            <div className="mt-7">
               {primaryAsset ? (
-                <a
-                  href={primaryAsset.browser_download_url}
-                  onClick={() => setDownloadStarted(true)}
-                >
-                  <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-medium text-sm gap-2">
+                <a href={primaryAsset.browser_download_url} onClick={() => setDownloadStarted(true)}>
+                  <Button className="group h-12 w-full gap-2 rounded-full bg-primary text-[14px] font-semibold text-primary-foreground shadow-[0_12px_36px_-10px_rgba(50,117,248,0.6)] transition-all hover:bg-primary/90 active:scale-[0.99]">
                     {downloadStarted ? (
                       <>
-                        <CheckCircle className="w-4 h-4" />
+                        <CheckCircle className="h-4 w-4" />
                         Download started
                       </>
                     ) : (
                       <>
-                        <Download className="w-4 h-4" />
+                        <Download className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
                         Download for {primaryMeta.label}
                       </>
                     )}
                   </Button>
                 </a>
               ) : (
-                <Button
-                  disabled
-                  className="w-full h-12 opacity-50 text-white font-medium text-sm gap-2"
-                >
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                <Button disabled className="h-12 w-full gap-2 rounded-full opacity-50">
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   Release coming soon
                 </Button>
               )}
 
-              <p className="text-center text-xs text-muted-foreground mt-3">
+              <p className="mt-3 text-center text-[11.5px] tabular-nums text-white/40">
                 {primaryMeta.ext}
                 {primaryAsset ? ` · ${formatBytes(primaryAsset.size)}` : ""}
-                {release?.published_at
-                  ? ` · Released ${formatDate(release.published_at)}`
-                  : ""}
+                {release?.published_at ? ` · Released ${formatDate(release.published_at)}` : ""}
               </p>
             </div>
+          </div>
+        </motion.section>
 
-            {/* API error warning */}
-            {releaseError && (
-              <p className="text-xs text-muted-foreground text-center mt-2 flex items-center justify-center gap-1">
-                <AlertCircle className="w-3 h-3" />
-                Could not fetch release info.{" "}
-                <a
-                  href="https://github.com/Zenvi-pro/zenvi-core/releases"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  View on GitHub
-                </a>
-              </p>
-            )}
-          </motion.div>
-
-          {/* What's new */}
-          {release?.body && (
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              custom={0.22}
-            >
-              <div className="rounded-xl border border-white/[0.06] bg-[#0D0D0D] p-6 mb-4">
-                <h2 className="text-sm font-semibold text-white mb-3">
-                  What's new in {release.tag_name}
-                </h2>
-                <p className="text-xs text-muted-foreground whitespace-pre-line leading-relaxed line-clamp-6">
-                  {release.body}
-                </p>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Other platforms */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            custom={0.24}
-            className="mb-14"
-          >
-            <p className="text-xs text-muted-foreground text-center mb-3">
-              Other platforms
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              {secondaryCards.map(({ meta, asset }, i) => {
-                const cardContent = (
-                  <div
-                    className={`rounded-lg border border-white/[0.06] bg-[#0F0F0F] transition-all duration-200 p-4 flex items-center gap-3 group ${
-                      asset
-                        ? "hover:border-white/[0.12] hover:bg-[#141414] cursor-pointer"
-                        : "opacity-50 cursor-not-allowed"
-                    }`}
-                  >
-                    <div className="w-8 h-8 rounded-md border border-white/[0.06] flex items-center justify-center text-muted-foreground group-hover:text-white transition-colors">
-                      <meta.icon className="w-4 h-4" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-white font-medium">
-                        {meta.label}
-                      </p>
-                      <p className="text-[11px] text-muted-foreground">
-                        {meta.ext}
-                        {asset ? ` · ${formatBytes(asset.size)}` : " · Coming soon"}
-                      </p>
-                    </div>
-                    {asset && (
-                      <ChevronRight className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                    )}
-                  </div>
-                );
-
-                return asset ? (
-                  <a key={i} href={asset.browser_download_url}>
-                    {cardContent}
-                  </a>
-                ) : (
-                  <div key={i}>{cardContent}</div>
-                );
-              })}
-            </div>
-          </motion.div>
-
-          {/* Next steps */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            custom={0.3}
-          >
-            <div className="rounded-xl border border-white/[0.06] bg-[#0D0D0D] p-6">
-              <h2 className="text-sm font-semibold text-white mb-5">
-                What's next
-              </h2>
-              <div className="space-y-5">
-                {NEXT_STEPS.map((step, i) => (
-                  <div key={i} className="flex items-start gap-4">
-                    <div className="w-6 h-6 rounded-full border border-white/[0.08] flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <span className="text-[11px] font-medium text-muted-foreground">
-                        {i + 1}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-white">
-                        {step.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-                        {step.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </main>
-
-      {/* Minimal footer */}
-      <motion.footer
-        variants={fadeUp}
-        initial="hidden"
-        animate="visible"
-        custom={0.36}
-        className="border-t border-white/[0.06] py-6 px-6"
-      >
-        <div className="max-w-2xl mx-auto flex items-center justify-between">
-          <span className="text-sm font-semibold text-white">Zenvi</span>
-          <p className="text-xs text-muted-foreground">
-            Having trouble?{" "}
+        {releaseError && (
+          <p className="mt-2 flex items-center justify-center gap-1.5 text-[11.5px] text-white/40">
+            <AlertCircle className="h-3 w-3" />
+            Could not fetch release info.{" "}
             <a
-              href="mailto:support@zenvi.pro"
+              href="https://github.com/Zenvi-pro/zenvi-core/releases"
+              target="_blank"
+              rel="noreferrer"
               className="text-primary hover:underline"
             >
-              support@zenvi.pro
+              View on GitHub
             </a>
           </p>
-        </div>
-      </motion.footer>
+        )}
+
+        {/* ───────── Other platforms ───────── */}
+        <motion.section
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={0.14}
+          className="mt-10"
+        >
+          <p className="text-[10.5px] font-semibold uppercase tracking-[0.18em] text-white/40">
+            Other platforms
+          </p>
+          <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+            {secondaryCards.map(({ meta, asset }, i) => {
+              const card = (
+                <div
+                  className={`group flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.015] px-4 py-3 transition-all duration-300 ${
+                    asset
+                      ? "hover:-translate-y-0.5 hover:border-white/[0.15] hover:bg-white/[0.04]"
+                      : "cursor-not-allowed opacity-50"
+                  }`}
+                >
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-white/[0.07] text-white/55 transition-colors group-hover:border-primary/40 group-hover:text-primary">
+                    <meta.icon className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13.5px] font-medium text-white">{meta.label}</p>
+                    <p className="text-[11px] tabular-nums text-white/40">
+                      {meta.ext}
+                      {asset ? ` · ${formatBytes(asset.size)}` : " · coming soon"}
+                    </p>
+                  </div>
+                  {asset && (
+                    <ChevronRight
+                      className="h-3.5 w-3.5 shrink-0 text-white/25 transition-all group-hover:translate-x-0.5 group-hover:text-primary"
+                      aria-hidden
+                    />
+                  )}
+                </div>
+              );
+
+              return asset ? (
+                <a key={i} href={asset.browser_download_url}>
+                  {card}
+                </a>
+              ) : (
+                <div key={i}>{card}</div>
+              );
+            })}
+          </div>
+        </motion.section>
+
+        {/* ───────── What's new ───────── */}
+        {release?.body && (
+          <motion.section
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={0.18}
+            className="mt-10"
+          >
+            <div className="flex items-baseline justify-between gap-4">
+              <div>
+                <h2 className="font-serif text-[22px] leading-tight tracking-tight text-white md:text-[24px]">
+                  What&apos;s new
+                </h2>
+                <p className="mt-1 text-[11.5px] uppercase tracking-[0.16em] text-white/40">
+                  {release.tag_name}
+                </p>
+              </div>
+              <a
+                href={`https://github.com/Zenvi-pro/zenvi-core/releases/tag/${release.tag_name}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-[12px] font-medium text-white/55 transition-colors hover:text-white"
+              >
+                Full notes ↗
+              </a>
+            </div>
+            <div className={`mt-5 p-6 ${glass}`}>
+              <p className="line-clamp-8 whitespace-pre-line text-[13px] leading-[1.7] text-white/65">
+                {release.body}
+              </p>
+            </div>
+          </motion.section>
+        )}
+
+        {/* ───────── Next steps ───────── */}
+        <motion.section
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={0.22}
+          className="mt-10"
+        >
+          <h2 className="font-serif text-[22px] leading-tight tracking-tight text-white md:text-[24px]">
+            What&apos;s next
+          </h2>
+          <p className="mt-1 text-[11.5px] uppercase tracking-[0.16em] text-white/40">
+            Three steps
+          </p>
+          <ol className="mt-5 space-y-2.5">
+            {NEXT_STEPS.map((step, i) => (
+              <li
+                key={i}
+                className={`flex items-start gap-4 p-5 ${glass}`}
+              >
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-primary/35 bg-primary/10 text-[11px] font-semibold tabular-nums text-primary">
+                  {i + 1}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[14px] font-medium text-white">{step.title}</p>
+                  <p className="mt-1 text-[13px] leading-relaxed text-white/55">
+                    {step.description}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </motion.section>
+
+        {/* ───────── Tail link ───────── */}
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={0.26}
+          className="mt-10 flex items-center justify-center gap-4 border-t border-white/[0.06] pt-8 text-[12.5px] text-white/45"
+        >
+          <Link to="/dashboard/usage" className="hover:text-white transition-colors">
+            Check your usage
+          </Link>
+          <span aria-hidden className="text-white/15">·</span>
+          <Link to="/docs" className="hover:text-white transition-colors">
+            Read the docs
+          </Link>
+          <span aria-hidden className="text-white/15">·</span>
+          <a
+            href="https://github.com/Zenvi-pro/zenvi-core"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-white transition-colors"
+          >
+            GitHub
+          </a>
+        </motion.div>
+      </main>
     </div>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Sub-components
-// ---------------------------------------------------------------------------
-function MinimalNav() {
+// ───────── Empty-ish state screens (no-plan / invalid) ─────────
+
+function StateScreen({ kind }: { kind: "no-plan" | "invalid" }) {
+  const config = {
+    "no-plan": {
+      icon: Sparkles,
+      iconTone: "text-primary",
+      title: "No active plan.",
+      body: "You need an active Zenvi subscription to download the app.",
+      ctaLabel: "View plans",
+      ctaHref: "/#pricing",
+    },
+    invalid: {
+      icon: XCircle,
+      iconTone: "text-rose-400",
+      title: "Invalid access link.",
+      body: "This link doesn't look right, or may have expired. Check your invite email or join the waitlist to get early access.",
+      ctaLabel: "Back to Zenvi",
+      ctaHref: "/",
+    },
+  }[kind];
+
+  const Icon = config.icon;
+
   return (
-    <nav className="border-b border-white/[0.06] px-6 py-4">
-      <div className="max-w-2xl mx-auto flex items-center justify-between">
-        <Link to="/" className="text-lg font-bold text-white tracking-tight">
-          Zenvi
-        </Link>
-        <Link
-          to="/"
-          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-white transition-colors"
+    <div className="relative flex min-h-screen flex-col">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[400px] bg-[radial-gradient(ellipse_60%_42%_at_50%_-6%,rgba(50,117,248,0.14),transparent_70%)]"
+      />
+      <div className="relative flex flex-1 flex-col items-center justify-center px-6 text-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          className={`max-w-md ${glass} px-10 py-12`}
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          Back to site
-        </Link>
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.025]">
+            <Icon className={`h-6 w-6 ${config.iconTone}`} aria-hidden />
+          </div>
+          <h1 className="mt-6 font-serif text-[30px] leading-tight text-white">
+            {config.title}
+          </h1>
+          <p className="mt-3 text-[14px] leading-relaxed text-white/55">{config.body}</p>
+          <Link to={config.ctaHref} className="mt-8 inline-block">
+            <Button
+              className={
+                kind === "no-plan"
+                  ? "h-10 gap-1.5 rounded-full bg-primary px-5 text-[13px] font-semibold text-primary-foreground hover:bg-primary/90"
+                  : "h-10 gap-1.5 rounded-full border border-white/[0.1] bg-transparent px-5 text-[13px] text-white hover:bg-white/[0.05]"
+              }
+              variant={kind === "no-plan" ? "default" : "outline"}
+            >
+              {kind === "invalid" && <ArrowLeft className="h-3.5 w-3.5" />}
+              {config.ctaLabel}
+            </Button>
+          </Link>
+        </motion.div>
       </div>
-    </nav>
+    </div>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Static data
-// ---------------------------------------------------------------------------
+// ───────── Static copy ─────────
+
 const NEXT_STEPS = [
   {
     title: "Install Zenvi",
@@ -612,7 +577,7 @@ const NEXT_STEPS = [
   {
     title: "Launch and explore",
     description:
-      "Start a new project or import existing footage. The AI chat panel is on the right — try describing what you want to create.",
+      "Start a new project or import existing footage. The AI chat panel is on the right — describe what you want to create.",
   },
   {
     title: "Connect your AI models",

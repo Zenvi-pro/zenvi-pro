@@ -34,9 +34,9 @@ const Index = () => {
     return () => window.clearTimeout(t);
   }, [location.hash, introVisible]);
 
-  // Signup CTAs link out to https://zenvi.pro/login?mode=signup directly — no in-page modal.
+  // Signup CTAs route internally so the post-auth redirect to /dashboard/download works.
   const openWaitlist = () => {
-    window.location.href = "https://zenvi.pro/login?mode=signup";
+    navigate("/login?mode=signup");
   };
 
   const openAccessCode = (planKey?: string) => {
@@ -47,13 +47,10 @@ const Index = () => {
   const handleHeroDownload = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
-      const { data: sub } = await supabase.rpc("get_user_subscription");
-      if (sub && sub.length > 0) {
-        navigate("/download");
-        return;
-      }
+      navigate("/dashboard/download");
+      return;
     }
-    document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
+    navigate("/login?mode=signup");
   };
 
   const handleIntroComplete = () => {
