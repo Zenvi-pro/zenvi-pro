@@ -76,8 +76,12 @@ ALTER TABLE public.api_usage ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view own usage"
   ON public.api_usage FOR SELECT USING (auth.uid() = user_id);
 
+-- (user_id, recorded_at DESC) instead of (user_id, DATE_TRUNC('month', recorded_at) DESC):
+-- DATE_TRUNC(text, timestamptz) is STABLE, not IMMUTABLE — rejected by Postgres in
+-- index expressions on modern versions. A plain timestamp index serves the same
+-- "current month for this user" range scans equally well.
 CREATE INDEX IF NOT EXISTS api_usage_user_month_idx
-  ON public.api_usage (user_id, DATE_TRUNC('month', recorded_at) DESC);
+  ON public.api_usage (user_id, recorded_at DESC);
 
 CREATE INDEX IF NOT EXISTS api_usage_user_provider_idx
   ON public.api_usage (user_id, provider);
