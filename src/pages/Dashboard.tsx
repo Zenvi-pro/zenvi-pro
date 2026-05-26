@@ -41,22 +41,72 @@ interface HistoryRow {
   request_count: number;
 }
 
+interface CreditsBalance {
+  subscription_points: number;
+  rollover_points: number;
+  bonus_points: number;
+  topup_points: number;
+  total_points: number;
+  overage_enabled: boolean;
+  overage_limit_usd: number;
+  overage_spent_cycle: number;
+  billing_interval: string;
+  referral_code: string | null;
+  in_standard_mode: boolean;
+}
+
+interface CategoryRow {
+  category: string;
+  total_credits: number;
+  total_usd_est: number;
+  request_count: number;
+}
+
 // ── Constants ──────────────────────────────────────────────────────────────────
 
 const TIER_LABELS: Record<string, string> = {
-  none: "No Plan",
-  creator: "Creator",
+  // Canonical (post-rename)
+  free: "Free",
+  starter: "Starter",
   pro: "Pro",
-  studio: "Studio",
+  max: "Max",
   lifetime: "Lifetime",
+  none: "No Plan",
+  // Legacy aliases (still in DB for any in-flight subscriptions)
+  creator: "Starter",
+  studio: "Max",
 };
 
 const TIER_ORDER: Record<string, number> = {
   none: 0,
+  free: 0,
   creator: 1,
+  starter: 1,
   pro: 2,
   studio: 3,
+  max: 3,
   lifetime: 4,
+};
+
+// Categories rendered in the dashboard breakdown. Order = display order.
+const CATEGORY_LABEL: Record<string, string> = {
+  llm: "LLM / Chat",
+  video: "Video generation",
+  indexing: "Video indexing",
+  search: "Clip search",
+  vision: "Vision / Tagging",
+  research: "Web research",
+  other: "Other",
+};
+
+const CATEGORY_HEX: Record<string, string> = {
+  llm:       "#3275F8",  // brand blue
+  video:     "#A78BFA",  // purple
+  indexing:  "#F472B6",  // pink
+  search:    "#67E8F9",  // cyan
+  vision:    "#5FBF8F",  // green
+  research:  "#FBBF24",  // amber
+  other:     "#9CA3AF",  // gray
 };
 
 const PROVIDER_LABEL: Record<string, string> = {
@@ -195,6 +245,55 @@ export default function DashboardPage() {
     },
   });
 
+  // ── Credits balance — 4 buckets + overage status ──
+  // Auto-creates the row on first query, so new users see a clean zero state
+  // instead of an error if their auth trigger ran before the migration.
+  const { data: balance } = useQuery<CreditsBalance | null>({
+    queryKey: ["credits-balance"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_credits_balance");
+      if (error) {
+        console.error("get_credits_balance failed:", error);
+        return null;
+      }
+      const row = Array.isArray(data) ? data[0] : data;
+      if (!row) return null;
+      return {
+        subscription_points: Number(row.subscription_points ?? 0),
+        rollover_points:     Number(row.rollover_points ?? 0),
+        bonus_points:        Number(row.bonus_points ?? 0),
+        topup_points:        Number(row.topup_points ?? 0),
+        total_points:        Number(row.total_points ?? 0),
+        overage_enabled:     Boolean(row.overage_enabled),
+        overage_limit_usd:   Number(row.overage_limit_usd ?? 0),
+        overage_spent_cycle: Number(row.overage_spent_cycle ?? 0),
+        billing_interval:    String(row.billing_interval ?? "monthly"),
+        referral_code:       row.referral_code ?? null,
+        in_standard_mode:    Boolean(row.in_standard_mode),
+      };
+    },
+  });
+
+  // ── Category breakdown — LLM vs Video vs Indexing etc ──
+  const { data: categories = [] } = useQuery<CategoryRow[]>({
+    queryKey: ["category-breakdown"],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_category_breakdown", {
+        p_month_offset: 0,
+      });
+      if (error) {
+        console.error("get_category_breakdown failed:", error);
+        return [];
+      }
+      return (data ?? []).map((r: Record<string, unknown>) => ({
+        category:      String(r.category ?? "other"),
+        total_credits: Number(r.total_credits ?? 0),
+        total_usd_est: Number(r.total_usd_est ?? 0),
+        request_count: Number(r.request_count ?? 0),
+      }));
+    },
+  });
+
   const pct = totals?.percentage_used ?? 0;
   const maxHistoryCost = Math.max(...history.map((h) => h.total_cost_usd), 0.01);
 
@@ -265,13 +364,123 @@ export default function DashboardPage() {
           </motion.div>
         )}
 
+        {/* ───────── Credit balance (NEW: 4-bucket view) ───────── */}
+        {balance && (
+          <motion.section
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={0.06}
+            className={`relative mt-10 overflow-hidden p-7 md:p-9 ${glass}`}
+          >
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 opacity-[0.045] [background-image:radial-gradient(rgba(255,255,255,0.85)_1px,transparent_1px)] [background-size:14px_14px]"
+            />
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent"
+            />
+
+            <div className="relative grid gap-8 md:grid-cols-[1.4fr_1fr] md:items-start">
+              <div>
+                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/45">
+                  Credits remaining
+                </p>
+                <p className="mt-2 font-serif text-[56px] font-normal leading-none tracking-[-0.02em] tabular-nums text-white md:text-[72px]">
+                  {balance.total_points.toLocaleString()}
+                </p>
+                <p className="mt-3 text-[13px] text-white/55">
+                  ≈ <span className="text-white/85">${(balance.total_points * 0.01).toFixed(2)}</span> of usage value
+                  {balance.in_standard_mode && (
+                    <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-300">
+                      Standard mode — out of credits
+                    </span>
+                  )}
+                </p>
+
+                {/* Stacked bucket bar — visual proof of where the credits came from */}
+                {balance.total_points > 0 && (
+                  <div className="mt-5 flex h-2 w-full overflow-hidden rounded-full bg-white/[0.04]">
+                    {([
+                      ["subscription_points", "#3275F8", "Subscription"],
+                      ["rollover_points",     "#67A4FF", "Rollover"],
+                      ["bonus_points",        "#A78BFA", "Bonus"],
+                      ["topup_points",        "#FBBF24", "Top-up"],
+                    ] as const).map(([key, color, label]) => {
+                      const v = balance[key];
+                      const pct = (v / balance.total_points) * 100;
+                      if (pct <= 0) return null;
+                      return (
+                        <div
+                          key={key}
+                          className="h-full"
+                          style={{ width: `${pct}%`, backgroundColor: color }}
+                          title={`${label}: ${v.toLocaleString()} cr (${pct.toFixed(0)}%)`}
+                        />
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Bucket legend */}
+                <div className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-[12px] md:grid-cols-4">
+                  {([
+                    ["subscription_points", "#3275F8", "Subscription"],
+                    ["rollover_points",     "#67A4FF", "Rollover"],
+                    ["bonus_points",        "#A78BFA", "Bonus"],
+                    ["topup_points",        "#FBBF24", "Top-up"],
+                  ] as const).map(([key, color, label]) => (
+                    <div key={key} className="flex items-center gap-2">
+                      <span
+                        aria-hidden
+                        className="h-1.5 w-1.5 rounded-full"
+                        style={{ backgroundColor: color }}
+                      />
+                      <span className="text-white/55">{label}</span>
+                      <span className="ml-auto tabular-nums text-white/85">
+                        {balance[key].toLocaleString()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right column: overage status + next refill */}
+              <div className="flex flex-col gap-3 border-t border-white/[0.07] pt-6 md:border-l md:border-t-0 md:pl-8 md:pt-0">
+                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/45">
+                  Overage
+                </p>
+                <p className="font-serif text-[22px] leading-tight text-white">
+                  {balance.overage_enabled ? "Enabled" : "Off"}
+                </p>
+                <p className="text-[12px] text-white/55">
+                  {balance.overage_enabled
+                    ? `Cap: $${balance.overage_limit_usd.toFixed(2)} · Used: $${balance.overage_spent_cycle.toFixed(2)}`
+                    : "When you run out, paid AI features pause. Enable overage in Manage Billing to keep going at sticker rates."}
+                </p>
+                {balance.referral_code && (
+                  <div className="mt-3 rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2">
+                    <p className="text-[10.5px] uppercase tracking-[0.16em] text-white/40">
+                      Referral code
+                    </p>
+                    <p className="mt-1 font-mono text-[13px] tabular-nums text-white/85">
+                      {balance.referral_code}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.section>
+        )}
+
         {/* ───────── Hero card: spend + plan ───────── */}
         <motion.section
           variants={fadeUp}
           initial="hidden"
           animate="visible"
           custom={0.08}
-          className={`relative mt-10 overflow-hidden p-7 md:p-9 ${glass}`}
+          className={`relative mt-6 overflow-hidden p-7 md:p-9 ${glass}`}
         >
           {/* Subtle dot grid backdrop — Cursor-inspired but blue */}
           <div
@@ -369,6 +578,72 @@ export default function DashboardPage() {
             sub="rolling"
           />
         </motion.div>
+
+        {/* ───────── Where credits went (category breakdown) ───────── */}
+        {categories.length > 0 && categories.some((c) => c.total_credits > 0) && (
+          <motion.section
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={0.14}
+            className="mt-10"
+          >
+            <SectionHeader title="What you spent on" caption="By category" />
+            <div className={`mt-5 p-6 md:p-7 ${glass}`}>
+              <div className="space-y-5">
+                {categories
+                  .slice()
+                  .filter((c) => c.total_credits > 0)
+                  .sort((a, b) => b.total_credits - a.total_credits)
+                  .map((c) => {
+                    const totalCredits = categories.reduce((sum, x) => sum + x.total_credits, 0) || 1;
+                    const share = (c.total_credits / totalCredits) * 100;
+                    const color = CATEGORY_HEX[c.category] ?? CATEGORY_HEX.other;
+                    const label = CATEGORY_LABEL[c.category] ?? c.category;
+                    return (
+                      <div key={c.category}>
+                        <div className="mb-2 flex items-baseline justify-between gap-4">
+                          <div className="flex items-center gap-2.5">
+                            <span
+                              className="h-2 w-2 rounded-full"
+                              style={{
+                                backgroundColor: color,
+                                boxShadow: `0 0 10px ${color}80`,
+                              }}
+                              aria-hidden
+                            />
+                            <span className="text-[13.5px] font-medium text-white">
+                              {label}
+                            </span>
+                            <span className="text-[11px] tabular-nums text-white/35">
+                              {c.request_count.toLocaleString()} req
+                            </span>
+                          </div>
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-[13.5px] font-medium tabular-nums text-white">
+                              {c.total_credits.toLocaleString()} cr
+                            </span>
+                            <span className="text-[11px] tabular-nums text-white/35">
+                              ≈ ${c.total_usd_est.toFixed(2)} · {share.toFixed(0)}%
+                            </span>
+                          </div>
+                        </div>
+                        <div className="h-1 rounded-full bg-white/[0.05]">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${share}%` }}
+                            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.35 }}
+                            className="h-full rounded-full"
+                            style={{ backgroundColor: color, boxShadow: `0 0 14px ${color}80` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            </div>
+          </motion.section>
+        )}
 
         {/* ───────── Where it went (provider breakdown) ───────── */}
         {providers.length > 0 && (

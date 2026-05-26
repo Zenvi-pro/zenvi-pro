@@ -7,79 +7,539 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "14.1"
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
   }
   public: {
     Tables: {
-      profiles: {
+      api_pricing: {
         Row: {
+          effective_from: string
+          flat_cost_per_unit: number
           id: string
-          email: string | null
-          full_name: string | null
-          avatar_url: string | null
-          stripe_customer_id: string | null
+          input_cost_per_million: number
+          model_pattern: string
+          output_cost_per_million: number
+          provider: string
+        }
+        Insert: {
+          effective_from?: string
+          flat_cost_per_unit?: number
+          id?: string
+          input_cost_per_million?: number
+          model_pattern: string
+          output_cost_per_million?: number
+          provider: string
+        }
+        Update: {
+          effective_from?: string
+          flat_cost_per_unit?: number
+          id?: string
+          input_cost_per_million?: number
+          model_pattern?: string
+          output_cost_per_million?: number
+          provider?: string
+        }
+        Relationships: []
+      }
+      api_usage: {
+        Row: {
+          app_version: string | null
+          category: string | null
+          cost_usd: number
+          id: string
+          input_tokens: number
+          model: string | null
+          operation: string | null
+          output_tokens: number
+          provider: string
+          recorded_at: string
+          units: number
+          user_id: string
+        }
+        Insert: {
+          app_version?: string | null
+          category?: string | null
+          cost_usd?: number
+          id?: string
+          input_tokens?: number
+          model?: string | null
+          operation?: string | null
+          output_tokens?: number
+          provider: string
+          recorded_at?: string
+          units?: number
+          user_id: string
+        }
+        Update: {
+          app_version?: string | null
+          category?: string | null
+          cost_usd?: number
+          id?: string
+          input_tokens?: number
+          model?: string | null
+          operation?: string | null
+          output_tokens?: number
+          provider?: string
+          recorded_at?: string
+          units?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      bonus_config: {
+        Row: {
+          description: string | null
+          event_type: string
+          is_repeatable: boolean
+          points: number
+        }
+        Insert: {
+          description?: string | null
+          event_type: string
+          is_repeatable?: boolean
+          points: number
+        }
+        Update: {
+          description?: string | null
+          event_type?: string
+          is_repeatable?: boolean
+          points?: number
+        }
+        Relationships: []
+      }
+      bonus_events: {
+        Row: {
+          awarded_at: string
+          event_key: string | null
+          event_type: string
+          id: string
+          points_awarded: number
+          user_id: string
+        }
+        Insert: {
+          awarded_at?: string
+          event_key?: string | null
+          event_type: string
+          id?: string
+          points_awarded: number
+          user_id: string
+        }
+        Update: {
+          awarded_at?: string
+          event_key?: string | null
+          event_type?: string
+          id?: string
+          points_awarded?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      desktop_auth_sessions: {
+        Row: {
+          access_token: string | null
           created_at: string
+          expires_at: string
+          refresh_token: string | null
+          state: string
+          used: boolean
+          user_id: string | null
+        }
+        Insert: {
+          access_token?: string | null
+          created_at?: string
+          expires_at?: string
+          refresh_token?: string | null
+          state: string
+          used?: boolean
+          user_id?: string | null
+        }
+        Update: {
+          access_token?: string | null
+          created_at?: string
+          expires_at?: string
+          refresh_token?: string | null
+          state?: string
+          used?: boolean
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      llm_model_tiers: {
+        Row: {
+          base_credits_per_call: number
+          context_threshold_tokens: number
+          description: string | null
+          model_pattern: string
+          surcharge_block_tokens: number
+          surcharge_credits_per_block: number
+          tier_band: string
           updated_at: string
         }
         Insert: {
-          id: string
-          email?: string | null
-          full_name?: string | null
-          avatar_url?: string | null
-          stripe_customer_id?: string | null
-          created_at?: string
+          base_credits_per_call: number
+          context_threshold_tokens?: number
+          description?: string | null
+          model_pattern: string
+          surcharge_block_tokens?: number
+          surcharge_credits_per_block?: number
+          tier_band: string
           updated_at?: string
         }
         Update: {
+          base_credits_per_call?: number
+          context_threshold_tokens?: number
+          description?: string | null
+          model_pattern?: string
+          surcharge_block_tokens?: number
+          surcharge_credits_per_block?: number
+          tier_band?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      point_transactions: {
+        Row: {
+          balance_after: number | null
+          bucket: string
+          category: string | null
+          created_at: string
+          id: string
+          note: string | null
+          operation: string | null
+          overage_usd: number | null
+          points_delta: number
+          provider: string | null
+          refund_of: string | null
+          session_id: string | null
+          txn_type: string
+          user_id: string
+        }
+        Insert: {
+          balance_after?: number | null
+          bucket: string
+          category?: string | null
+          created_at?: string
           id?: string
+          note?: string | null
+          operation?: string | null
+          overage_usd?: number | null
+          points_delta: number
+          provider?: string | null
+          refund_of?: string | null
+          session_id?: string | null
+          txn_type: string
+          user_id: string
+        }
+        Update: {
+          balance_after?: number | null
+          bucket?: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          operation?: string | null
+          overage_usd?: number | null
+          points_delta?: number
+          provider?: string | null
+          refund_of?: string | null
+          session_id?: string | null
+          txn_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "point_transactions_refund_of_fkey"
+            columns: ["refund_of"]
+            isOneToOne: false
+            referencedRelation: "point_transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          stripe_customer_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
           email?: string | null
           full_name?: string | null
-          avatar_url?: string | null
+          id: string
           stripe_customer_id?: string | null
-          created_at?: string
           updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          stripe_customer_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      stripe_webhook_events: {
+        Row: {
+          error: string | null
+          event_type: string
+          payload: Json
+          processed_at: string
+          stripe_event_id: string
+        }
+        Insert: {
+          error?: string | null
+          event_type: string
+          payload: Json
+          processed_at?: string
+          stripe_event_id: string
+        }
+        Update: {
+          error?: string | null
+          event_type?: string
+          payload?: Json
+          processed_at?: string
+          stripe_event_id?: string
         }
         Relationships: []
       }
       subscriptions: {
         Row: {
-          id: string
-          user_id: string
-          stripe_subscription_id: string | null
-          stripe_customer_id: string | null
-          tier: string
-          status: string
-          current_period_end: string | null
+          billing_interval: string | null
           cancel_at_period_end: boolean
           created_at: string
+          current_period_end: string | null
+          id: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          tier: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          billing_interval?: string | null
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          tier?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          billing_interval?: string | null
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          tier?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tier_config: {
+        Row: {
+          annual_monthly_points: number
+          description: string | null
+          max_accumulated_points: number
+          max_concurrent_generations: number
+          max_daily_generations: number
+          max_export_resolution: string
+          max_indexing_minutes_per_month: number
+          monthly_points: number
+          overage_allowed: boolean
+          overage_markup_percentage: number
+          overage_monthly_cap_usd: number
+          rollover_cap_points: number
+          rollover_percentage: number
+          seats: number
+          tier: string
           updated_at: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          stripe_subscription_id?: string | null
-          stripe_customer_id?: string | null
-          tier?: string
-          status?: string
-          current_period_end?: string | null
-          cancel_at_period_end?: boolean
-          created_at?: string
+          annual_monthly_points: number
+          description?: string | null
+          max_accumulated_points?: number
+          max_concurrent_generations?: number
+          max_daily_generations?: number
+          max_export_resolution?: string
+          max_indexing_minutes_per_month?: number
+          monthly_points: number
+          overage_allowed?: boolean
+          overage_markup_percentage?: number
+          overage_monthly_cap_usd?: number
+          rollover_cap_points?: number
+          rollover_percentage?: number
+          seats?: number
+          tier: string
           updated_at?: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          stripe_subscription_id?: string | null
-          stripe_customer_id?: string | null
+          annual_monthly_points?: number
+          description?: string | null
+          max_accumulated_points?: number
+          max_concurrent_generations?: number
+          max_daily_generations?: number
+          max_export_resolution?: string
+          max_indexing_minutes_per_month?: number
+          monthly_points?: number
+          overage_allowed?: boolean
+          overage_markup_percentage?: number
+          overage_monthly_cap_usd?: number
+          rollover_cap_points?: number
+          rollover_percentage?: number
+          seats?: number
           tier?: string
-          status?: string
-          current_period_end?: string | null
-          cancel_at_period_end?: boolean
-          created_at?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      tier_limits: {
+        Row: {
+          description: string | null
+          monthly_usd_limit: number
+          tier: string
+        }
+        Insert: {
+          description?: string | null
+          monthly_usd_limit: number
+          tier: string
+        }
+        Update: {
+          description?: string | null
+          monthly_usd_limit?: number
+          tier?: string
+        }
+        Relationships: []
+      }
+      usage_anomalies: {
+        Row: {
+          action_taken: string | null
+          baseline_avg_credits: number
+          category: string | null
+          detected_at: string
+          id: string
+          multiplier: number
+          note: string | null
+          resolved_at: string | null
+          spend_today_credits: number
+          user_id: string
+        }
+        Insert: {
+          action_taken?: string | null
+          baseline_avg_credits: number
+          category?: string | null
+          detected_at?: string
+          id?: string
+          multiplier: number
+          note?: string | null
+          resolved_at?: string | null
+          spend_today_credits: number
+          user_id: string
+        }
+        Update: {
+          action_taken?: string | null
+          baseline_avg_credits?: number
+          category?: string | null
+          detected_at?: string
+          id?: string
+          multiplier?: number
+          note?: string | null
+          resolved_at?: string | null
+          spend_today_credits?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_credits: {
+        Row: {
+          billing_interval: string
+          bonus_points: number
+          created_at: string
+          in_standard_mode: boolean
+          overage_enabled: boolean
+          overage_limit_usd: number
+          overage_spent_cycle: number
+          referral_code: string | null
+          referred_by: string | null
+          rollover_points: number
+          subscription_points: number
+          topup_points: number
+          total_points: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          billing_interval?: string
+          bonus_points?: number
+          created_at?: string
+          in_standard_mode?: boolean
+          overage_enabled?: boolean
+          overage_limit_usd?: number
+          overage_spent_cycle?: number
+          referral_code?: string | null
+          referred_by?: string | null
+          rollover_points?: number
+          subscription_points?: number
+          topup_points?: number
+          total_points?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          billing_interval?: string
+          bonus_points?: number
+          created_at?: string
+          in_standard_mode?: boolean
+          overage_enabled?: boolean
+          overage_limit_usd?: number
+          overage_spent_cycle?: number
+          referral_code?: string | null
+          referred_by?: string | null
+          rollover_points?: number
+          subscription_points?: number
+          topup_points?: number
+          total_points?: number | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -91,8 +551,8 @@ export type Database = {
           id: string
           invited_at: string | null
           status: string
-          used_by: string | null
           used_at: string | null
+          used_by: string | null
         }
         Insert: {
           access_token?: string
@@ -101,8 +561,8 @@ export type Database = {
           id?: string
           invited_at?: string | null
           status?: string
-          used_by?: string | null
           used_at?: string | null
+          used_by?: string | null
         }
         Update: {
           access_token?: string
@@ -111,8 +571,8 @@ export type Database = {
           id?: string
           invited_at?: string | null
           status?: string
-          used_by?: string | null
           used_at?: string | null
+          used_by?: string | null
         }
         Relationships: []
       }
@@ -121,88 +581,222 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      validate_waitlist_token: {
-        Args: { token: string }
-        Returns: { is_valid: boolean; entry_status: string }[]
+      allocate_free_tier_monthly: { Args: never; Returns: number }
+      allocate_monthly_points: {
+        Args: { p_billing_interval: string; p_tier: string; p_user_id: string }
+        Returns: undefined
       }
-      claim_waitlist_token: {
-        Args: { token: string }
-        Returns: boolean
-      }
-      get_user_download_access: {
-        Args: Record<string, never>
-        Returns: boolean
-      }
-      complete_desktop_auth_session: {
-        Args: {
-          session_state: string
-          p_access_token: string
-          p_refresh_token: string
-        }
-        Returns: boolean
-      }
-      poll_desktop_auth_session: {
-        Args: { session_state: string }
-        Returns: { authenticated: boolean; access_token: string; refresh_token: string }[]
-      }
-      get_user_subscription: {
-        Args: Record<string, never>
-        Returns: {
-          tier: string
-          status: string
-          current_period_end: string
-          cancel_at_period_end: boolean
-        }[]
-      }
-      get_stripe_customer_id: {
-        Args: Record<string, never>
-        Returns: string
-      }
-      batch_record_api_usage: {
-        Args: { records: unknown }
+      award_bonus: {
+        Args: { p_event_key?: string; p_event_type: string }
         Returns: number
       }
-      get_monthly_totals: {
-        Args: Record<string, never>
+      batch_record_api_usage: { Args: { records: Json }; Returns: number }
+      calculate_api_cost: {
+        Args: {
+          p_input_tokens: number
+          p_model: string
+          p_output_tokens: number
+          p_provider: string
+          p_units?: number
+        }
+        Returns: number
+      }
+      check_credits_allowed: {
+        Args: { p_estimated_credits?: number }
         Returns: {
-          total_cost_usd: number
-          total_requests: number
-          monthly_limit_usd: number
-          percentage_used: number
+          allowed: boolean
+          balance: number
+          in_standard_mode: boolean
+          overage_enabled: boolean
+          required: number
           tier: string
-        }[]
-      }
-      get_usage_summary: {
-        Args: Record<string, never>
-        Returns: {
-          provider: string
-          total_cost_usd: number
-          total_input_tokens: number
-          total_output_tokens: number
-          request_count: number
-        }[]
-      }
-      get_usage_history: {
-        Args: { months_back?: number }
-        Returns: {
-          month: string
-          total_cost_usd: number
-          request_count: number
         }[]
       }
       check_usage_allowed: {
         Args: { p_estimated_cost?: number }
         Returns: boolean
       }
-      calculate_api_cost: {
+      claim_waitlist_token: { Args: { token: string }; Returns: boolean }
+      complete_desktop_auth_session: {
         Args: {
-          p_provider: string
-          p_model: string
-          p_input_tokens: number
-          p_output_tokens: number
-          p_units?: number
+          p_access_token: string
+          p_refresh_token: string
+          session_state: string
         }
-        Returns: number
+        Returns: boolean
+      }
+      compute_llm_credits: {
+        Args: {
+          p_input_tokens?: number
+          p_model: string
+          p_output_tokens?: number
+        }
+        Returns: {
+          base: number
+          credits: number
+          over_tokens: number
+          surcharge: number
+          tier_band: string
+        }[]
+      }
+      credit_points: {
+        Args: {
+          p_bucket: string
+          p_note?: string
+          p_operation?: string
+          p_points: number
+          p_txn_type: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
+      deduct_points: {
+        Args: {
+          p_note?: string
+          p_operation: string
+          p_points: number
+          p_provider?: string
+          p_session_id?: string
+        }
+        Returns: string
+      }
+      get_category_breakdown: {
+        Args: { p_month_offset?: number }
+        Returns: {
+          category: string
+          request_count: number
+          total_credits: number
+          total_usd_est: number
+        }[]
+      }
+      get_credits_balance: {
+        Args: never
+        Returns: {
+          billing_interval: string
+          bonus_points: number
+          in_standard_mode: boolean
+          overage_enabled: boolean
+          overage_limit_usd: number
+          overage_spent_cycle: number
+          referral_code: string
+          rollover_points: number
+          subscription_points: number
+          topup_points: number
+          total_points: number
+        }[]
+      }
+      get_monthly_totals: {
+        Args: never
+        Returns: {
+          monthly_limit_usd: number
+          percentage_used: number
+          tier: string
+          total_cost_usd: number
+          total_requests: number
+        }[]
+      }
+      get_point_history: {
+        Args: { p_limit?: number }
+        Returns: {
+          balance_after: number
+          bucket: string
+          created_at: string
+          id: string
+          note: string
+          operation: string
+          points_delta: number
+          provider: string
+          txn_type: string
+        }[]
+      }
+      get_stripe_customer_id: { Args: never; Returns: string }
+      get_tier_config: {
+        Args: { p_tier: string }
+        Returns: {
+          annual_monthly_points: number
+          description: string | null
+          max_accumulated_points: number
+          max_concurrent_generations: number
+          max_daily_generations: number
+          max_export_resolution: string
+          max_indexing_minutes_per_month: number
+          monthly_points: number
+          overage_allowed: boolean
+          overage_markup_percentage: number
+          overage_monthly_cap_usd: number
+          rollover_cap_points: number
+          rollover_percentage: number
+          seats: number
+          tier: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "tier_config"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      get_usage_history: {
+        Args: { months_back?: number }
+        Returns: {
+          month: string
+          request_count: number
+          total_cost_usd: number
+        }[]
+      }
+      get_usage_summary: {
+        Args: never
+        Returns: {
+          provider: string
+          request_count: number
+          total_cost_usd: number
+          total_input_tokens: number
+          total_output_tokens: number
+        }[]
+      }
+      get_user_by_referral_code: { Args: { p_code: string }; Returns: string }
+      get_user_download_access: { Args: never; Returns: boolean }
+      get_user_subscription: {
+        Args: never
+        Returns: {
+          cancel_at_period_end: boolean
+          current_period_end: string
+          status: string
+          tier: string
+        }[]
+      }
+      poll_desktop_auth_session: {
+        Args: { session_state: string }
+        Returns: {
+          access_token: string
+          authenticated: boolean
+          refresh_token: string
+        }[]
+      }
+      record_stripe_event: {
+        Args: { p_event_id: string; p_event_type: string; p_payload: Json }
+        Returns: boolean
+      }
+      refund_points: {
+        Args: {
+          p_note?: string
+          p_operation: string
+          p_original_txn?: string
+          p_points: number
+        }
+        Returns: undefined
+      }
+      update_overage_settings: {
+        Args: { p_enabled: boolean; p_limit_usd: number }
+        Returns: undefined
+      }
+      validate_waitlist_token: {
+        Args: { token: string }
+        Returns: {
+          entry_status: string
+          is_valid: boolean
+        }[]
       }
     }
     Enums: {
@@ -332,7 +926,11 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
   public: {
     Enums: {},
   },
 } as const
+
