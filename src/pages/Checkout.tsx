@@ -9,94 +9,116 @@ import { useToast } from "@/hooks/use-toast";
 import { ACCESS_CODE_KEY } from "@/components/landing/AccessCodeModal";
 
 const PLANS = {
-  creator_monthly: {
-    name: "Creator",
+  // ── Canonical post-rename plans ───────────────────────────────────────────
+  starter_monthly: {
+    name: "Starter",
     price: "$29",
     period: "/mo",
-    tier: "creator",
+    tier: "starter",
     interval: "monthly",
     description: "Your AI video editor, always on.",
     features: [
-      "1,500 AI credits per month (10 credits per video generation)",
-      "Up to 1080p export quality",
-      "60 min of video indexing & smart search",
-      "Unlimited AI chat assistance",
-      "20% credit rollover each month",
-      "Standard generation queue",
+      "2,500 credits/month (~$25 of AI usage)",
+      "≈ 50 AI clips OR 2,500 chats OR 60 min indexing",
+      "1 seat",
+      "All cloud LLMs (light / standard / premium)",
+      "All Kling video models including 2.0",
+      "TwelveLabs clip indexing + smart search",
+      "1-month credit rollover",
+      "Overage opt-in (1.5× sticker, $50 cap)",
+      "No watermark",
     ],
   },
-  creator_annual: {
-    name: "Creator (Annual)",
-    price: "$249",
+  starter_annual: {
+    name: "Starter (Annual)",
+    price: "$300",
     period: "/yr",
-    tier: "creator",
+    tier: "starter",
     interval: "annual",
-    displayPrice: "$20.75",
+    displayPrice: "$25",
     displayPeriod: "/mo",
-    description: "Your AI video editor, always on. Billed as $249/yr.",
+    description: "Your AI video editor, always on. Billed as $300/yr (save 14%).",
     features: [
-      "1,500 AI credits per month (10 credits per video generation)",
-      "Up to 1080p export quality",
-      "60 min of video indexing & smart search",
-      "Unlimited AI chat assistance",
-      "20% credit rollover each month",
-      "Standard generation queue",
+      "3,000 credits/month (annual bonus)",
+      "1 seat",
+      "All cloud LLMs (light / standard / premium)",
+      "All Kling video models including 2.0",
+      "TwelveLabs clip indexing + smart search",
+      "1-month credit rollover",
+      "No watermark",
     ],
   },
   pro_monthly: {
     name: "Pro",
-    price: "$99",
+    price: "$49",
     period: "/mo",
     tier: "pro",
     interval: "monthly",
-    description: "Professional-grade AI, studio-ready output.",
+    description: "Studio-ready power, pooled across your team.",
     features: [
-      "5,000 AI credits per month (3.3× more than Creator)",
-      "Up to 4K export quality",
-      "250 min of video indexing & smart search",
-      "Unlimited AI chat assistance",
-      "Morph & transition video generation",
-      "Product demo generation",
-      "Priority generation queue — no waiting at peak hours",
-      "25% credit rollover + brand kit",
+      "5,500 credits/month (~$55 of AI usage)",
+      "≈ 110 AI clips OR 5,500 chats OR 250 min indexing",
+      "3 pooled seats",
+      "Everything in Starter",
+      "Priority Runware queue at peak",
+      "Per-seat usage analytics",
+      "2-month credit rollover",
+      "Overage opt-in (1.3× sticker, $150 cap)",
     ],
   },
   pro_annual: {
     name: "Pro (Annual)",
-    price: "$999",
+    price: "$468",
     period: "/yr",
     tier: "pro",
     interval: "annual",
-    displayPrice: "$83.25",
+    displayPrice: "$39",
     displayPeriod: "/mo",
-    description: "Professional-grade AI, studio-ready output. Billed as $999/yr.",
+    description: "Studio-ready power, pooled across your team. Billed as $468/yr (save 20%).",
     features: [
-      "5,000 AI credits per month (3.3× more than Creator)",
-      "Up to 4K export quality",
-      "250 min of video indexing & smart search",
-      "Unlimited AI chat assistance",
-      "Morph & transition video generation",
-      "Product demo generation",
-      "Priority generation queue — no waiting at peak hours",
-      "25% credit rollover + brand kit",
+      "6,600 credits/month (annual bonus)",
+      "3 pooled seats",
+      "Everything in Starter",
+      "Priority Runware queue at peak",
+      "Per-seat usage analytics",
+      "2-month credit rollover",
     ],
   },
-  studio_monthly: {
-    name: "Studio",
+  max_monthly: {
+    name: "Max",
     price: "$199",
     period: "/mo",
-    tier: "studio",
+    tier: "max",
     interval: "monthly",
-    description: "One pool. Three editors. Unlimited creativity.",
+    description: "One pool. Eight editors. Unlimited creativity.",
     features: [
-      "12,000 shared AI credits/mo across 3 seats",
-      "Up to 4K export quality",
-      "600 min of video indexing & smart search",
-      "3 concurrent video generations per seat",
-      "All Pro features included",
-      "Team analytics dashboard",
-      "Priority support + dedicated onboarding",
-      "API access for custom integrations",
+      "25,000 credits/month (~$250 of AI usage)",
+      "≈ 500 AI clips OR 25k chats OR 1,600 min indexing",
+      "8 pooled seats",
+      "Everything in Pro",
+      "Priority Runware queue 24/7",
+      "3-month credit rollover",
+      "Overage opt-in (1.2× sticker, $500 cap)",
+      "Custom voices (3/org)",
+      "Beta access to new models",
+    ],
+  },
+  max_annual: {
+    name: "Max (Annual)",
+    price: "$1,788",
+    period: "/yr",
+    tier: "max",
+    interval: "annual",
+    displayPrice: "$149",
+    displayPeriod: "/mo",
+    description: "One pool. Eight editors. Unlimited creativity. Billed as $1,788/yr (save 25%).",
+    features: [
+      "30,000 credits/month (annual bonus)",
+      "8 pooled seats",
+      "Everything in Pro",
+      "Priority Runware queue 24/7",
+      "3-month credit rollover",
+      "Custom voices (3/org)",
     ],
   },
   lifetime: {
@@ -107,12 +129,56 @@ const PLANS = {
     interval: "once",
     description: "Pay once. Create forever.",
     features: [
-      "1,000 AI credits every month, forever",
-      "All Creator features included",
-      "Credits accumulate (up to 1,500 max)",
+      "1,000 credits every month, forever",
+      "Credits accumulate up to 1,500",
       "One payment, no renewals, ever",
       "Top-up credit packs available for heavy months",
       "Locked in at today's price — forever",
+    ],
+  },
+  // ── Legacy plan keys (old links from email, social, in-flight clients) ───
+  // Aliased onto canonical tiers so /checkout?plan=creator_monthly still
+  // works through the rename window.
+  creator_monthly: {
+    name: "Starter",
+    price: "$29",
+    period: "/mo",
+    tier: "starter",
+    interval: "monthly",
+    description: "Your AI video editor, always on.",
+    features: [
+      "2,500 credits/month (~$25 of AI usage)",
+      "1 seat",
+      "All cloud LLMs + Kling video + indexing",
+      "1-month credit rollover",
+    ],
+  },
+  creator_annual: {
+    name: "Starter (Annual)",
+    price: "$300",
+    period: "/yr",
+    tier: "starter",
+    interval: "annual",
+    displayPrice: "$25",
+    displayPeriod: "/mo",
+    description: "Your AI video editor, always on. Billed as $300/yr.",
+    features: [
+      "3,000 credits/month (annual bonus)",
+      "1 seat",
+      "All cloud LLMs + Kling video + indexing",
+    ],
+  },
+  studio_monthly: {
+    name: "Max",
+    price: "$199",
+    period: "/mo",
+    tier: "max",
+    interval: "monthly",
+    description: "One pool. Eight editors. Unlimited creativity.",
+    features: [
+      "25,000 credits/month (~$250 of AI usage)",
+      "8 pooled seats",
+      "Everything in Pro + priority 24/7",
     ],
   },
 } as const;
@@ -352,6 +418,19 @@ export default function CheckoutPage() {
               ))}
             </ul>
 
+            {/* Overage explainer — opt-in lives in /dashboard/usage settings */}
+            {plan.tier !== "lifetime" && (
+              <div className="mb-6 rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-white/60 mb-1.5">
+                  About overage
+                </p>
+                <p className="text-xs text-white/55 leading-relaxed">
+                  Overage is <strong className="text-white/80">off by default</strong>. If you run out
+                  of credits, paid AI features pause until next cycle. You can enable overage anytime
+                  from your dashboard — you set the dollar cap, we never charge above it.
+                </p>
+              </div>
+            )}
 
             <Button
               onClick={handleCheckout}
