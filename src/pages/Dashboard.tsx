@@ -319,6 +319,8 @@ export default function DashboardPage() {
     );
   }
 
+  const isFreeTier = totals?.tier === "none" || totals?.tier === "free";
+
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* Ambient brand-blue glow at the top — Flora touch */}
@@ -327,7 +329,47 @@ export default function DashboardPage() {
         className="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-[radial-gradient(ellipse_60%_42%_at_50%_-6%,rgba(50,117,248,0.16),transparent_70%)]"
       />
 
-      <main className="relative mx-auto w-full max-w-5xl px-6 py-14 lg:px-10">
+      {isFreeTier && (
+        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/40 px-6 backdrop-blur-[1px]">
+          <div className="relative w-full max-w-md rounded-2xl border border-white/[0.09] bg-gradient-to-br from-[#0f1116] via-[#0a0c11] to-[#08090c] p-8 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.85)] text-center">
+            {/* Edge glow */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/55 to-transparent"
+            />
+            
+            {/* Icon */}
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-primary/30 bg-primary/10">
+              <Zap className="h-5 w-5 text-primary" />
+            </div>
+
+            <h2 className="mt-4 font-serif text-[24px] font-normal leading-tight text-white">
+              Upgrade to Unlock Dashboard
+            </h2>
+            <p className="mt-3 text-[13.5px] leading-relaxed text-white/60">
+              Usage and spending tracking are exclusive to our premium plans. Upgrade your plan to monitor point consumption, request logs, and cost analytics.
+            </p>
+
+            <div className="mt-8 flex flex-col gap-3">
+              <Button
+                onClick={() => navigate("/pricing")}
+                className="w-full h-11 bg-white hover:bg-white/90 text-black font-semibold rounded-full active:scale-[0.98] transition-all"
+              >
+                View Pricing & Upgrade
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => navigate("/dashboard/download")}
+                className="w-full h-11 text-white/50 hover:text-white/80 hover:bg-white/[0.03] rounded-full"
+              >
+                Go to Download Page
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <main className={`relative mx-auto w-full max-w-5xl px-6 py-14 lg:px-10 ${isFreeTier ? "filter blur-[6px] pointer-events-none select-none" : ""}`}>
         {/* ───────── Header ───────── */}
         <motion.header variants={fadeUp} initial="hidden" animate="visible">
           <p className="inline-flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-[0.22em] text-primary">
