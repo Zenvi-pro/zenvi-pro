@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Download,
   CheckCircle,
@@ -10,9 +10,13 @@ import {
   ChevronRight,
   AlertCircle,
   Sparkles,
+  KeyRound,
+  X,
+  Calendar,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 
 // ───────── GitHub release types ─────────
@@ -176,6 +180,15 @@ export default function DownloadPage() {
   const [tokenState, setTokenState] = useState<TokenState>("loading");
   const [detectedPlatform, setDetectedPlatform] = useState<Platform>("mac");
   const [downloadStarted, setDownloadStarted] = useState(false);
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+
+  // Modal and pending download states
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pendingDownloadUrl, setPendingDownloadUrl] = useState<string | null>(null);
+  const [accessCode, setAccessCode] = useState("");
+  const [isSubmittingCode, setIsSubmittingCode] = useState(false);
+  const [modalError, setModalError] = useState("");
+  const [isIncorrectCode, setIsIncorrectCode] = useState(false);
 
   useEffect(() => {
     setDetectedPlatform(detectPlatform());
@@ -191,9 +204,17 @@ export default function DownloadPage() {
           setTokenState("invalid");
           return;
         }
+
+        // Check if user has an active subscription
         const { data: sub } = await supabase.rpc("get_user_subscription");
-        if (sub && sub.length > 0) setTokenState("valid");
-        else setTokenState("no-plan");
+        const hasSub = sub && sub.length > 0;
+
+        // Check if user has claimed a waitlist token
+        const { data: hasAccessRpc } = await supabase.rpc("get_user_download_access");
+        const userHasAccess = hasSub || !!hasAccessRpc;
+
+        setHasAccess(userHasAccess);
+        setTokenState("valid");
       } catch {
         setTokenState("invalid");
       }
@@ -207,6 +228,16 @@ export default function DownloadPage() {
     retry: 1,
   });
 
+  const handleDownloadClick = (e: React.MouseEvent<HTMLAnchorElement>, url: string) => {
+    if (!hasAccess) {
+      e.preventDefault();
+      setPendingDownloadUrl(url);
+      setIsModalOpen(true);
+    } else {
+      setDownloadStarted(true);
+    }
+  };
+
   // ── Loading ──────────────────────────────────────────────────────────────
   if (tokenState === "loading") {
     return (
@@ -214,11 +245,6 @@ export default function DownloadPage() {
         <Loader2 className="h-5 w-5 animate-spin text-primary" />
       </div>
     );
-  }
-
-  // ── No plan ──────────────────────────────────────────────────────────────
-  if (tokenState === "no-plan") {
-    return <StateScreen kind="no-plan" />;
   }
 
   // ── Invalid token ────────────────────────────────────────────────────────
@@ -242,6 +268,52 @@ export default function DownloadPage() {
   if (detectedPlatform === "linux") {
     secondaryCards.push({ meta: DEB_META, asset: getAsset(".deb") });
   }
+
+  const handleCodeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = accessCode.trim();
+    if (!trimmed) return;
+
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(trimmed)) {
+      setModalError("Reach out to the founders for early access or questions.");
+      setIsIncorrectCode(true);
+      return;
+    }
+
+    setIsSubmittingCode(true);
+    setModalError("");
+    setIsIncorrectCode(false);
+
+    try {
+      const { data: success, error: rpcError } = await supabase.rpc("claim_waitlist_token", {
+        token: trimmed,
+      });
+
+      if (rpcError || !success) {
+        setModalError("Reach out to the founders for early access or questions.");
+        setIsIncorrectCode(true);
+        return;
+      }
+
+      setHasAccess(true);
+      setIsModalOpen(false);
+      setAccessCode("");
+
+      const downloadUrl = pendingDownloadUrl || primaryAsset?.browser_download_url;
+      if (downloadUrl) {
+        setDownloadStarted(true);
+        const link = document.createElement("a");
+        link.href = downloadUrl;
+        link.click();
+      }
+    } catch {
+      setModalError("Reach out to the founders for early access or questions.");
+      setIsIncorrectCode(true);
+    } finally {
+      setIsSubmittingCode(false);
+    }
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -307,7 +379,10 @@ export default function DownloadPage() {
 
             <div className="mt-7">
               {primaryAsset ? (
-                <a href={primaryAsset.browser_download_url} onClick={() => setDownloadStarted(true)}>
+                <a
+                  href={primaryAsset.browser_download_url}
+                  onClick={(e) => handleDownloadClick(e, primaryAsset.browser_download_url)}
+                >
                   <Button className="group h-12 w-full gap-2 rounded-full bg-primary text-[14px] font-semibold text-primary-foreground shadow-[0_12px_36px_-10px_rgba(50,117,248,0.6)] transition-all hover:bg-primary/90 active:scale-[0.99]">
                     {downloadStarted ? (
                       <>
@@ -394,7 +469,11 @@ export default function DownloadPage() {
               );
 
               return asset ? (
-                <a key={i} href={asset.browser_download_url}>
+                <a
+                  key={i}
+                  href={asset.browser_download_url}
+                  onClick={(e) => handleDownloadClick(e, asset.browser_download_url)}
+                >
                   {card}
                 </a>
               ) : (
@@ -499,6 +578,112 @@ export default function DownloadPage() {
           </a>
         </motion.div>
       </main>
+
+      {/* Access Code Modal */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => {
+                setIsModalOpen(false);
+                setModalError("");
+                setIsIncorrectCode(false);
+                setAccessCode("");
+              }}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100]"
+            />
+
+            <div className="fixed inset-0 z-[101] flex items-center justify-center px-4 pointer-events-none">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96, y: 16 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: 16 }}
+                transition={{ duration: 0.2 }}
+                className="w-full max-w-md pointer-events-auto"
+              >
+                <div className="relative rounded-2xl border border-white/[0.07] bg-[#0c0c16]/95 bg-gradient-to-br from-white/[0.045] via-white/[0.018] to-white/[0.005] backdrop-blur-xl p-8 shadow-2xl">
+                  <button
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      setModalError("");
+                      setIsIncorrectCode(false);
+                      setAccessCode("");
+                    }}
+                    className="absolute top-4 right-4 p-2 rounded-lg hover:bg-white/5 transition-colors"
+                  >
+                    <X className="w-4 h-4 text-white/50 hover:text-white" />
+                  </button>
+
+                  <div className="w-11 h-11 rounded-lg border border-primary/20 bg-primary/5 flex items-center justify-center mb-5">
+                    <KeyRound className="w-5 h-5 text-primary" />
+                  </div>
+
+                  <h2 className="text-xl font-serif font-normal text-white mb-2">
+                    Zenvi is Waitlist Only
+                  </h2>
+                  <p className="text-[13.5px] leading-relaxed text-white/60 mb-6">
+                    Right now Zenvi is waitlisted only, please enter an access code to enter.
+                  </p>
+
+                  <form onSubmit={handleCodeSubmit} className="space-y-4">
+                    <Input
+                      placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                      value={accessCode}
+                      onChange={(e) => {
+                        setAccessCode(e.target.value);
+                        setModalError("");
+                        setIsIncorrectCode(false);
+                      }}
+                      required
+                      autoFocus
+                      className="h-11 bg-white/[0.03] border-white/[0.07] focus:border-primary text-white placeholder:text-white/30 font-mono text-sm"
+                    />
+
+                    {modalError && (
+                      <div className="space-y-3">
+                        <p className="text-sm text-rose-400 font-medium leading-relaxed">
+                          {modalError}
+                        </p>
+                        {isIncorrectCode && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              window.open(
+                                "https://calendly.com/nilay800/zenvi",
+                                "Calendly",
+                                "width=800,height=600,status=no,toolbar=no,menubar=no,location=no"
+                              );
+                            }}
+                            className="inline-flex items-center justify-center gap-2 h-10 w-full rounded-xl border border-primary/35 bg-primary/10 px-4 text-xs font-semibold text-white hover:bg-primary/20 hover:border-primary/55 transition-all shadow-[0_0_15px_rgba(50,117,248,0.2)]"
+                          >
+                            <Calendar className="w-3.5 h-3.5 text-[#3275F8]" />
+                            Book a Call on Calendly
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    <Button
+                      type="submit"
+                      disabled={isSubmittingCode || !accessCode.trim()}
+                      className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-medium shadow-[0_12px_36px_-10px_rgba(50,117,248,0.6)] active:scale-[0.99] transition-all"
+                    >
+                      {isSubmittingCode ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        "Validate & Download"
+                      )}
+                    </Button>
+                  </form>
+                </div>
+              </motion.div>
+            </div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

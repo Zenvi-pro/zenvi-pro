@@ -64,7 +64,7 @@ export default function SignupPage() {
           });
           navigate("/auth/success");
         } else {
-          navigate(next ?? "/");
+          navigate(next ?? "/download");
         }
       }
     } catch (err: unknown) {
