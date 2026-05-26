@@ -660,6 +660,57 @@ export type Database = {
         }
         Returns: string
       }
+      detect_spend_anomalies: { Args: never; Returns: number }
+      get_admin_anomalies: {
+        Args: { p_limit?: number }
+        Returns: {
+          action_taken: string
+          baseline_avg_credits: number
+          detected_at: string
+          email: string
+          id: string
+          multiplier: number
+          note: string
+          resolved_at: string
+          spend_today_credits: number
+          user_id: string
+        }[]
+      }
+      get_admin_summary: {
+        Args: never
+        Returns: {
+          anomalies_this_week: number
+          est_arr_usd: number
+          est_gross_margin_pct: number
+          est_gross_profit_usd: number
+          est_mrr_usd: number
+          free_users: number
+          legacy_count: number
+          lifetime_count: number
+          max_count: number
+          month_credits_used: number
+          month_request_count: number
+          month_total_cost_usd: number
+          overage_enabled_users: number
+          pro_count: number
+          standard_mode_users: number
+          starter_count: number
+          total_paid_users: number
+        }[]
+      }
+      get_admin_top_spenders: {
+        Args: { p_limit?: number }
+        Returns: {
+          cost_usd: number
+          credits_used: number
+          email: string
+          in_standard_mode: boolean
+          overage_enabled: boolean
+          request_count: number
+          tier: string
+          user_id: string
+        }[]
+      }
       get_category_breakdown: {
         Args: { p_month_offset?: number }
         Returns: {
@@ -766,6 +817,7 @@ export type Database = {
           tier: string
         }[]
       }
+      is_admin: { Args: never; Returns: boolean }
       poll_desktop_auth_session: {
         Args: { session_state: string }
         Returns: {
