@@ -161,16 +161,11 @@ export default function DashboardPage() {
   const [billingLoading, setBillingLoading] = useState(false);
   const [oocOpen, setOocOpen] = useState(false);
 
-  // Auth + subscription guard
+  // Auth guard
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
         navigate("/login?next=/dashboard/usage");
-        return;
-      }
-      const { data: sub } = await supabase.rpc("get_user_subscription");
-      if (!sub || sub.length === 0) {
-        window.location.href = "/#pricing";
       }
     });
   }, [navigate]);
