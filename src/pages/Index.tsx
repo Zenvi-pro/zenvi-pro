@@ -65,7 +65,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-black">
       {introVisible && <IntroOverlay onComplete={handleIntroComplete} />}
-      <Navbar onOpenWaitlist={openWaitlist} onOpenAccessCode={handleHeroDownload} />
+      <Navbar onOpenWaitlist={openWaitlist} onOpenAccessCode={handleHeroDownload} isIntroActive={introVisible} />
       <FloraHero onOpenWaitlist={openWaitlist} />
       <FloraFeatures />
       <FloraWorkflows />

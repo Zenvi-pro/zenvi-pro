@@ -16,6 +16,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import OutOfCreditsModal, { shouldShowOocModal, markOocModalDismissed } from "@/components/OutOfCreditsModal";
+import { useQueryClient } from "@tanstack/react-query";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -155,7 +157,9 @@ const glass =
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [billingLoading, setBillingLoading] = useState(false);
+  const [oocOpen, setOocOpen] = useState(false);
 
   // Auth + subscription guard
   useEffect(() => {
@@ -296,6 +300,16 @@ export default function DashboardPage() {
 
   const pct = totals?.percentage_used ?? 0;
   const maxHistoryCost = Math.max(...history.map((h) => h.total_cost_usd), 0.01);
+
+  // Auto-open the out-of-credits modal once per session when the user lands
+  // here in standard mode or with a zero balance. Re-runs on every balance
+  // refresh so a fresh deduction below the threshold reopens it.
+  useEffect(() => {
+    if (!balance) return;
+    if (shouldShowOocModal(balance.total_points, balance.in_standard_mode)) {
+      setOocOpen(true);
+    }
+  }, [balance?.total_points, balance?.in_standard_mode]);
 
   // Derived: avg cost per day this month
   const now = new Date();
@@ -789,32 +803,32 @@ export default function DashboardPage() {
 
           <div className="mt-5 grid gap-3 md:grid-cols-3">
             <PlanTile
-              tier="creator"
+              tier="starter"
               currentTier={totals?.tier ?? "none"}
-              name="Creator"
+              name="Starter"
               price="$29"
               cadence="/mo"
-              tagline="For indie creators"
-              bullets={["1,500 credits/mo", "1080p export", "60 min indexing"]}
+              tagline="Solo creators"
+              bullets={["2,500 credits/mo", "1 seat", "All cloud models"]}
             />
             <PlanTile
               tier="pro"
               currentTier={totals?.tier ?? "none"}
               name="Pro"
-              price="$99"
+              price="$49"
               cadence="/mo"
-              tagline="For freelancers"
-              bullets={["5,000 credits/mo", "4K export", "Priority queue"]}
+              tagline="Pooled team usage"
+              bullets={["5,500 credits/mo", "3 pooled seats", "Priority queue at peak"]}
               accent
             />
             <PlanTile
-              tier="studio"
+              tier="max"
               currentTier={totals?.tier ?? "none"}
-              name="Studio"
+              name="Max"
               price="$199"
               cadence="/mo"
-              tagline="For teams"
-              bullets={["12,000 shared credits", "3 seats", "API access"]}
+              tagline="Agency-scale"
+              bullets={["25,000 credits/mo", "8 pooled seats", "Priority queue 24/7"]}
             />
           </div>
         </motion.section>
@@ -868,6 +882,22 @@ export default function DashboardPage() {
           </motion.div>
         )}
       </main>
+
+      {/* Out-of-credits modal — auto-opens when in_standard_mode OR balance ≤ 0 */}
+      {balance && (
+        <OutOfCreditsModal
+          open={oocOpen}
+          tier={balance.billing_interval === "lifetime" ? "lifetime" : (totals?.tier ?? "free")}
+          balance={balance.total_points}
+          overageEnabled={balance.overage_enabled}
+          inStandardMode={balance.in_standard_mode}
+          onClose={() => { markOocModalDismissed(); setOocOpen(false); }}
+          onOverageEnabled={() => {
+            // Refetch balance immediately so the dashboard reflects the new state
+            queryClient.invalidateQueries({ queryKey: ["credits-balance"] });
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -948,11 +978,19 @@ function PlanTile({
   bullets: string[];
   accent?: boolean;
 }) {
+  // "Current" means exact tier match. Everything else is a clickable
+  // upgrade/switch — we no longer mark plans as "Included" via tier-order
+  // because Lifetime sits above Max numerically yet doesn't actually
+  // "cover" a monthly plan, and the "Included" state confuses users about
+  // whether the link is interactive.
   const currentOrder = TIER_ORDER[currentTier] ?? 0;
   const tileOrder = TIER_ORDER[tier] ?? 0;
-  const isCurrent = currentOrder === tileOrder;
-  const isLower = currentOrder > tileOrder;
-  const isUpgrade = !isCurrent && !isLower;
+  const isCurrent = currentTier === tier ||
+    // legacy aliases — treat creator-as-starter, studio-as-max for "current"
+    (tier === "starter" && currentTier === "creator") ||
+    (tier === "max"     && currentTier === "studio");
+  const isUpgrade = !isCurrent && tileOrder > currentOrder;
+  const ctaLabel  = isUpgrade ? `Upgrade to ${name}` : `Switch to ${name}`;
 
   return (
     <div
@@ -999,18 +1037,18 @@ function PlanTile({
           >
             Manage plan
           </Link>
-        ) : isUpgrade ? (
+        ) : (
           <Link
             to={`/checkout?plan=${tier}_monthly&mode=upgrade`}
-            className="group inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-full bg-white text-[12px] font-semibold text-black transition-all hover:bg-white/90 active:scale-[0.98]"
+            className={`group inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-full text-[12px] transition-all active:scale-[0.98] ${
+              isUpgrade
+                ? "bg-white font-semibold text-black hover:bg-white/90"
+                : "border border-white/[0.1] bg-transparent font-medium text-white/80 hover:bg-white/[0.05] hover:text-white"
+            }`}
           >
-            Upgrade to {name}
+            {ctaLabel}
             <ArrowUpRight className="h-3 w-3 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </Link>
-        ) : (
-          <span className="inline-flex h-8 w-full items-center justify-center rounded-full border border-white/[0.05] text-[11.5px] text-white/35">
-            Included
-          </span>
         )}
       </div>
     </div>

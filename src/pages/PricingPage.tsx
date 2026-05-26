@@ -73,6 +73,17 @@ function LiquidGlassCard({ children, className, isPro }: LiquidGlassCardProps) {
   );
 }
 
+const TIER_ORDER: Record<string, number> = {
+  none: 0,
+  free: 0,
+  starter: 1,
+  creator: 1,
+  pro: 2,
+  max: 3,
+  studio: 3,
+  lifetime: 4,
+};
+
 export default function PricingPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>("monthly");
@@ -81,23 +92,119 @@ export default function PricingPage() {
   const openWaitlist = () => setIsWaitlistOpen(true);
   const closeWaitlist = () => setIsWaitlistOpen(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentTier, setCurrentTier] = useState<string>("none");
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setIsLoggedIn(!!data.session));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, s) => setIsLoggedIn(!!s));
+    const fetchTier = async () => {
+      try {
+        const { data: totalsData } = await supabase.rpc("get_monthly_totals");
+        const row = Array.isArray(totalsData) ? totalsData[0] : totalsData;
+        setCurrentTier(row?.tier ?? "none");
+      } catch (err) {
+        console.error("Failed to fetch monthly totals/tier:", err);
+        // Fallback check
+        const { data: subData } = await supabase.rpc("get_user_subscription");
+        if (subData && subData.length > 0) {
+          setCurrentTier(subData[0].tier ?? "none");
+        } else {
+          setCurrentTier("none");
+        }
+      }
+    };
+
+    supabase.auth.getSession().then(({ data }) => {
+      const logged = !!data.session;
+      setIsLoggedIn(logged);
+      if (logged) {
+        fetchTier();
+      } else {
+        setCurrentTier("none");
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, s) => {
+      const logged = !!s;
+      setIsLoggedIn(logged);
+      if (logged) {
+        fetchTier();
+      } else {
+        setCurrentTier("none");
+      }
+    });
+
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleTierClick = (planHref: string) => {
-    if (isLoggedIn) {
-      navigate("/dashboard/download");
-    } else {
-      navigate(planHref);
+  const getButtonProps = (tier: string, defaultLabel: string) => {
+    if (!isLoggedIn) {
+      return {
+        label: defaultLabel,
+        href: tier === "free"
+          ? "/login?mode=signup"
+          : `/checkout?plan=${activeTab === "annual" ? `${tier}_annual` : `${tier}_monthly`}`,
+        disabled: false,
+      };
     }
+
+    const currentOrder = TIER_ORDER[currentTier] ?? 0;
+    const tileOrder = TIER_ORDER[tier] ?? 0;
+
+    const isCurrent = currentTier === tier ||
+      (tier === "starter" && currentTier === "creator") ||
+      (tier === "max"     && currentTier === "studio") ||
+      (tier === "free"    && (currentTier === "none" || currentTier === "free"));
+
+    if (isCurrent) {
+      return {
+        label: "Current Plan",
+        href: "#",
+        disabled: true,
+      };
+    }
+
+    if (tier === "free") {
+      return {
+        label: "Downgrade to Free",
+        href: `/checkout?plan=free_monthly&mode=downgrade`,
+        disabled: false,
+      };
+    }
+
+    const isUpgrade = tileOrder > currentOrder;
+    const planKey = activeTab === "annual" ? `${tier}_annual` : `${tier}_monthly`;
+    return {
+      label: isUpgrade ? `Upgrade to ${defaultLabel.replace("Get ", "")}` : `Downgrade to ${defaultLabel.replace("Get ", "")}`,
+      href: `/checkout?plan=${planKey}&mode=${isUpgrade ? "upgrade" : "downgrade"}`,
+      disabled: false,
+    };
   };
 
-  const getButtonLabel = (defaultLabel: string) => {
-    return isLoggedIn ? "Download Now" : defaultLabel;
+  const renderPlanButton = (tier: string, defaultLabel: string, isProCard = false) => {
+    const { label, href, disabled } = getButtonProps(tier, defaultLabel);
+
+    if (disabled) {
+      return (
+        <button
+          disabled
+          className="mt-8 w-full py-3 rounded-xl bg-white/[0.02] border border-white/[0.05] text-white/30 text-xs font-medium cursor-not-allowed"
+        >
+          {label}
+        </button>
+      );
+    }
+
+    const baseClass = isProCard
+      ? "mt-8 w-full py-3 rounded-xl bg-[#3275F8] hover:bg-[#2563eb] text-white text-xs font-bold transition-all duration-200 shadow-[0_4px_20px_rgba(50,117,248,0.4)] active:scale-95 text-center block"
+      : "mt-8 w-full py-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-white text-xs font-semibold transition-all duration-200 backdrop-blur-md active:scale-95 text-center block";
+
+    return (
+      <button
+        onClick={() => navigate(href)}
+        className={baseClass}
+      >
+        {label}
+      </button>
+    );
   };
 
   // Automatically scroll to the very top of the page whenever the user navigates here
@@ -286,12 +393,7 @@ export default function PricingPage() {
                         </ul>
                       </div>
 
-                      <button
-                        onClick={() => handleTierClick("/login?mode=signup")}
-                        className="mt-8 w-full py-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-white text-xs font-semibold transition-all duration-200 backdrop-blur-md active:scale-95"
-                      >
-                        {getButtonLabel("Get Free")}
-                      </button>
+                      {renderPlanButton("free", "Get Free")}
                     </div>
                   </LiquidGlassCard>
                 </div>
@@ -354,12 +456,7 @@ export default function PricingPage() {
                         </ul>
                       </div>
 
-                      <button
-                        onClick={() => handleTierClick(`/checkout?plan=${activeTab === "annual" ? "starter_annual" : "starter_monthly"}`)}
-                        className="mt-8 w-full py-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-white text-xs font-semibold transition-all duration-200 backdrop-blur-md active:scale-95"
-                      >
-                        {getButtonLabel("Get Starter")}
-                      </button>
+                      {renderPlanButton("starter", "Get Starter")}
                     </div>
                   </LiquidGlassCard>
                 </div>
@@ -427,12 +524,7 @@ export default function PricingPage() {
                         </ul>
                       </div>
 
-                      <button
-                        onClick={() => handleTierClick(`/checkout?plan=${activeTab === "annual" ? "pro_annual" : "pro_monthly"}`)}
-                        className="mt-8 w-full py-3 rounded-xl bg-[#3275F8] hover:bg-[#2563eb] text-white text-xs font-bold transition-all duration-200 shadow-[0_4px_20px_rgba(50,117,248,0.4)] active:scale-95"
-                      >
-                        {getButtonLabel("Get Pro")}
-                      </button>
+                      {renderPlanButton("pro", "Get Pro", true)}
                     </div>
                   </LiquidGlassCard>
                 </div>
@@ -495,12 +587,7 @@ export default function PricingPage() {
                         </ul>
                       </div>
 
-                      <button
-                        onClick={() => handleTierClick(`/checkout?plan=${activeTab === "annual" ? "max_annual" : "max_monthly"}`)}
-                        className="mt-8 w-full py-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-white text-xs font-semibold transition-all duration-200 backdrop-blur-md active:scale-95"
-                      >
-                        {getButtonLabel("Get Max")}
-                      </button>
+                      {renderPlanButton("max", "Get Max")}
                     </div>
                   </LiquidGlassCard>
                 </div>

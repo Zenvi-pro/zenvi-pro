@@ -8,11 +8,17 @@ const CORS = {
 };
 
 const PRICE_IDS: Record<string, string> = {
-  creator_monthly: Deno.env.get("STRIPE_PRICE_CREATOR_MONTHLY") ?? "",
-  creator_annual:  Deno.env.get("STRIPE_PRICE_CREATOR_ANNUAL")  ?? "",
+  // Canonical tier names (post-rename)
+  starter_monthly: Deno.env.get("STRIPE_PRICE_STARTER_MONTHLY") ?? Deno.env.get("STRIPE_PRICE_CREATOR_MONTHLY") ?? "",
+  starter_annual:  Deno.env.get("STRIPE_PRICE_STARTER_ANNUAL")  ?? Deno.env.get("STRIPE_PRICE_CREATOR_ANNUAL")  ?? "",
   pro_monthly:     Deno.env.get("STRIPE_PRICE_PRO_MONTHLY")     ?? "",
   pro_annual:      Deno.env.get("STRIPE_PRICE_PRO_ANNUAL")      ?? "",
-  studio_monthly:  Deno.env.get("STRIPE_PRICE_STUDIO_MONTHLY")  ?? "",
+  max_monthly:     Deno.env.get("STRIPE_PRICE_MAX_MONTHLY")     ?? Deno.env.get("STRIPE_PRICE_STUDIO_MONTHLY") ?? "",
+  max_annual:      Deno.env.get("STRIPE_PRICE_MAX_ANNUAL")      ?? "",
+  // Legacy keys (preserved for in-flight client builds — alias to canonical)
+  creator_monthly: Deno.env.get("STRIPE_PRICE_STARTER_MONTHLY") ?? Deno.env.get("STRIPE_PRICE_CREATOR_MONTHLY") ?? "",
+  creator_annual:  Deno.env.get("STRIPE_PRICE_STARTER_ANNUAL")  ?? Deno.env.get("STRIPE_PRICE_CREATOR_ANNUAL")  ?? "",
+  studio_monthly:  Deno.env.get("STRIPE_PRICE_MAX_MONTHLY")     ?? Deno.env.get("STRIPE_PRICE_STUDIO_MONTHLY") ?? "",
 };
 
 Deno.serve(async (req) => {

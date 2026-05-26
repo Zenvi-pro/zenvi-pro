@@ -193,6 +193,8 @@ export default function CheckoutPage() {
 
   const planKey = (searchParams.get("plan") ?? "pro_monthly") as PlanKey;
   const isUpgradeMode = searchParams.get("mode") === "upgrade";
+  const isDowngradeMode = searchParams.get("mode") === "downgrade";
+  const isPlanChangeMode = isUpgradeMode || isDowngradeMode;
   const plan = PLANS[planKey] ?? PLANS.pro_monthly;
 
   const [status, setStatus] = useState<Status>("checking-auth");
@@ -200,8 +202,9 @@ export default function CheckoutPage() {
   const [accessCode, setAccessCode] = useState<string | null>(null);
 
   useEffect(() => {
+    const modeParam = isUpgradeMode ? "&mode=upgrade" : isDowngradeMode ? "&mode=downgrade" : "";
     const redirectToLogin = () =>
-      navigate(`/login?next=${encodeURIComponent(`/checkout?plan=${planKey}${isUpgradeMode ? "&mode=upgrade" : ""}`)}`);
+      navigate(`/login?next=${encodeURIComponent(`/checkout?plan=${planKey}${modeParam}`)}`);
 
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) {
@@ -216,8 +219,8 @@ export default function CheckoutPage() {
         if (error) { redirectToLogin(); return; }
       }
 
-      // Upgrade mode — no access code needed, user already has a subscription
-      if (isUpgradeMode) {
+      // Upgrade/downgrade mode — no access code needed, user already has a subscription
+      if (isPlanChangeMode) {
         setStatus("ready");
         return;
       }
@@ -247,11 +250,12 @@ export default function CheckoutPage() {
       // No code, no prior access — show the access-code gate
       setStatus("no-code");
     }).catch(redirectToLogin);
-  }, [navigate, planKey, isUpgradeMode]);
+  }, [navigate, planKey, isUpgradeMode, isDowngradeMode, isPlanChangeMode]);
 
   async function handleCheckout() {
-    setStatus(isUpgradeMode ? "upgrading" : "redirecting");
-    const loginUrl = `/login?next=${encodeURIComponent(`/checkout?plan=${planKey}${isUpgradeMode ? "&mode=upgrade" : ""}`)}`;
+    setStatus(isPlanChangeMode ? "upgrading" : "redirecting");
+    const modeParam = isUpgradeMode ? "&mode=upgrade" : isDowngradeMode ? "&mode=downgrade" : "";
+    const loginUrl = `/login?next=${encodeURIComponent(`/checkout?plan=${planKey}${modeParam}`)}`;
 
     try {
       let { data: { session } } = await supabase.auth.getSession();
@@ -269,8 +273,8 @@ export default function CheckoutPage() {
         session = refreshed.session;
       }
 
-      // ── Upgrade existing subscription ────────────────────────────────────
-      if (isUpgradeMode) {
+      // ── Upgrade / Downgrade existing subscription ────────────────────────
+      if (isPlanChangeMode) {
         const res = await fetch(
           `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/upgrade-subscription`,
           {
@@ -283,8 +287,11 @@ export default function CheckoutPage() {
           },
         );
         const payload = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(payload?.error ?? `Upgrade failed (HTTP ${res.status})`);
-        toast({ title: "Plan upgraded!", description: `You're now on ${plan.name}.` });
+        if (!res.ok) throw new Error(payload?.error ?? `Plan change failed (HTTP ${res.status})`);
+        toast({
+          title: isUpgradeMode ? "Plan upgraded!" : "Plan changed!",
+          description: `You're now on ${plan.name}.`,
+        });
         navigate("/download");
         return;
       }
@@ -440,9 +447,9 @@ export default function CheckoutPage() {
               {status === "redirecting" ? (
                 <><Loader2 className="w-4 h-4 animate-spin mr-2" />Redirecting to payment…</>
               ) : status === "upgrading" ? (
-                <><Loader2 className="w-4 h-4 animate-spin mr-2" />Upgrading plan…</>
-              ) : isUpgradeMode ? (
-                "Confirm Upgrade"
+                <><Loader2 className="w-4 h-4 animate-spin mr-2" />Updating plan…</>
+              ) : isPlanChangeMode ? (
+                isUpgradeMode ? "Confirm Upgrade" : "Confirm Plan Change"
               ) : (
                 "Continue to payment"
               )}

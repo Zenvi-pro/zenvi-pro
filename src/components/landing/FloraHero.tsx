@@ -183,7 +183,7 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
             className="font-bold text-center"
             style={{ 
               fontFamily: "Geist, system-ui, sans-serif", 
-              fontSize: "min(15vw, 242px)", 
+              fontSize: "min(18vw, 290px)", 
               letterSpacing: "0.05em",
               transform: "translateX(2%)" // slightly shift to center the optical weight
             }}
@@ -232,19 +232,19 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
             {/* Editorial display headline */}
             <h2
               aria-hidden="true"
-              className="mx-auto mb-5 max-w-3xl text-balance font-serif text-5xl font-normal leading-[1.02] tracking-[-0.01em] text-white drop-shadow-[0_4px_28px_rgba(0,0,0,0.6)] md:text-[64px] md:leading-[1.04]"
+              className="mx-auto mb-6 max-w-4xl text-balance font-serif text-5xl font-normal leading-[1.02] tracking-[-0.01em] text-white drop-shadow-[0_4px_28px_rgba(0,0,0,0.6)] md:text-[76px] md:leading-[1.04]"
             >
               Edit like you're <em className="italic">meant</em> to.
             </h2>
 
             {/* Sub-line with strike-through */}
-            <div className="mx-auto mb-9 max-w-2xl">
+            <div className="mx-auto mb-10 max-w-3xl">
               <TextReveal
                 text={SUB_TEXT}
                 progress={desktopSubProgress}
                 strikePhrase="not cloud speed"
                 strikeProgress={desktopStrikeProgress}
-                className="mx-auto text-base font-medium text-white/85 drop-shadow-[0_2px_14px_rgba(0,0,0,0.55)] md:text-lg"
+                className="mx-auto text-base font-medium text-white/85 drop-shadow-[0_2px_14px_rgba(0,0,0,0.55)] md:text-xl"
               />
             </div>
 
