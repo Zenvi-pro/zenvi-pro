@@ -73,6 +73,17 @@ function LiquidGlassCard({ children, className, isPro }: LiquidGlassCardProps) {
   );
 }
 
+const TIER_ORDER: Record<string, number> = {
+  none: 0,
+  free: 0,
+  starter: 1,
+  creator: 1,
+  pro: 2,
+  max: 3,
+  studio: 3,
+  lifetime: 4,
+};
+
 export default function PricingPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>("monthly");
@@ -81,23 +92,119 @@ export default function PricingPage() {
   const openWaitlist = () => setIsWaitlistOpen(true);
   const closeWaitlist = () => setIsWaitlistOpen(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentTier, setCurrentTier] = useState<string>("none");
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setIsLoggedIn(!!data.session));
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, s) => setIsLoggedIn(!!s));
+    const fetchTier = async () => {
+      try {
+        const { data: totalsData } = await supabase.rpc("get_monthly_totals");
+        const row = Array.isArray(totalsData) ? totalsData[0] : totalsData;
+        setCurrentTier(row?.tier ?? "none");
+      } catch (err) {
+        console.error("Failed to fetch monthly totals/tier:", err);
+        // Fallback check
+        const { data: subData } = await supabase.rpc("get_user_subscription");
+        if (subData && subData.length > 0) {
+          setCurrentTier(subData[0].tier ?? "none");
+        } else {
+          setCurrentTier("none");
+        }
+      }
+    };
+
+    supabase.auth.getSession().then(({ data }) => {
+      const logged = !!data.session;
+      setIsLoggedIn(logged);
+      if (logged) {
+        fetchTier();
+      } else {
+        setCurrentTier("none");
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, s) => {
+      const logged = !!s;
+      setIsLoggedIn(logged);
+      if (logged) {
+        fetchTier();
+      } else {
+        setCurrentTier("none");
+      }
+    });
+
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleTierClick = (planHref: string) => {
-    if (isLoggedIn) {
-      navigate("/dashboard/download");
-    } else {
-      navigate(planHref);
+  const getButtonProps = (tier: string, defaultLabel: string) => {
+    if (!isLoggedIn) {
+      return {
+        label: defaultLabel,
+        href: tier === "free"
+          ? "/login?mode=signup"
+          : `/checkout?plan=${activeTab === "annual" ? `${tier}_annual` : `${tier}_monthly`}`,
+        disabled: false,
+      };
     }
+
+    const currentOrder = TIER_ORDER[currentTier] ?? 0;
+    const tileOrder = TIER_ORDER[tier] ?? 0;
+
+    const isCurrent = currentTier === tier ||
+      (tier === "starter" && currentTier === "creator") ||
+      (tier === "max"     && currentTier === "studio") ||
+      (tier === "free"    && (currentTier === "none" || currentTier === "free"));
+
+    if (isCurrent) {
+      return {
+        label: "Current Plan",
+        href: "#",
+        disabled: true,
+      };
+    }
+
+    if (tier === "free") {
+      return {
+        label: "Downgrade to Free",
+        href: `/checkout?plan=free_monthly&mode=downgrade`,
+        disabled: false,
+      };
+    }
+
+    const isUpgrade = tileOrder > currentOrder;
+    const planKey = activeTab === "annual" ? `${tier}_annual` : `${tier}_monthly`;
+    return {
+      label: isUpgrade ? `Upgrade to ${defaultLabel.replace("Get ", "")}` : `Downgrade to ${defaultLabel.replace("Get ", "")}`,
+      href: `/checkout?plan=${planKey}&mode=${isUpgrade ? "upgrade" : "downgrade"}`,
+      disabled: false,
+    };
   };
 
-  const getButtonLabel = (defaultLabel: string) => {
-    return isLoggedIn ? "Download Now" : defaultLabel;
+  const renderPlanButton = (tier: string, defaultLabel: string, isProCard = false) => {
+    const { label, href, disabled } = getButtonProps(tier, defaultLabel);
+
+    if (disabled) {
+      return (
+        <button
+          disabled
+          className="mt-8 w-full py-3 rounded-xl bg-white/[0.02] border border-white/[0.05] text-white/30 text-xs font-medium cursor-not-allowed"
+        >
+          {label}
+        </button>
+      );
+    }
+
+    const baseClass = isProCard
+      ? "mt-8 w-full py-3 rounded-xl bg-[#3275F8] hover:bg-[#2563eb] text-white text-xs font-bold transition-all duration-200 shadow-[0_4px_20px_rgba(50,117,248,0.4)] active:scale-95 text-center block"
+      : "mt-8 w-full py-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-white text-xs font-semibold transition-all duration-200 backdrop-blur-md active:scale-95 text-center block";
+
+    return (
+      <button
+        onClick={() => navigate(href)}
+        className={baseClass}
+      >
+        {label}
+      </button>
+    );
   };
 
   // Automatically scroll to the very top of the page whenever the user navigates here
@@ -251,22 +358,32 @@ export default function PricingPage() {
                             <span className="text-4xl font-bold">$0</span>
                             <span className="text-xs text-white/60">/mo</span>
                           </div>
-                          <p className="text-[11px] text-white/50 mt-1">Limited usage to explore</p>
+                          <p className="text-[11px] text-white/50 mt-1">100 credits/month to try things</p>
                         </div>
 
-                        <div className="w-full h-px bg-white/10 my-6" />
+                        {/* Free credit allotment */}
+                        <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] p-3.5 backdrop-blur-md">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[10px] font-bold text-white/60 uppercase tracking-wider">Monthly trial</span>
+                            <Info className="w-3 h-3 text-white/40" />
+                          </div>
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-bold text-white">100</span>
+                            <span className="text-[11px] text-white/55">credits / mo</span>
+                          </div>
+                          <p className="mt-1.5 text-[10.5px] text-white/45 leading-snug">
+                            ~2 AI clips · or 100 chats · or 6 min indexing · Ollama local models stay free
+                          </p>
+                        </div>
 
                         <ul className="space-y-3.5">
                           {[
                             "1 seat (solo)",
+                            "Local Ollama models (free, unlimited)",
+                            "All cloud features (capped by 100 cr)",
+                            "Watermark on exports",
                             "3 active projects",
-                            "All models",
                             "Full canvas & layer editor",
-                            "Run & create techniques",
-                            "FAUNA (unlimited, free)",
-                            "Annotations & labels",
-                            "Download & export",
-                            "Up to 17 generations free*",
                           ].map((feature, idx) => (
                             <li key={idx} className="flex items-start gap-3 text-xs text-white/80 leading-snug">
                               <Check className="w-3.5 h-3.5 text-white/40 shrink-0 mt-0.5" />
@@ -276,12 +393,7 @@ export default function PricingPage() {
                         </ul>
                       </div>
 
-                      <button
-                        onClick={() => handleTierClick("/login?mode=signup")}
-                        className="mt-8 w-full py-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-white text-xs font-semibold transition-all duration-200 backdrop-blur-md active:scale-95"
-                      >
-                        {getButtonLabel("Get Free")}
-                      </button>
+                      {renderPlanButton("free", "Get Free")}
                     </div>
                   </LiquidGlassCard>
                 </div>
@@ -301,37 +413,40 @@ export default function PricingPage() {
                             <div className="flex items-baseline gap-2">
                               <span className="text-4xl font-bold">$25</span>
                               <span className="text-xs text-white/40 line-through">$29</span>
-                              <span className="text-xs text-white/60">/seat/mo</span>
+                              <span className="text-xs text-white/60">/mo</span>
                             </div>
                           ) : (
                             <div className="flex items-baseline gap-1">
                               <span className="text-4xl font-bold">$29</span>
-                              <span className="text-xs text-white/60">/seat/mo</span>
+                              <span className="text-xs text-white/60">/mo</span>
                             </div>
                           )}
-                          <p className="text-[11px] text-white/50 mt-1">Up to 8 seats</p>
+                          <p className="text-[11px] text-white/50 mt-1">1 seat</p>
                         </div>
 
-                        {/* Special launch offer box */}
+                        {/* Credit allotment */}
                         <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] p-3.5 backdrop-blur-md">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-[10px] font-bold text-[#3275F8] uppercase tracking-wider">Special launch offer</span>
+                            <span className="text-[10px] font-bold text-[#3275F8] uppercase tracking-wider">Monthly credits</span>
                             <Info className="w-3 h-3 text-white/40" />
                           </div>
-                          <div className="flex items-start gap-2">
-                            <Check className="w-3.5 h-3.5 text-[#3275F8] shrink-0 mt-0.5" />
-                            <span className="text-xs text-white/90 font-medium">Extra $12 usage/seat/mo</span>
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-bold text-white">2,500</span>
+                            <span className="text-[11px] text-white/55">≈ $25 of AI</span>
                           </div>
+                          <p className="mt-1.5 text-[10.5px] text-white/45 leading-snug">
+                            ~50 AI video clips · or 2,500 chats · or 60 min of indexing · mix &amp; match
+                          </p>
                         </div>
 
                         <ul className="space-y-3.5">
                           {[
-                            "Up to 8 seats",
-                            "Pooled team usage",
-                            "Unlimited projects",
-                            "All models",
-                            "API & MCP access",
-                            "Real-time collaboration",
+                            "All cloud LLMs (light / standard / premium)",
+                            "All Kling video models incl. 2.0",
+                            "TwelveLabs clip indexing + search",
+                            "1-month credit rollover",
+                            "Overage opt-in (1.5× sticker)",
+                            "No watermark",
                           ].map((feature, idx) => (
                             <li key={idx} className="flex items-start gap-3 text-xs text-white/80 leading-snug">
                               <Check className="w-3.5 h-3.5 text-[#3275F8] shrink-0 mt-0.5" />
@@ -341,12 +456,7 @@ export default function PricingPage() {
                         </ul>
                       </div>
 
-                      <button
-                        onClick={() => handleTierClick(`/checkout?plan=${activeTab === "annual" ? "creator_annual" : "creator_monthly"}`)}
-                        className="mt-8 w-full py-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-white text-xs font-semibold transition-all duration-200 backdrop-blur-md active:scale-95"
-                      >
-                        {getButtonLabel("Get Starter")}
-                      </button>
+                      {renderPlanButton("starter", "Get Starter")}
                     </div>
                   </LiquidGlassCard>
                 </div>
@@ -371,43 +481,40 @@ export default function PricingPage() {
                             <div className="flex items-baseline gap-2">
                               <span className="text-4xl font-bold">$39</span>
                               <span className="text-xs text-white/40 line-through">$49</span>
-                              <span className="text-xs text-white/60">/seat/mo</span>
+                              <span className="text-xs text-white/60">/mo</span>
                             </div>
                           ) : (
                             <div className="flex items-baseline gap-1">
                               <span className="text-4xl font-bold">$49</span>
-                              <span className="text-xs text-white/60">/seat/mo</span>
+                              <span className="text-xs text-white/60">/mo</span>
                             </div>
                           )}
-                          <p className="text-[11px] text-white/50 mt-1">Up to 8 seats</p>
+                          <p className="text-[11px] text-white/50 mt-1">3 pooled seats</p>
                         </div>
 
-                        {/* Special launch offer box */}
+                        {/* Credit allotment */}
                         <div className="mb-6 rounded-xl border border-[#3275F8]/30 bg-[#3275F8]/[0.05] p-3.5 backdrop-blur-md shadow-inner">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-[10px] font-bold text-[#3275F8] uppercase tracking-wider">Special launch offer</span>
+                            <span className="text-[10px] font-bold text-[#3275F8] uppercase tracking-wider">Monthly credits</span>
                             <Info className="w-3 h-3 text-[#3275F8]/70" />
                           </div>
-                          <div className="flex flex-col gap-2.5">
-                            <div className="flex items-start gap-2">
-                              <Check className="w-3.5 h-3.5 text-[#3275F8] shrink-0 mt-0.5" />
-                              <span className="text-xs text-white/90 font-medium leading-snug">Unmetered Nano Banana 2 and Pro (off-peak)</span>
-                            </div>
-                            <div className="flex items-start gap-2">
-                              <Check className="w-3.5 h-3.5 text-[#3275F8] shrink-0 mt-0.5" />
-                              <span className="text-xs text-white/90 font-medium leading-snug">Extra $50 included usage/seat/mo</span>
-                            </div>
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-bold text-white">5,500</span>
+                            <span className="text-[11px] text-white/55">≈ $55 of AI</span>
                           </div>
+                          <p className="mt-1.5 text-[10.5px] text-white/55 leading-snug">
+                            ~110 AI clips · or 5,500 chats · or 250 min indexing · pooled across seats
+                          </p>
                         </div>
 
                         <ul className="space-y-3.5">
                           {[
-                            "Up to 8 seats",
+                            "3 pooled seats",
                             "Everything in Starter",
-                            "Shared team assets",
-                            "Shared elements",
-                            "Per-member usage caps",
-                            "Usage analytics",
+                            "Priority Runware queue (peak)",
+                            "Usage analytics per seat",
+                            "2-month credit rollover",
+                            "Overage opt-in (1.3× sticker)",
                           ].map((feature, idx) => (
                             <li key={idx} className="flex items-start gap-3 text-xs text-white/90 leading-snug">
                               <Check className="w-3.5 h-3.5 text-[#3275F8] shrink-0 mt-0.5" />
@@ -417,12 +524,7 @@ export default function PricingPage() {
                         </ul>
                       </div>
 
-                      <button
-                        onClick={() => handleTierClick(`/checkout?plan=${activeTab === "annual" ? "pro_annual" : "pro_monthly"}`)}
-                        className="mt-8 w-full py-3 rounded-xl bg-[#3275F8] hover:bg-[#2563eb] text-white text-xs font-bold transition-all duration-200 shadow-[0_4px_20px_rgba(50,117,248,0.4)] active:scale-95"
-                      >
-                        {getButtonLabel("Get Pro")}
-                      </button>
+                      {renderPlanButton("pro", "Get Pro", true)}
                     </div>
                   </LiquidGlassCard>
                 </div>
@@ -442,39 +544,39 @@ export default function PricingPage() {
                             <div className="flex items-baseline gap-2">
                               <span className="text-4xl font-bold">$149</span>
                               <span className="text-xs text-white/40 line-through">$199</span>
-                              <span className="text-xs text-white/60">/seat/mo</span>
+                              <span className="text-xs text-white/60">/mo</span>
                             </div>
                           ) : (
                             <div className="flex items-baseline gap-1">
                               <span className="text-4xl font-bold">$199</span>
-                              <span className="text-xs text-white/60">/seat/mo</span>
+                              <span className="text-xs text-white/60">/mo</span>
                             </div>
                           )}
-                          <p className="text-[11px] text-white/50 mt-1">Up to 8 seats</p>
+                          <p className="text-[11px] text-white/50 mt-1">8 pooled seats</p>
                         </div>
 
-                        {/* Special launch offer box */}
+                        {/* Credit allotment */}
                         <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] p-3.5 backdrop-blur-md">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-[10px] font-bold text-[#3275F8] uppercase tracking-wider">Special launch offer</span>
+                            <span className="text-[10px] font-bold text-[#3275F8] uppercase tracking-wider">Monthly credits</span>
                             <Info className="w-3 h-3 text-white/40" />
                           </div>
-                          <div className="flex flex-col gap-2.5">
-                            <div className="flex items-start gap-2">
-                              <Check className="w-3.5 h-3.5 text-[#3275F8] shrink-0 mt-0.5" />
-                              <span className="text-xs text-white/90 font-medium leading-snug">Unmetered Nano Banana 2 and Pro (24/7)</span>
-                            </div>
-                            <div className="flex items-start gap-2">
-                              <Check className="w-3.5 h-3.5 text-[#3275F8] shrink-0 mt-0.5" />
-                              <span className="text-xs text-white/90 font-medium leading-snug">Extra $100 included usage/seat/mo</span>
-                            </div>
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-bold text-white">25,000</span>
+                            <span className="text-[11px] text-white/55">≈ $250 of AI</span>
                           </div>
+                          <p className="mt-1.5 text-[10.5px] text-white/55 leading-snug">
+                            ~500 AI clips · or 25k chats · or 1,600 min indexing · 8-seat pool
+                          </p>
                         </div>
 
                         <ul className="space-y-3.5">
                           {[
-                            "Up to 8 seats",
+                            "8 pooled seats",
                             "Everything in Pro",
+                            "Priority Runware queue 24/7",
+                            "3-month credit rollover",
+                            "Overage opt-in (1.2× sticker)",
                             "Custom voices (3/org)",
                           ].map((feature, idx) => (
                             <li key={idx} className="flex items-start gap-3 text-xs text-white/80 leading-snug">
@@ -485,12 +587,7 @@ export default function PricingPage() {
                         </ul>
                       </div>
 
-                      <button
-                        onClick={() => handleTierClick("/checkout?plan=studio_monthly")}
-                        className="mt-8 w-full py-3 rounded-xl bg-white/[0.05] hover:bg-white/[0.1] border border-white/10 text-white text-xs font-semibold transition-all duration-200 backdrop-blur-md active:scale-95"
-                      >
-                        {getButtonLabel("Get Max")}
-                      </button>
+                      {renderPlanButton("max", "Get Max")}
                     </div>
                   </LiquidGlassCard>
                 </div>

@@ -1,13 +1,13 @@
 -- 10 invite codes for early access. Email is a placeholder (not a real address).
 INSERT INTO public.waitlist (email, access_token, status, invited_at) VALUES
-  ('invite-01@zenvi.internal', '9413478a-23ce-4d65-954d-7baea4df1f64', 'invited', now()),
-  ('invite-02@zenvi.internal', '8b1158a5-7bb7-4976-8cca-8046af8b7b50', 'invited', now()),
-  ('invite-03@zenvi.internal', 'cc9ef45f-94b7-4ed1-9b2e-a6361e08a256', 'invited', now()),
-  ('invite-04@zenvi.internal', 'e56ced0a-2f28-4bb3-b8ac-e5a3516daf97', 'invited', now()),
-  ('invite-05@zenvi.internal', '23d5fab5-6777-4126-b80d-dcb3c894000f', 'invited', now()),
-  ('invite-06@zenvi.internal', '61be0fd1-3ce4-448a-8862-261da8b7912d', 'invited', now()),
-  ('invite-07@zenvi.internal', '2f18064f-7998-4ab2-a128-67ae9e51c4ff', 'invited', now()),
-  ('invite-08@zenvi.internal', 'ef0070c3-b5d4-48fa-9c26-6ac6fc7ad395', 'invited', now()),
-  ('invite-09@zenvi.internal', '374b8dc5-dd77-4a26-b491-cf283f4be272', 'invited', now()),
-  ('invite-10@zenvi.internal', '380ddb3a-95ab-4df5-acd1-9e58768be4ed', 'invited', now())
+  ('invite-01@zenvi.internal', '8b6e6b4f-8e50-482a-89a1-8d2b78b548b2', 'invited', now()),
+  ('invite-02@zenvi.internal', 'ef2cf75c-7d9a-4c28-912a-0a78dbd56b02', 'invited', now()),
+  ('invite-03@zenvi.internal', 'a9b2c3d4-e5f6-47b8-a9c0-1e2f3a4b5c6d', 'invited', now()),
+  ('invite-04@zenvi.internal', '9c4d28e7-5b6c-48fa-88bd-87e3d9fa0e21', 'invited', now()),
+  ('invite-05@zenvi.internal', '5f2b8d0c-a9d7-4632-90b1-ce2813a48e71', 'invited', now()),
+  ('invite-06@zenvi.internal', '7d3a8e9b-cf10-4286-90bd-f40b2a75dcb1', 'invited', now()),
+  ('invite-07@zenvi.internal', '4b0d2e8f-7c6a-4952-b8bd-9b37a4e6012c', 'invited', now()),
+  ('invite-08@zenvi.internal', '2e7b8c9d-fa0e-412f-963d-4c7b8e210a56', 'invited', now()),
+  ('invite-09@zenvi.internal', 'b9e0f3d4-c5a6-4f7e-89bd-a0c1d2e3f4b5', 'invited', now()),
+  ('invite-10@zenvi.internal', '1c2d3e4f-5a6b-47c8-9d0e-1a2b3c4d5e6f', 'invited', now())
 ON CONFLICT (email) DO NOTHING;

@@ -20,6 +20,7 @@ import DocsHome from "./pages/DocsHome";
 import DocsPage from "./pages/DocsPage";
 import PricingPage from "./pages/PricingPage";
 import DashboardLayout from "./components/dashboard/DashboardLayout";
+import AdminBilling from "./pages/AdminBilling";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,9 @@ const App = () => (
             <Route path="download" element={<Download />} />
             <Route path="usage" element={<DashboardUsage />} />
           </Route>
+
+          {/* Admin (internal only — gated server-side by is_admin RPC) */}
+          <Route path="/admin/billing" element={<AdminBilling />} />
 
           {/* Legacy /download redirect into dashboard */}
           <Route path="/download" element={<Navigate to="/dashboard/download" replace />} />

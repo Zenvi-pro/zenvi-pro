@@ -7,14 +7,38 @@ const CORS = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+// Plan keys map to Stripe price IDs configured in the project env.
+//
+// New (canonical) plan keys: starter | pro | max  × monthly | annual
+// Legacy keys (creator, studio) are accepted so older client builds keep
+// working through the renaming window — they resolve to the same Stripe
+// price IDs as their renamed siblings.
 const PRICE_IDS: Record<string, string> = {
-  creator_monthly: Deno.env.get("STRIPE_PRICE_CREATOR_MONTHLY") ?? "",
-  creator_annual: Deno.env.get("STRIPE_PRICE_CREATOR_ANNUAL") ?? "",
-  pro_monthly: Deno.env.get("STRIPE_PRICE_PRO_MONTHLY") ?? "",
-  pro_annual: Deno.env.get("STRIPE_PRICE_PRO_ANNUAL") ?? "",
-  studio_monthly: Deno.env.get("STRIPE_PRICE_STUDIO_MONTHLY") ?? "",
-  lifetime: Deno.env.get("STRIPE_PRICE_LIFETIME") ?? "",
+  // Canonical tier names (post-rename)
+  starter_monthly: Deno.env.get("STRIPE_PRICE_STARTER_MONTHLY") ?? Deno.env.get("STRIPE_PRICE_CREATOR_MONTHLY") ?? "",
+  starter_annual:  Deno.env.get("STRIPE_PRICE_STARTER_ANNUAL")  ?? Deno.env.get("STRIPE_PRICE_CREATOR_ANNUAL")  ?? "",
+  pro_monthly:     Deno.env.get("STRIPE_PRICE_PRO_MONTHLY")     ?? "",
+  pro_annual:      Deno.env.get("STRIPE_PRICE_PRO_ANNUAL")      ?? "",
+  max_monthly:     Deno.env.get("STRIPE_PRICE_MAX_MONTHLY")     ?? Deno.env.get("STRIPE_PRICE_STUDIO_MONTHLY") ?? "",
+  max_annual:      Deno.env.get("STRIPE_PRICE_MAX_ANNUAL")      ?? "",
+  // Lifetime: one-time purchase (unchanged)
+  lifetime:        Deno.env.get("STRIPE_PRICE_LIFETIME")        ?? "",
+  // Legacy keys (preserved for in-flight client builds — alias to canonical)
+  creator_monthly: Deno.env.get("STRIPE_PRICE_STARTER_MONTHLY") ?? Deno.env.get("STRIPE_PRICE_CREATOR_MONTHLY") ?? "",
+  creator_annual:  Deno.env.get("STRIPE_PRICE_STARTER_ANNUAL")  ?? Deno.env.get("STRIPE_PRICE_CREATOR_ANNUAL")  ?? "",
+  studio_monthly:  Deno.env.get("STRIPE_PRICE_MAX_MONTHLY")     ?? Deno.env.get("STRIPE_PRICE_STUDIO_MONTHLY") ?? "",
 };
+
+/** Map a plan key to the canonical tier_config tier name we write to DB. */
+function planToTier(plan: string): string {
+  if (plan === "lifetime") return "lifetime";
+  // strip _monthly / _annual suffix
+  const base = plan.replace(/_monthly$|_annual$/, "");
+  // legacy → canonical
+  if (base === "creator") return "starter";
+  if (base === "studio")  return "max";
+  return base;  // starter, pro, max
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
@@ -51,7 +75,7 @@ Deno.serve(async (req) => {
       : plan === "lifetime"
         ? "lifetime"
         : "monthly";
-    const tier = isLifetimePlan ? "lifetime" : plan.replace(/_monthly$|_annual$/, "");
+    const tier = planToTier(plan);
 
     // ── Validate access code ─────────────────────────────────────────────────
     const { data: hasAccess } = await supabase.rpc("get_user_download_access");

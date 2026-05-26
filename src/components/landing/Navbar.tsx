@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 interface NavbarProps {
   onOpenWaitlist?: () => void;
   onOpenAccessCode?: () => void;
+  isIntroActive?: boolean;
 }
 
 const navLinks = [
@@ -18,7 +19,7 @@ const navLinks = [
   { label: "Docs", href: "/docs" },
 ];
 
-const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
+const Navbar = ({ onOpenWaitlist, onOpenAccessCode, isIntroActive }: NavbarProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [session, setSession] = useState<boolean>(false);
   const location = useLocation();
@@ -68,7 +69,12 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode }: NavbarProps) => {
           
           {/* Left: Logo */}
           <div className="pointer-events-auto flex items-center">
-            <Link to="/" className="opacity-90 hover:opacity-100 transition-opacity">
+            <Link
+              to="/"
+              className="opacity-90 hover:opacity-100 transition-opacity"
+              style={{ opacity: isIntroActive ? 0 : undefined }}
+              data-zenvi-logo-target
+            >
               <ZenviLogo size={32} />
             </Link>
           </div>

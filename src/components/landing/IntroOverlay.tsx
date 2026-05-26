@@ -17,9 +17,9 @@ export function IntroOverlay({ onComplete }: IntroOverlayProps) {
   const [phase, setPhase] = useState<1 | 2 | 3>(1);
   const [overlayVisible, setOverlayVisible] = useState(true);
   const [target, setTarget] = useState<{ left: number; top: number; scale: number }>({
-    left: 24,
-    top: 24,
-    scale: 0.35,
+    left: 32,
+    top: 32,
+    scale: 32 / LOGO_SIZE_INTRO,
   });
 
   const syncTargetFromNavbar = useCallback(() => {
@@ -33,7 +33,7 @@ export function IntroOverlay({ onComplete }: IntroOverlayProps) {
     if (!el) return;
 
     const rect = el.getBoundingClientRect();
-    const targetSize = Math.max(rect.height, 42);
+    const targetSize = rect.height;
     setTarget({
       left: rect.left + rect.width / 2 - LOGO_SIZE_INTRO / 2,
       top: rect.top + rect.height / 2 - LOGO_SIZE_INTRO / 2,

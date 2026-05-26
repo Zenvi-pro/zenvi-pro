@@ -8,21 +8,44 @@
  *   - checkout.session.completed
  *   - customer.subscription.updated
  *   - customer.subscription.deleted
+ *   - invoice.payment_succeeded   (NEW — used for cycle refills)
+ *
+ * Stripe price → tier mapping is driven by env vars in Supabase project
+ * settings. Both canonical (STRIPE_PRICE_STARTER_*, _MAX_*) and legacy
+ * (STRIPE_PRICE_CREATOR_*, _STUDIO_*) names are accepted so the rename
+ * can roll out gradually. priceToTierAndInterval always returns the
+ * canonical tier name written to the subscriptions table.
+ *
+ * Idempotency:
+ *   record_stripe_event(stripe_event_id, type, payload) is called FIRST
+ *   on every webhook hit. If it returns false the event has already been
+ *   processed and we return 200 without doing the work again.
  */
 
 import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-function priceToTierAndInterval(priceId: string): { tier: string; interval: "monthly" | "annual" } {
-  const map: Record<string, { tier: string; interval: "monthly" | "annual" }> = {
-    [Deno.env.get("STRIPE_PRICE_CREATOR_MONTHLY") ?? "__none__"]: { tier: "creator", interval: "monthly" },
-    [Deno.env.get("STRIPE_PRICE_CREATOR_ANNUAL") ?? "__none__"]: { tier: "creator", interval: "annual" },
-    [Deno.env.get("STRIPE_PRICE_PRO_MONTHLY") ?? "__none__"]: { tier: "pro", interval: "monthly" },
-    [Deno.env.get("STRIPE_PRICE_PRO_ANNUAL") ?? "__none__"]: { tier: "pro", interval: "annual" },
-    [Deno.env.get("STRIPE_PRICE_STUDIO_MONTHLY") ?? "__none__"]: { tier: "studio", interval: "monthly" },
-    [Deno.env.get("STRIPE_PRICE_LIFETIME") ?? "__none__"]: { tier: "lifetime", interval: "monthly" },
+type Tier = "starter" | "pro" | "max" | "lifetime";
+type Interval = "monthly" | "annual" | "lifetime";
+
+function priceToTierAndInterval(priceId: string): { tier: Tier; interval: Interval } {
+  const env = (k: string) => Deno.env.get(k) ?? "__none__";
+
+  // Canonical mapping (post-rename)
+  const map: Record<string, { tier: Tier; interval: Interval }> = {
+    [env("STRIPE_PRICE_STARTER_MONTHLY")]: { tier: "starter", interval: "monthly" },
+    [env("STRIPE_PRICE_STARTER_ANNUAL")]:  { tier: "starter", interval: "annual"  },
+    [env("STRIPE_PRICE_PRO_MONTHLY")]:     { tier: "pro",     interval: "monthly" },
+    [env("STRIPE_PRICE_PRO_ANNUAL")]:      { tier: "pro",     interval: "annual"  },
+    [env("STRIPE_PRICE_MAX_MONTHLY")]:     { tier: "max",     interval: "monthly" },
+    [env("STRIPE_PRICE_MAX_ANNUAL")]:      { tier: "max",     interval: "annual"  },
+    [env("STRIPE_PRICE_LIFETIME")]:        { tier: "lifetime", interval: "lifetime" },
+    // Legacy price IDs map onto the canonical tier names
+    [env("STRIPE_PRICE_CREATOR_MONTHLY")]: { tier: "starter", interval: "monthly" },
+    [env("STRIPE_PRICE_CREATOR_ANNUAL")]:  { tier: "starter", interval: "annual"  },
+    [env("STRIPE_PRICE_STUDIO_MONTHLY")]:  { tier: "max",     interval: "monthly" },
   };
-  return map[priceId] ?? { tier: "creator", interval: "monthly" };
+  return map[priceId] ?? { tier: "starter", interval: "monthly" };
 }
 
 /** Claim an access code for a user (service-role direct write, bypasses RLS). */
@@ -72,6 +95,31 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
+  // ── Idempotency gate ──────────────────────────────────────────────────────
+  // record_stripe_event inserts (event_id, type, payload) into
+  // stripe_webhook_events. Returns true if newly inserted, false if duplicate.
+  // We use the result to short-circuit duplicate deliveries from Stripe
+  // (which DO happen — Stripe retries on any non-2xx, and network blips can
+  // produce duplicate 2xx ACKs after the original was already processed).
+  try {
+    const { data: inserted, error: idempErr } = await supabase.rpc("record_stripe_event", {
+      p_event_id:   event.id,
+      p_event_type: event.type,
+      p_payload:    event.data.object as unknown,
+    });
+    if (idempErr) {
+      console.warn("stripe-webhook: idempotency log write failed:", idempErr);
+      // Fall through — better to risk a duplicate write than miss the event
+    } else if (inserted === false) {
+      console.log("stripe-webhook: duplicate event %s — already processed", event.id);
+      return new Response(JSON.stringify({ received: true, duplicate: true }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  } catch (e) {
+    console.warn("stripe-webhook: idempotency check error (continuing):", e);
+  }
+
   try {
     switch (event.type) {
       // ── Checkout completed ─────────────────────────────────────────────────
@@ -97,7 +145,6 @@ Deno.serve(async (req) => {
             { onConflict: "user_id" },
           );
 
-          // Grant lifetime points allocation
           await supabase.rpc("allocate_monthly_points", {
             p_user_id: userId,
             p_tier: "lifetime",
@@ -112,14 +159,12 @@ Deno.serve(async (req) => {
         if (session.mode !== "subscription" || !session.subscription) break;
 
         const sub = await stripe.subscriptions.retrieve(session.subscription as string);
-        // Read user ID from subscription metadata first; fall back to session metadata
-        // (session metadata is also set as of the latest version of create-checkout-session)
         const userId = sub.metadata.supabase_user_id ?? session.metadata?.supabase_user_id;
         const accessCode = sub.metadata.access_code ?? session.metadata?.access_code ?? "";
         if (!userId) break;
 
         const { tier, interval } = priceToTierAndInterval(sub.items.data[0].price.id);
-        const billingInterval = sub.metadata.billing_interval ?? interval;
+        const billingInterval = (sub.metadata.billing_interval as Interval) ?? interval;
 
         await supabase.from("subscriptions").upsert(
           {
@@ -135,7 +180,6 @@ Deno.serve(async (req) => {
           { onConflict: "user_id" },
         );
 
-        // Grant points for new subscription
         await supabase.rpc("allocate_monthly_points", {
           p_user_id: userId,
           p_tier: tier,
@@ -146,14 +190,17 @@ Deno.serve(async (req) => {
         break;
       }
 
-      // ── Plan change / renewal / pause ──────────────────────────────────────
+      // ── Plan change / pause / cancel-at-period-end change ─────────────────
+      // Note: this fires on RENEWALS too, but we no longer call
+      // allocate_monthly_points here — that's moved to invoice.payment_succeeded
+      // so renewals only refill credits when a real payment lands.
       case "customer.subscription.updated": {
         const sub = event.data.object as Stripe.Subscription;
         const userId = sub.metadata.supabase_user_id;
         if (!userId) break;
 
         const { tier, interval } = priceToTierAndInterval(sub.items.data[0].price.id);
-        const billingInterval = sub.metadata.billing_interval ?? interval;
+        const billingInterval = (sub.metadata.billing_interval as Interval) ?? interval;
 
         await supabase.from("subscriptions").upsert(
           {
@@ -168,19 +215,39 @@ Deno.serve(async (req) => {
           },
           { onConflict: "user_id" },
         );
+        // No point allocation here — handled by invoice.payment_succeeded
+        break;
+      }
 
-        // Allocate points on renewal or plan change (only for active statuses)
-        if (sub.status === "active" || sub.status === "trialing") {
-          await supabase.rpc("allocate_monthly_points", {
-            p_user_id: userId,
-            p_tier: tier,
-            p_billing_interval: billingInterval,
-          });
-        }
+      // ── Cycle renewal: payment landed → refill credits ─────────────────────
+      // Fires on first invoice AND on every renewal. We allocate points
+      // only on real successful payment so a card decline doesn't grant
+      // free credits and a paused-then-resumed subscription doesn't
+      // accidentally hand out a second allocation.
+      case "invoice.payment_succeeded": {
+        const invoice = event.data.object as Stripe.Invoice;
+        if (!invoice.subscription) break;  // not a subscription invoice
+
+        const sub = await stripe.subscriptions.retrieve(invoice.subscription as string);
+        const userId = sub.metadata.supabase_user_id;
+        if (!userId) break;
+
+        const { tier, interval } = priceToTierAndInterval(sub.items.data[0].price.id);
+        const billingInterval = (sub.metadata.billing_interval as Interval) ?? interval;
+
+        await supabase.rpc("allocate_monthly_points", {
+          p_user_id: userId,
+          p_tier: tier,
+          p_billing_interval: billingInterval,
+        });
         break;
       }
 
       // ── Cancellation / expiry ──────────────────────────────────────────────
+      // Mark subscription canceled but leave existing credits intact — the
+      // user paid for them and can use them through current_period_end.
+      // A nightly cron should zero subscription_points after period_end if
+      // status='canceled' (Phase 9 reconciliation job).
       case "customer.subscription.deleted": {
         const sub = event.data.object as Stripe.Subscription;
         await supabase
@@ -192,6 +259,13 @@ Deno.serve(async (req) => {
     }
   } catch (err) {
     console.error(`Error handling event ${event.type}:`, err);
+    // Record the error against the idempotency row so we have a trail
+    try {
+      await supabase
+        .from("stripe_webhook_events")
+        .update({ error: (err as Error).message })
+        .eq("stripe_event_id", event.id);
+    } catch { /* ignore */ }
     return new Response(JSON.stringify({ error: (err as Error).message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

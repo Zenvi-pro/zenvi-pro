@@ -59,7 +59,8 @@ BEGIN
   -- Idempotent: only write if not already claimed by this user
   UPDATE public.waitlist
   SET used_by = auth.uid(),
-      used_at  = COALESCE(used_at, now())
+      used_at  = COALESCE(used_at, now()),
+      status   = 'used'
   WHERE id = v_row_id
     AND used_by IS DISTINCT FROM auth.uid();
 
