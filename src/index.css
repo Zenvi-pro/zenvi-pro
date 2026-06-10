@@ -22,9 +22,9 @@
     --popover: 0 0% 4%;
     --popover-foreground: 0 0% 100%;
 
-    /* Neon green accent (Flora.ai style) */
-    --primary: 83 77% 55%;
-    --primary-foreground: 0 0% 0%;
+    /* Electric blue accent */
+    --primary: 220 93% 57%;
+    --primary-foreground: 0 0% 100%;
 
     /* Secondary (muted dark) */
     --secondary: 0 0% 8%;
@@ -35,27 +35,27 @@
     --muted-foreground: 0 0% 63%;
 
     /* Accent */
-    --accent: 83 77% 55%;
-    --accent-foreground: 0 0% 0%;
+    --accent: 220 93% 57%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 0 0% 12%;
     --input: 0 0% 10%;
-    --ring: 83 77% 55%;
+    --ring: 220 93% 57%;
 
     --radius: 1rem;
 
     /* Sidebar */
     --sidebar-background: 0 0% 0%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 83 77% 55%;
-    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-primary: 220 93% 57%;
+    --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 8%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 0 0% 12%;
-    --sidebar-ring: 83 77% 55%;
+    --sidebar-ring: 220 93% 57%;
   }
 }
 
