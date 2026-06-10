@@ -1,24 +1,10 @@
-import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { resolveStripePriceIdFromPlan, resolveTierName } from "../_shared/tier-prices.ts";
+import { createStripeClient, STRIPE_CORS_HEADERS } from "../_shared/stripe-env.ts";
 
 const CORS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  ...STRIPE_CORS_HEADERS,
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
-
-const PRICE_IDS: Record<string, string> = {
-  // Canonical tier names (post-rename)
-  starter_monthly: Deno.env.get("STRIPE_PRICE_STARTER_MONTHLY") ?? Deno.env.get("STRIPE_PRICE_CREATOR_MONTHLY") ?? "",
-  starter_annual:  Deno.env.get("STRIPE_PRICE_STARTER_ANNUAL")  ?? Deno.env.get("STRIPE_PRICE_CREATOR_ANNUAL")  ?? "",
-  pro_monthly:     Deno.env.get("STRIPE_PRICE_PRO_MONTHLY")     ?? "",
-  pro_annual:      Deno.env.get("STRIPE_PRICE_PRO_ANNUAL")      ?? "",
-  max_monthly:     Deno.env.get("STRIPE_PRICE_MAX_MONTHLY")     ?? Deno.env.get("STRIPE_PRICE_STUDIO_MONTHLY") ?? "",
-  max_annual:      Deno.env.get("STRIPE_PRICE_MAX_ANNUAL")      ?? "",
-  // Legacy keys (preserved for in-flight client builds — alias to canonical)
-  creator_monthly: Deno.env.get("STRIPE_PRICE_STARTER_MONTHLY") ?? Deno.env.get("STRIPE_PRICE_CREATOR_MONTHLY") ?? "",
-  creator_annual:  Deno.env.get("STRIPE_PRICE_STARTER_ANNUAL")  ?? Deno.env.get("STRIPE_PRICE_CREATOR_ANNUAL")  ?? "",
-  studio_monthly:  Deno.env.get("STRIPE_PRICE_MAX_MONTHLY")     ?? Deno.env.get("STRIPE_PRICE_STUDIO_MONTHLY") ?? "",
 };
 
 Deno.serve(async (req) => {
@@ -34,40 +20,48 @@ Deno.serve(async (req) => {
       { global: { headers: { Authorization: authHeader } } },
     );
 
+    const serviceSupabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) return json({ error: "Unauthorized" }, 401);
 
     const { plan } = await req.json();
-    const newPriceId = PRICE_IDS[plan];
-    if (!newPriceId) return json({ error: `Unknown plan: ${plan}` }, 400);
+    if (!plan) return json({ error: "Missing plan" }, 400);
 
-    // Get their current subscription from DB
+    const { tier, interval, priceId } = await resolveStripePriceIdFromPlan(serviceSupabase, plan, req);
+    if (!priceId) return json({ error: `No Stripe price configured for plan: ${plan}` }, 400);
+
     const { data: subRows } = await supabase
       .from("subscriptions")
       .select("stripe_subscription_id")
       .eq("user_id", user.id)
+      .in("status", ["active", "trialing"])
       .single();
 
     const stripeSubId = subRows?.stripe_subscription_id;
-    if (!stripeSubId) return json({ error: "No active subscription to upgrade." }, 400);
+    if (!stripeSubId) {
+      return json({ error: "No active subscription. Use checkout to subscribe." }, 409);
+    }
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
-      apiVersion: "2024-06-20",
-      httpClient: Stripe.createFetchHttpClient(),
-    });
+    const stripe = createStripeClient(req);
 
-    // Retrieve the current subscription to get the item ID
     const currentSub = await stripe.subscriptions.retrieve(stripeSubId);
     const itemId = currentSub.items.data[0]?.id;
     if (!itemId) return json({ error: "Could not find subscription item." }, 500);
 
-    // Update the subscription — prorate immediately
     await stripe.subscriptions.update(stripeSubId, {
-      items: [{ id: itemId, price: newPriceId }],
+      items: [{ id: itemId, price: priceId }],
       proration_behavior: "create_prorations",
+      metadata: {
+        ...currentSub.metadata,
+        supabase_user_id: user.id,
+        plan: String(resolveTierName(tier)),
+        billing_interval: interval,
+      },
     });
-
-    // Webhook (customer.subscription.updated) will sync the DB
 
     return json({ success: true });
   } catch (err) {

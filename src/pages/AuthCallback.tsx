@@ -1,31 +1,21 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { consumeAuthRedirect, resolvePostLoginPath } from "@/lib/auth-redirect";
 
-// Landing page for OAuth redirects (GitHub, Google). 
-// Supabase automatically exchanges the auth code for a session when this page loads.
-// We listen for the session, then forward to wherever the user was going.
+// Landing page for OAuth redirects (GitHub, Google).
+// Supabase exchanges the auth code for a session when this page loads.
 export default function AuthCallbackPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    const getNext = () => {
-      const n = sessionStorage.getItem("auth_next");
-      sessionStorage.removeItem("auth_next");
-      return n ?? "/download";
-    };
-
-    const getState = () => {
-      const s = sessionStorage.getItem("auth_state");
-      sessionStorage.removeItem("auth_state");
-      return s;
-    };
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
         subscription.unsubscribe();
-        const desktopState = getState();
+        const { next, state: desktopState } = consumeAuthRedirect(searchParams);
+
         if (desktopState) {
           await supabase.rpc("complete_desktop_auth_session", {
             session_state: desktopState,
@@ -34,17 +24,17 @@ export default function AuthCallbackPage() {
           });
           navigate("/auth/success", { replace: true });
         } else {
-          navigate(getNext(), { replace: true });
+          const dest = await resolvePostLoginPath(next);
+          navigate(dest, { replace: true });
         }
       } else if (event === "INITIAL_SESSION" && !session) {
-        // OAuth exchange produced no session — go home
         subscription.unsubscribe();
         navigate("/", { replace: true });
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, searchParams]);
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">

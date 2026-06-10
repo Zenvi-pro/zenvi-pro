@@ -2,7 +2,7 @@
  * Claude generate edge function.
  *
  * Proxies requests to the Anthropic Claude API, enforces per-user
- * usage limits, and records consumption to api_usage.
+ * credits, and records consumption via charge_llm_call.
  *
  * Required env vars:
  *   ANTHROPIC_API_KEY   – API key from console.anthropic.com
@@ -36,14 +36,12 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: CORS });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
-  // ── API key check ────────────────────────────────────────────────────────────
   const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
   if (!ANTHROPIC_API_KEY) {
     console.error("claude-generate: ANTHROPIC_API_KEY is not set");
     return json({ error: "Missing ANTHROPIC_API_KEY" }, 500);
   }
 
-  // ── Auth ─────────────────────────────────────────────────────────────────────
   const authHeader = req.headers.get("Authorization");
   if (!authHeader) return json({ error: "Missing Authorization header" }, 401);
 
@@ -56,7 +54,6 @@ Deno.serve(async (req) => {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) return json({ error: "Unauthorized" }, 401);
 
-  // ── Parse body ────────────────────────────────────────────────────────────────
   let body: {
     messages: Array<{ role: "user" | "assistant"; content: string }>;
     model?: string;
@@ -79,16 +76,17 @@ Deno.serve(async (req) => {
   const maxTokens = body.max_tokens ?? DEFAULT_MAX_TOKENS;
   const useStream = body.stream === true;
 
-  // ── Usage guard ───────────────────────────────────────────────────────────────
-  // Rough estimate: ~$0.01 per request as a gating check.
-  const { data: allowed } = await supabase.rpc("check_usage_allowed", {
-    p_estimated_cost: 0.01,
+  const { data: creditCheck } = await supabase.rpc("check_credits_allowed", {
+    p_estimated_credits: 5,
   });
-  if (!allowed) {
-    return json({ error: "Monthly usage limit reached. Upgrade your plan to continue." }, 429);
+  const row = Array.isArray(creditCheck) ? creditCheck[0] : creditCheck;
+  if (row && !row.allowed) {
+    return json(
+      { error: "Insufficient credits. Upgrade your plan or enable overage to continue." },
+      429,
+    );
   }
 
-  // ── Call Claude ───────────────────────────────────────────────────────────────
   const anthropic = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
 
   const params: Anthropic.MessageCreateParams = {
@@ -100,7 +98,6 @@ Deno.serve(async (req) => {
 
   try {
     if (useStream) {
-      // ── Streaming response ─────────────────────────────────────────────────
       const stream = anthropic.messages.stream(params);
 
       const encoder = new TextEncoder();
@@ -120,9 +117,8 @@ Deno.serve(async (req) => {
             outputTokens = final.usage.output_tokens;
           } finally {
             controller.close();
-            // Record usage after stream completes (fire-and-forget)
-            recordUsage(supabase, user.id, model, inputTokens, outputTokens).catch(
-              (e) => console.error("claude-generate: usage record failed", e),
+            recordUsage(supabase, model, inputTokens, outputTokens).catch(
+              (e) => console.error("claude-generate: charge_llm_call failed", e),
             );
           }
         },
@@ -138,17 +134,14 @@ Deno.serve(async (req) => {
       });
     }
 
-    // ── Non-streaming response ───────────────────────────────────────────────
     const message = await anthropic.messages.create(params);
 
-    // Record usage (fire-and-forget — don't fail the response if this errors)
     recordUsage(
       supabase,
-      user.id,
       model,
       message.usage.input_tokens,
       message.usage.output_tokens,
-    ).catch((e) => console.error("claude-generate: usage record failed", e));
+    ).catch((e) => console.error("claude-generate: charge_llm_call failed", e));
 
     return json({
       id: message.id,
@@ -164,8 +157,6 @@ Deno.serve(async (req) => {
   }
 });
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -175,22 +166,15 @@ function json(body: unknown, status = 200) {
 
 async function recordUsage(
   supabase: ReturnType<typeof createClient>,
-  userId: string,
   model: string,
   inputTokens: number,
   outputTokens: number,
 ) {
-  await supabase.rpc("batch_record_api_usage", {
-    records: JSON.stringify([
-      {
-        provider: "anthropic",
-        model,
-        operation: "chat",
-        input_tokens: inputTokens,
-        output_tokens: outputTokens,
-        units: 1,
-        recorded_at: new Date().toISOString(),
-      },
-    ]),
+  if (inputTokens === 0 && outputTokens === 0) return;
+  await supabase.rpc("charge_llm_call", {
+    p_model: model,
+    p_input_tokens: inputTokens,
+    p_output_tokens: outputTokens,
+    p_provider: "anthropic",
   });
 }

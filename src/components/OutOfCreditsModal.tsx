@@ -17,6 +17,7 @@ import { Link } from "react-router-dom";
 import { AlertTriangle, ArrowUpRight, Zap, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { buildCheckoutHref } from "@/lib/checkout-routing";
 
 const STORAGE_KEY = "ooc-modal-dismissed-at";
 const DISMISS_TTL_MS = 60 * 60 * 1000; // re-show after 1h if still out
@@ -82,7 +83,9 @@ export default function OutOfCreditsModal({
 
   const tierLabel = TIER_LABEL[tier] ?? tier;
   const next = NEXT_TIER[tier];
-  const upgradeHref = next ? `/checkout?plan=${next}_monthly` : "/pricing";
+  const upgradeHref = next
+    ? buildCheckoutHref(`${next}_monthly`, tier, "upgrade")
+    : "/pricing";
   const upgradeCta  = tier === "free" ? "Upgrade to Starter" : next ? `Upgrade to ${TIER_LABEL[next]}` : "See plans";
   const canOverage  = tier !== "free" && tier !== "lifetime";
 

@@ -1,100 +1,107 @@
 # Stripe + Supabase setup checklist
 
-Until you finish these 4 steps, the **Pay** button on `/pricing` won't do anything useful — every paid signup will fail. Steps 1–3 take about 15 minutes in total. Step 4 takes ~3 minutes once you have Stripe set up.
+Until you finish these steps, paid checkout will not sync subscriptions to Supabase. Local dev (`npm run dev`) uses **Stripe test mode** and requires a **separate test webhook** endpoint.
 
 ---
 
-## Step 1 — Create products + prices in your Stripe dashboard
+## Step 1 — Create products + prices in Stripe
 
-Go to https://dashboard.stripe.com/products → **+ Add product**. Create one product per plan, with two recurring prices on the subscription ones and a single one-time price for Lifetime:
+Go to https://dashboard.stripe.com/products and create Starter, Pro, and Max with monthly + annual recurring prices.
 
-| Product name | Price 1 (monthly) | Price 2 (annual) | Notes |
-|---|---|---|---|
-| Zenvi Starter | **$29 / month** | **$300 / year** | Trial: none. Tax behaviour: inclusive or exclusive per your jurisdiction. |
-| Zenvi Pro | **$49 / month** | **$468 / year** | Same. |
-| Zenvi Max | **$199 / month** | **$1,788 / year** | Same. |
-| Zenvi Lifetime | **$99 one-time** | — | Set as one-time payment, not recurring. |
+Price IDs are stored in Supabase `tier_config` (not env vars):
 
-After creating each price, click into it and copy the `price_…` identifier from the URL or the price detail page. You'll need 7 price IDs total:
+| Column | Used when |
+|--------|-----------|
+| `stripe_monthly_price_id` / `stripe_annual_price_id` | Production (`zenvi.pro`) |
+| `stripe_monthly_price_id_sandbox` / `stripe_annual_price_id_sandbox` | Local dev (`npm run dev`) |
 
-```
-STRIPE_PRICE_STARTER_MONTHLY  =  price_...
-STRIPE_PRICE_STARTER_ANNUAL   =  price_...
-STRIPE_PRICE_PRO_MONTHLY      =  price_...
-STRIPE_PRICE_PRO_ANNUAL       =  price_...
-STRIPE_PRICE_MAX_MONTHLY      =  price_...
-STRIPE_PRICE_MAX_ANNUAL       =  price_...
-STRIPE_PRICE_LIFETIME         =  price_...
+Sandbox IDs for starter/max are seeded by migrations. Set live IDs and any missing sandbox IDs in the Supabase SQL editor:
+
+```sql
+UPDATE tier_config SET stripe_monthly_price_id = 'price_...' WHERE tier = 'starter';
+-- repeat for pro, max, annual columns, and sandbox columns as needed
 ```
 
 ---
 
-## Step 2 — Get your Stripe API keys
+## Step 2 — Webhook endpoints (test + live)
 
-1. https://dashboard.stripe.com/apikeys → reveal your **Secret key** (starts with `sk_live_` for production or `sk_test_` for test mode). Copy it.
-2. https://dashboard.stripe.com/webhooks → click **+ Add an endpoint**:
-   - **Endpoint URL:** `https://xktarhzbrdnxkaovtdxj.supabase.co/functions/v1/stripe-webhook`
-   - **Events to send:**
-     - `checkout.session.completed`
-     - `customer.subscription.updated`
-     - `customer.subscription.deleted`
-     - `invoice.payment_succeeded`
-   - Click **Add endpoint**.
-3. On the endpoint detail page, click **Reveal** under **Signing secret**. Copy that (starts with `whsec_`).
+**Production (live mode):** https://dashboard.stripe.com/webhooks
 
----
+**Local dev (test mode):** toggle **Test mode** in Stripe, then https://dashboard.stripe.com/test/webhooks
 
-## Step 3 — Set every env var in Supabase project settings
+Both endpoints use the same URL:
 
-Go to https://supabase.com/dashboard/project/xktarhzbrdnxkaovtdxj/settings/functions and add:
+`https://xktarhzbrdnxkaovtdxj.supabase.co/functions/v1/stripe-webhook`
 
-```
-STRIPE_SECRET_KEY              = sk_live_… or sk_test_…
-STRIPE_WEBHOOK_SECRET          = whsec_…
-STRIPE_PRICE_STARTER_MONTHLY   = price_…
-STRIPE_PRICE_STARTER_ANNUAL    = price_…
-STRIPE_PRICE_PRO_MONTHLY       = price_…
-STRIPE_PRICE_PRO_ANNUAL        = price_…
-STRIPE_PRICE_MAX_MONTHLY       = price_…
-STRIPE_PRICE_MAX_ANNUAL        = price_…
-STRIPE_PRICE_LIFETIME          = price_…
-```
+**Events to enable:**
 
-After saving, the edge functions (`create-checkout-session`, `stripe-webhook`) pick these up on their next invocation — no redeploy needed.
+- `checkout.session.completed`
+- `customer.subscription.updated`
+- `customer.subscription.deleted`
+- `invoice.payment_succeeded`
+
+Copy each endpoint's **Signing secret** (`whsec_…`). Test and live endpoints have different secrets.
 
 ---
 
-## Step 4 — Deploy the edge functions
+## Step 3 — Supabase Edge Function secrets
 
-The functions are already in `supabase/functions/` in the repo. Push them with:
+Go to https://supabase.com/dashboard/project/xktarhzbrdnxkaovtdxj/settings/functions
+
+| Secret | Required for |
+|--------|----------------|
+| `STRIPE_SECRET_KEY` | Production checkout + live webhooks |
+| `STRIPE_WEBHOOK_SECRET` | Live webhook signature verification |
+| `STRIPE_TEST_SECRET_KEY` | Local dev checkout (`sk_test_…`) |
+| `STRIPE_TEST_WEBHOOK_SECRET` | Test webhook signature verification |
+
+Or via CLI from the repo root:
 
 ```bash
-cd "/Users/nilaygoyal/Documents/Github/zenvi frontend website"
-supabase functions deploy create-checkout-session
-supabase functions deploy create-billing-portal
-supabase functions deploy stripe-webhook
+supabase secrets set STRIPE_TEST_SECRET_KEY=sk_test_...
+supabase secrets set STRIPE_TEST_WEBHOOK_SECRET=whsec_...
+supabase secrets set STRIPE_SECRET_KEY=sk_live_...
+supabase secrets set STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
-(Run `supabase login` first if it prompts you.)
+Secrets are picked up on the next function invocation — no redeploy required after changing secrets only.
 
 ---
 
-## Test it end-to-end
+## Step 4 — Deploy edge functions
 
-1. Open https://zenvi.pro/pricing in incognito.
-2. Sign up as a brand-new user.
-3. Click **Get Pro**.
-4. Use Stripe test card `4242 4242 4242 4242` (any future expiry, any CVC).
-5. After success, you should land on `/checkout/success`.
-6. Open `/dashboard/usage` — should show **5,500 credits** in the balance card and tier "Zenvi Pro".
-
-If you don't see 5,500 cr immediately, the webhook hasn't fired yet — Stripe sometimes takes a few seconds. Refresh after ~10 seconds. If it's still wrong, check Stripe Dashboard → Webhooks → click your endpoint → look at recent deliveries. The error response (if any) tells you exactly which env var is missing or wrong.
+```bash
+cd zenvi-pro
+supabase functions deploy create-checkout-session
+supabase functions deploy create-billing-portal
+supabase functions deploy upgrade-subscription
+supabase functions deploy stripe-webhook
+supabase functions deploy get-tier-pricing
+```
 
 ---
 
-## What happens when something goes wrong
+## Test locally (sandbox)
 
-Every Stripe webhook hit is logged in two places:
+1. `npm run dev` — frontend automatically sends `x-stripe-test-mode: true`.
+2. Log in, enter a valid waitlist access code, complete checkout for Max.
+3. Use test card `4242 4242 4242 4242`.
+4. `/checkout/success` polls until `get_user_subscription` returns your tier, then redirects to `/download`.
+5. `/dashboard` should show Max tier limits (not free-tier defaults).
 
-- **Stripe Dashboard → Webhooks → endpoint → Recent deliveries**: shows status + response. Easy first stop.
-- **Supabase Dashboard → Edge Functions → stripe-webhook → Logs**: shows what the handler did. Any thrown error gets recorded against the event in the `stripe_webhook_events` table — query `SELECT * FROM stripe_webhook_events WHERE error IS NOT NULL ORDER BY processed_at DESC LIMIT 20;` from the SQL editor for a quick audit.
+If the subscription row is missing after ~30s:
+
+- **Stripe Dashboard → Webhooks (test mode) → Recent deliveries** — 400 means wrong `STRIPE_TEST_WEBHOOK_SECRET`; 500 means handler error (check edge function logs).
+- **Supabase SQL:** `SELECT * FROM stripe_webhook_events ORDER BY processed_at DESC LIMIT 20;`
+
+---
+
+## Debugging
+
+| Symptom | Likely cause |
+|---------|----------------|
+| Webhook 400 | Missing or wrong test/live `whsec_` secret |
+| Webhook 500, then never retries | Old idempotency bug — redeploy latest `stripe-webhook` |
+| Checkout 400 "No Stripe price configured" | Sandbox price ID null in `tier_config` |
+| Paid in Stripe, free in UI | Webhook never succeeded — check deliveries + `subscriptions` table |

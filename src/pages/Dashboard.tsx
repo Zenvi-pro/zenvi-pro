@@ -18,20 +18,22 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import OutOfCreditsModal, { shouldShowOocModal, markOocModalDismissed } from "@/components/OutOfCreditsModal";
 import { useQueryClient } from "@tanstack/react-query";
+import { buildCheckoutHref } from "@/lib/checkout-routing";
+import { stripeEdgeFunctionUrl, stripeEdgeHeaders } from "@/lib/stripe-edge";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 interface MonthlyTotals {
-  total_cost_usd: number;
+  total_credits_used: number;
   total_requests: number;
-  monthly_limit_usd: number;
+  monthly_points_limit: number;
   percentage_used: number;
   tier: string;
 }
 
 interface ProviderRow {
   provider: string;
-  total_cost_usd: number;
+  total_credits: number;
   total_input_tokens: number;
   total_output_tokens: number;
   request_count: number;
@@ -39,7 +41,7 @@ interface ProviderRow {
 
 interface HistoryRow {
   month: string;
-  total_cost_usd: number;
+  total_credits: number;
   request_count: number;
 }
 
@@ -62,6 +64,23 @@ interface CategoryRow {
   total_credits: number;
   total_usd_est: number;
   request_count: number;
+}
+
+interface PointHistoryRow {
+  id: string;
+  txn_type: string;
+  points_delta: number;
+  credits_charged: number;
+  operation_label: string;
+  category: string;
+  provider: string | null;
+  model: string | null;
+  total_tokens: number;
+  quantity: number;
+  duration_seconds: number | null;
+  balance_after: number | null;
+  note: string | null;
+  created_at: string;
 }
 
 // ── Constants ──────────────────────────────────────────────────────────────────
@@ -101,6 +120,16 @@ const CATEGORY_LABEL: Record<string, string> = {
   other: "Other",
 };
 
+const TXN_TYPE_LABEL: Record<string, string> = {
+  deduction: "Used",
+  allocation: "Granted",
+  rollover: "Rollover",
+  bonus: "Bonus",
+  topup: "Top-up",
+  refund: "Refund",
+  overage_charge: "Overage",
+};
+
 const CATEGORY_HEX: Record<string, string> = {
   llm:       "#3275F8",  // brand blue
   video:     "#A78BFA",  // purple
@@ -130,8 +159,35 @@ const PROVIDER_HEX: Record<string, string> = {
   "nvidia-edge": "#67E8F9",
 };
 
-function fmt(usd: number) {
-  return usd < 0.01 ? "<$0.01" : `$${usd.toFixed(2)}`;
+function fmtCredits(credits: number) {
+  return `${credits.toLocaleString()} cr`;
+}
+
+function formatHistoryWhen(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function historyMeteringDetail(row: PointHistoryRow): string | null {
+  const parts: string[] = [];
+  if (row.total_tokens > 0) {
+    parts.push(`${row.total_tokens.toLocaleString()} tokens`);
+  }
+  if (row.duration_seconds != null && row.duration_seconds > 0) {
+    const mins = Math.ceil(row.duration_seconds / 60);
+    parts.push(`${mins} min`);
+  } else if (row.quantity > 1) {
+    parts.push(`×${row.quantity}`);
+  }
+  if (row.provider) {
+    parts.push(PROVIDER_LABEL[row.provider] ?? row.provider);
+  }
+  return parts.length > 0 ? parts.join(" · ") : null;
 }
 
 function barTint(pct: number) {
@@ -181,13 +237,13 @@ export default function DashboardPage() {
         return;
       }
       const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-billing-portal`,
+        stripeEdgeFunctionUrl("create-billing-portal"),
         {
           method: "POST",
-          headers: {
+          headers: stripeEdgeHeaders({
             Authorization: `Bearer ${session.access_token}`,
             "Content-Type": "application/json",
-          },
+          }),
           body: JSON.stringify({ returnUrl: `${window.location.origin}/dashboard/usage` }),
         },
       );
@@ -205,9 +261,9 @@ export default function DashboardPage() {
       if (error) throw error;
       const row = Array.isArray(data) ? data[0] : data;
       return {
-        total_cost_usd: Number(row?.total_cost_usd ?? 0),
+        total_credits_used: Number(row?.total_credits_used ?? 0),
         total_requests: Number(row?.total_requests ?? 0),
-        monthly_limit_usd: Number(row?.monthly_limit_usd ?? 10),
+        monthly_points_limit: Number(row?.monthly_points_limit ?? 100),
         percentage_used: Number(row?.percentage_used ?? 0),
         tier: row?.tier ?? "none",
       };
@@ -221,7 +277,7 @@ export default function DashboardPage() {
       if (error) throw error;
       return (data ?? []).map((r: Record<string, unknown>) => ({
         provider: String(r.provider ?? ""),
-        total_cost_usd: Number(r.total_cost_usd ?? 0),
+        total_credits: Number(r.total_credits ?? 0),
         total_input_tokens: Number(r.total_input_tokens ?? 0),
         total_output_tokens: Number(r.total_output_tokens ?? 0),
         request_count: Number(r.request_count ?? 0),
@@ -238,7 +294,7 @@ export default function DashboardPage() {
       if (error) throw error;
       return (data ?? []).map((r: Record<string, unknown>) => ({
         month: String(r.month ?? ""),
-        total_cost_usd: Number(r.total_cost_usd ?? 0),
+        total_credits: Number(r.total_credits ?? 0),
         request_count: Number(r.request_count ?? 0),
       }));
     },
@@ -274,6 +330,35 @@ export default function DashboardPage() {
   });
 
   // ── Category breakdown — LLM vs Video vs Indexing etc ──
+  const { data: pointHistory = [] } = useQuery<PointHistoryRow[]>({
+    queryKey: ["point-history", 0],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_point_history", {
+        p_limit: 40,
+        p_month_offset: 0,
+      });
+      if (error) throw error;
+      return (data ?? []).map((r: Record<string, unknown>) => ({
+        id: String(r.id ?? ""),
+        txn_type: String(r.txn_type ?? ""),
+        points_delta: Number(r.points_delta ?? 0),
+        credits_charged: Number(r.credits_charged ?? 0),
+        operation_label: String(r.operation_label ?? ""),
+        category: String(r.category ?? "other"),
+        provider: r.provider != null ? String(r.provider) : null,
+        model: r.model != null ? String(r.model) : null,
+        total_tokens: Number(r.total_tokens ?? 0),
+        quantity: Number(r.quantity ?? 1),
+        duration_seconds:
+          r.duration_seconds != null ? Number(r.duration_seconds) : null,
+        balance_after:
+          r.balance_after != null ? Number(r.balance_after) : null,
+        note: r.note != null ? String(r.note) : null,
+        created_at: String(r.created_at ?? ""),
+      }));
+    },
+  });
+
   const { data: categories = [] } = useQuery<CategoryRow[]>({
     queryKey: ["category-breakdown"],
     queryFn: async () => {
@@ -294,7 +379,7 @@ export default function DashboardPage() {
   });
 
   const pct = totals?.percentage_used ?? 0;
-  const maxHistoryCost = Math.max(...history.map((h) => h.total_cost_usd), 0.01);
+  const maxHistoryCredits = Math.max(...history.map((h) => h.total_credits), 1);
 
   // Auto-open the out-of-credits modal once per session when the user lands
   // here in standard mode or with a zero balance. Re-runs on every balance
@@ -309,7 +394,8 @@ export default function DashboardPage() {
   // Derived: avg cost per day this month
   const now = new Date();
   const dayOfMonth = now.getDate();
-  const avgPerDay = totals && dayOfMonth > 0 ? totals.total_cost_usd / dayOfMonth : 0;
+  const avgPerDay =
+    totals && dayOfMonth > 0 ? totals.total_credits_used / dayOfMonth : 0;
 
   if (totalsLoading) {
     return (
@@ -547,14 +633,17 @@ export default function DashboardPage() {
           <div className="relative grid gap-10 md:grid-cols-[1.5fr_1fr] md:items-center">
             <div>
               <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/45">
-                Spent this month
+                Credits used this month
               </p>
               <p className="mt-2 font-serif text-[56px] font-normal leading-none tracking-[-0.02em] tabular-nums text-white md:text-[72px]">
-                {fmt(totals?.total_cost_usd ?? 0)}
+                {(totals?.total_credits_used ?? 0).toLocaleString()}
               </p>
               <p className="mt-3 text-[13px] text-white/55">
-                of <span className="text-white/85">{fmt(totals?.monthly_limit_usd ?? 10)}</span>{" "}
-                limit
+                of{" "}
+                <span className="text-white/85">
+                  {(totals?.monthly_points_limit ?? 100).toLocaleString()} cr
+                </span>{" "}
+                plan allowance
               </p>
 
               {/* Progress bar — single tinted track, gradient fill */}
@@ -625,7 +714,7 @@ export default function DashboardPage() {
           <StatTile
             icon={TrendingUp}
             label="Average / day"
-            value={fmt(avgPerDay)}
+            value={fmtCredits(Math.round(avgPerDay))}
             sub="rolling"
           />
         </motion.div>
@@ -710,11 +799,11 @@ export default function DashboardPage() {
               <div className="space-y-5">
                 {providers
                   .slice()
-                  .sort((a, b) => b.total_cost_usd - a.total_cost_usd)
+                  .sort((a, b) => b.total_credits - a.total_credits)
                   .map((p) => {
                     const share =
-                      totals && totals.total_cost_usd > 0
-                        ? (p.total_cost_usd / totals.total_cost_usd) * 100
+                      totals && totals.total_credits_used > 0
+                        ? (p.total_credits / totals.total_credits_used) * 100
                         : 0;
                     const color = PROVIDER_HEX[p.provider] ?? "#9CA3AF";
                     const label = PROVIDER_LABEL[p.provider] ?? p.provider;
@@ -739,7 +828,7 @@ export default function DashboardPage() {
                           </div>
                           <div className="flex items-baseline gap-2">
                             <span className="text-[13.5px] font-medium tabular-nums text-white">
-                              {fmt(p.total_cost_usd)}
+                              {p.total_credits.toLocaleString()} cr
                             </span>
                             <span className="text-[11px] tabular-nums text-white/35">
                               {share.toFixed(0)}%
@@ -778,7 +867,8 @@ export default function DashboardPage() {
             <div className={`mt-5 p-6 md:p-7 ${glass}`}>
               <div className="flex h-32 items-end gap-3">
                 {history.map((h, i) => {
-                  const barH = maxHistoryCost > 0 ? (h.total_cost_usd / maxHistoryCost) * 100 : 0;
+                  const barH =
+                    maxHistoryCredits > 0 ? (h.total_credits / maxHistoryCredits) * 100 : 0;
                   const isCurrent = i === history.length - 1;
                   return (
                     <div
@@ -786,7 +876,7 @@ export default function DashboardPage() {
                       className="group flex flex-1 flex-col items-center gap-2"
                     >
                       <p className="text-[10px] tabular-nums text-white/30 transition-colors group-hover:text-white/70">
-                        {h.total_cost_usd > 0 ? fmt(h.total_cost_usd) : "—"}
+                        {h.total_credits > 0 ? `${h.total_credits.toLocaleString()} cr` : "—"}
                       </p>
                       <div className="flex h-20 w-full items-end">
                         <motion.div
@@ -802,7 +892,7 @@ export default function DashboardPage() {
                               ? "bg-gradient-to-t from-primary to-[#67A4FF] shadow-[0_0_18px_rgba(50,117,248,0.5)]"
                               : "bg-white/[0.08] group-hover:bg-white/[0.14]"
                           }`}
-                          style={{ minHeight: h.total_cost_usd > 0 ? 4 : 0 }}
+                          style={{ minHeight: h.total_credits > 0 ? 4 : 0 }}
                         />
                       </div>
                       <p className="text-[10px] uppercase tracking-wider text-white/40">
@@ -812,6 +902,74 @@ export default function DashboardPage() {
                   );
                 })}
               </div>
+            </div>
+          </motion.section>
+        )}
+
+        {/* ───────── Recent ledger (enriched point_transactions) ───────── */}
+        {pointHistory.length > 0 && (
+          <motion.section
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={0.22}
+            className="mt-10"
+          >
+            <SectionHeader title="Recent activity" caption="This month" />
+            <div className={`mt-5 overflow-hidden ${glass}`}>
+              <ul className="divide-y divide-white/[0.06]">
+                {pointHistory.map((row) => {
+                  const isCredit = row.points_delta > 0;
+                  const metering = historyMeteringDetail(row);
+                  const catColor = CATEGORY_HEX[row.category] ?? CATEGORY_HEX.other;
+                  return (
+                    <li
+                      key={row.id}
+                      className="flex flex-col gap-1 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span
+                            className="h-1.5 w-1.5 shrink-0 rounded-full"
+                            style={{ backgroundColor: catColor }}
+                            aria-hidden
+                          />
+                          <span className="truncate text-[13.5px] font-medium text-white">
+                            {row.operation_label}
+                          </span>
+                          <span className="text-[10px] uppercase tracking-wider text-white/35">
+                            {TXN_TYPE_LABEL[row.txn_type] ?? row.txn_type}
+                          </span>
+                        </div>
+                        {metering && (
+                          <p className="mt-0.5 pl-3.5 text-[11px] text-white/40">{metering}</p>
+                        )}
+                        {row.note && row.txn_type !== "deduction" && (
+                          <p className="mt-0.5 pl-3.5 text-[11px] text-white/45">{row.note}</p>
+                        )}
+                      </div>
+                      <div className="flex shrink-0 items-baseline gap-3 pl-3.5 sm:pl-0 sm:text-right">
+                        <span
+                          className={`text-[13.5px] font-medium tabular-nums ${
+                            isCredit ? "text-emerald-400" : "text-white"
+                          }`}
+                        >
+                          {isCredit ? "+" : "−"}
+                          {row.credits_charged.toLocaleString()} cr
+                        </span>
+                        {row.balance_after != null && (
+                          <span className="text-[11px] tabular-nums text-white/35">
+                            bal {row.balance_after.toLocaleString()}
+                          </span>
+                        )}
+                        <span className="text-[11px] tabular-nums text-white/30">
+                          {formatHistoryWhen(row.created_at)}
+                        </span>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           </motion.section>
         )}
@@ -1076,7 +1234,11 @@ function PlanTile({
           </Link>
         ) : (
           <Link
-            to={`/checkout?plan=${tier}_monthly&mode=upgrade`}
+            to={buildCheckoutHref(
+              `${tier}_monthly`,
+              currentTier,
+              isUpgrade ? "upgrade" : "downgrade",
+            )}
             className={`group inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-full text-[12px] transition-all active:scale-[0.98] ${
               isUpgrade
                 ? "bg-white font-semibold text-black hover:bg-white/90"

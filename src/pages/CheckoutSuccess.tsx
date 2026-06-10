@@ -1,65 +1,97 @@
-import { useEffect } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { CheckCircle, Download, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { ACCESS_CODE_KEY } from "@/components/landing/AccessCodeModal";
+import { CheckCircle, Download, ChevronRight, Loader2 } from "lucide-react";
+import { ACCESS_CODE_KEY, CHECKOUT_ACCESS_CODE_KEY } from "@/components/AccessCodeForm";
+import { supabase } from "@/integrations/supabase/client";
 
 // this is the checkout
 
 const TIER_LABELS: Record<string, string> = {
-  creator: "Creator",
-  creator_monthly: "Creator",
-  creator_annual: "Creator",
+  starter: "Starter",
+  starter_monthly: "Starter",
+  starter_annual: "Starter",
   pro: "Pro",
   pro_monthly: "Pro",
   pro_annual: "Pro",
-  studio: "Studio",
-  studio_monthly: "Studio",
+  max: "Max",
+  max_monthly: "Max",
+  max_annual: "Max",
+  creator_monthly: "Starter",
+  creator_annual: "Starter",
+  studio_monthly: "Max",
   lifetime: "Lifetime Access",
 };
 
 const SUCCESS_HEADING: Record<string, string> = {
-  lifetime: "You're in. Forever.",
-  creator_monthly: "Welcome to Zenvi Creator.",
-  creator_annual: "Welcome to Zenvi Creator.",
-  creator: "Welcome to Zenvi Creator.",
+  starter_monthly: "Welcome to Zenvi Starter.",
+  starter_annual: "Welcome to Zenvi Starter.",
+  starter: "Welcome to Zenvi Starter.",
   pro_monthly: "Welcome to Zenvi Pro.",
   pro_annual: "Welcome to Zenvi Pro.",
   pro: "Welcome to Zenvi Pro.",
-  studio_monthly: "Welcome to the Studio.",
-  studio: "Welcome to the Studio.",
+  max_monthly: "Welcome to Zenvi Max.",
+  max_annual: "Welcome to Zenvi Max.",
+  max: "Welcome to Zenvi Max.",
+  creator_monthly: "Welcome to Zenvi Starter.",
+  creator_annual: "Welcome to Zenvi Starter.",
+  studio_monthly: "Welcome to Zenvi Max.",
+  lifetime: "You're in. Forever.",
 };
 
 const SUCCESS_SUBTEXT: Record<string, string> = {
-  lifetime: "One payment. No renewals. Ever.",
-  creator_monthly: "Your AI video editor is ready.",
-  creator_annual: "Your AI video editor is ready.",
-  creator: "Your AI video editor is ready.",
+  starter_monthly: "Your AI video editor is ready.",
+  starter_annual: "Your AI video editor is ready.",
+  starter: "Your AI video editor is ready.",
   pro_monthly: "Professional-grade AI, unlocked.",
   pro_annual: "Professional-grade AI, unlocked.",
   pro: "Professional-grade AI, unlocked.",
+  max_monthly: "Your team's AI video studio is ready.",
+  max_annual: "Your team's AI video studio is ready.",
+  max: "Your team's AI video studio is ready.",
+  creator_monthly: "Your AI video editor is ready.",
+  creator_annual: "Your AI video editor is ready.",
   studio_monthly: "Your team's AI video studio is ready.",
-  studio: "Your team's AI video studio is ready.",
+  lifetime: "One payment. No renewals. Ever.",
 };
 
+const POLL_INTERVAL_MS = 2000;
+const POLL_TIMEOUT_MS = 30000;
+
 export default function CheckoutSuccessPage() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const plan = searchParams.get("plan") ?? "pro";
   const tierLabel = TIER_LABELS[plan] ?? "Pro";
+  const [activating, setActivating] = useState(true);
 
-  // Clear the access code from storage once payment is confirmed
   useEffect(() => {
     sessionStorage.removeItem(ACCESS_CODE_KEY);
+    sessionStorage.removeItem(CHECKOUT_ACCESS_CODE_KEY);
   }, []);
 
-  // Auto-redirect to download after a short delay so the user sees the success message
   useEffect(() => {
-    const timer = setTimeout(() => {
-      window.location.href = "/download";
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, []);
+    let cancelled = false;
+    const startedAt = Date.now();
+
+    async function pollSubscription() {
+      while (!cancelled && Date.now() - startedAt < POLL_TIMEOUT_MS) {
+        const { data } = await supabase.rpc("get_user_subscription");
+        if (data && data.length > 0) {
+          if (!cancelled) {
+            setActivating(false);
+            navigate("/download", { replace: true });
+          }
+          return;
+        }
+        await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+      }
+      if (!cancelled) setActivating(false);
+    }
+
+    void pollSubscription();
+    return () => { cancelled = true; };
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center px-6">
@@ -91,12 +123,19 @@ export default function CheckoutSuccessPage() {
           {SUCCESS_HEADING[plan] ?? "You're all set."}
         </h1>
         <p className="text-muted-foreground text-base mb-10 leading-relaxed">
-          {SUCCESS_SUBTEXT[plan] ?? (
-            <>
-              Welcome to Zenvi{" "}
-              <span className="text-white font-medium">{tierLabel}</span>.
-              Your account is active and ready to use.
-            </>
+          {activating ? (
+            <span className="inline-flex items-center gap-2 justify-center">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Activating your subscription…
+            </span>
+          ) : (
+            SUCCESS_SUBTEXT[plan] ?? (
+              <>
+                Welcome to Zenvi{" "}
+                <span className="text-white font-medium">{tierLabel}</span>.
+                Your account is active and ready to use.
+              </>
+            )
           )}
         </p>
 
