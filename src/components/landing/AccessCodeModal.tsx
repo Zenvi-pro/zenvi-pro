@@ -1,12 +1,15 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowRight, Loader2, KeyRound } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { X, KeyRound } from "lucide-react";
+import AccessCodeForm from "@/components/AccessCodeForm";
+import { ACCESS_CODE_KEY } from "@/components/AccessCodeForm";
 import { supabase } from "@/integrations/supabase/client";
+import { clampCheckoutPathIfNeeded } from "@/lib/checkout-access";
+import { clampPlanKeyToAllowedTier } from "@/lib/checkout-routing";
+import { useToast } from "@/hooks/use-toast";
 
-export const ACCESS_CODE_KEY = "zenvi_access_code";
+export { ACCESS_CODE_KEY };
 
 interface AccessCodeModalProps {
   isOpen: boolean;
@@ -15,84 +18,81 @@ interface AccessCodeModalProps {
   planKey?: string;
 }
 
+const TIER_LABEL: Record<string, string> = {
+  starter: "Starter",
+  pro: "Pro",
+  max: "Max",
+};
+
+function planTierFromKey(planKey: string): string | undefined {
+  const map: Record<string, string> = {
+    starter_monthly: "starter",
+    starter_annual: "starter",
+    pro_monthly: "pro",
+    pro_annual: "pro",
+    max_monthly: "max",
+    max_annual: "max",
+  };
+  return map[planKey];
+}
+
 export default function AccessCodeModal({ isOpen, onClose, planKey = "pro_monthly" }: AccessCodeModalProps) {
   const navigate = useNavigate();
-  const [code, setCode] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const { toast } = useToast();
+  const planTier = planTierFromKey(planKey);
 
-  // Skip modal if code already in sessionStorage, or if user has a prior claimed code.
+  async function navigateAfterCode(
+    targetPlanKey: string,
+    allowedTier?: string | null,
+  ) {
+    const clampedKey = clampPlanKeyToAllowedTier(targetPlanKey, allowedTier ?? null);
+    const checkoutPath = await clampCheckoutPathIfNeeded(`/checkout?plan=${clampedKey}`, {
+      skipIfPaid: true,
+    });
+
+    if (clampedKey !== targetPlanKey && allowedTier) {
+      const label = TIER_LABEL[allowedTier] ?? allowedTier;
+      toast({
+        title: `Your invite is for ${label}`,
+        description: `Continuing with the ${label} plan.`,
+      });
+    }
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      navigate(checkoutPath);
+    } else {
+      navigate(`/login?next=${encodeURIComponent(checkoutPath)}`);
+    }
+  }
+
   useEffect(() => {
     if (!isOpen) return;
 
-    // Code already entered this session — skip straight to checkout
-    const stored = sessionStorage.getItem(ACCESS_CODE_KEY);
-    if (stored) {
-      onClose();
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session) {
-          navigate(`/checkout?plan=${planKey}`);
-        } else {
-          navigate(`/login?next=${encodeURIComponent(`/checkout?plan=${planKey}`)}`);
-        }
-      });
-      return;
-    }
+    let cancelled = false;
 
-    // Logged in + already has a claimed code on their account — skip modal
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) return;
-      const { data: hasAccess } = await supabase.rpc("get_user_download_access");
-      if (hasAccess) {
-        onClose();
-        navigate(`/checkout?plan=${planKey}`);
-      }
-    });
-  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmed = code.trim();
-    if (!trimmed) return;
-
-    setIsLoading(true);
-    setError("");
-
-    try {
-      // Validate the code (works for both anon and logged-in)
-      const { data, error: rpcError } = await supabase.rpc("validate_waitlist_token", { token: trimmed });
-
-      if (rpcError || !data || data.length === 0) {
-        setError("Invalid or already used access code. Check your invite and try again.");
-        return;
-      }
-
-      // Store the validated code so checkout can pick it up
-      sessionStorage.setItem(ACCESS_CODE_KEY, trimmed);
-
+    (async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      onClose();
+      if (!session || cancelled) return;
 
-      if (session) {
-        // Already logged in — send straight to checkout
-        navigate(`/checkout?plan=${planKey}`);
-      } else {
-        // Not logged in — send to auth, then checkout
-        navigate(`/login?next=${encodeURIComponent(`/checkout?plan=${planKey}`)}`);
-      }
-    } catch {
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
+      const { data: claimedToken } = await supabase.rpc("get_user_claimed_waitlist_token");
+      if (cancelled || !claimedToken) return;
+
+      sessionStorage.setItem(ACCESS_CODE_KEY, String(claimedToken));
+      onClose();
+      await navigateAfterCode(planKey);
+    })();
+
+    return () => { cancelled = true; };
+  }, [isOpen, navigate, onClose, planKey]);
+
+  const handleValidated = (_code: string, allowedTier?: string | null) => {
+    onClose();
+    void navigateAfterCode(planKey, allowedTier);
   };
 
   const handleClose = () => {
     onClose();
-    setTimeout(() => {
-      setCode("");
-      setError("");
-    }, 200);
   };
 
   return (
@@ -134,35 +134,7 @@ export default function AccessCodeModal({ isOpen, onClose, planKey = "pro_monthl
                   Got an invite? Paste your access code below to get started with Zenvi.
                 </p>
 
-                <form onSubmit={handleSubmit} className="space-y-3">
-                  <Input
-                    placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-                    value={code}
-                    onChange={(e) => { setCode(e.target.value); setError(""); }}
-                    required
-                    autoFocus
-                    className="h-11 bg-white/[0.03] border-white/[0.06] focus:border-primary text-white placeholder:text-muted-foreground/50 font-mono text-sm"
-                  />
-
-                  {error && (
-                    <p className="text-xs text-destructive">{error}</p>
-                  )}
-
-                  <Button
-                    type="submit"
-                    disabled={isLoading || !code.trim()}
-                    className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-medium"
-                  >
-                    {isLoading ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <>
-                        Continue
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </>
-                    )}
-                  </Button>
-                </form>
+                <AccessCodeForm onValidated={handleValidated} planTier={planTier} />
 
                 <p className="text-xs text-muted-foreground/60 text-center mt-4">
                   Don't have a code?{" "}

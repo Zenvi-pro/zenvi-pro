@@ -7,8 +7,68 @@ import Footer from "@/components/landing/Footer";
 import WaitlistModal from "@/components/landing/WaitlistModal";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { useTierPricing, type TierPriceDisplay } from "@/hooks/useTierPricing";
+import { buildCheckoutHref, buildPaidPlanLoginHref, planChangeDirection } from "@/lib/checkout-routing";
 
 type TabType = "monthly" | "annual" | "enterprise";
+type PaidTier = "starter" | "pro" | "max";
+
+function PlanPrice({
+  tier,
+  activeTab,
+  loading,
+  getPlanPrice,
+}: {
+  tier: "free" | PaidTier;
+  activeTab: TabType;
+  loading: boolean;
+  getPlanPrice: (tier: string, interval: "monthly" | "annual") => TierPriceDisplay | null;
+}) {
+  if (loading) {
+    return (
+      <div className="mb-6">
+        <div className="h-10 w-28 bg-white/5 animate-pulse rounded" />
+      </div>
+    );
+  }
+
+  if (tier === "free") {
+    return (
+      <div className="mb-6">
+        <div className="flex items-baseline gap-1">
+          <span className="text-4xl font-bold">$0</span>
+          <span className="text-xs text-white/60">/mo</span>
+        </div>
+      </div>
+    );
+  }
+
+  const monthly = getPlanPrice(tier, "monthly");
+  const annual = getPlanPrice(tier, "annual");
+
+  if (activeTab === "annual" && annual?.monthly_equivalent_display) {
+    return (
+      <div className="mb-6">
+        <div className="flex items-baseline gap-2">
+          <span className="text-4xl font-bold">{annual.monthly_equivalent_display}</span>
+          {monthly && (
+            <span className="text-xs text-white/40 line-through">{monthly.display}</span>
+          )}
+          <span className="text-xs text-white/60">/mo</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-6">
+      <div className="flex items-baseline gap-1">
+        <span className="text-4xl font-bold">{monthly?.display ?? "—"}</span>
+        <span className="text-xs text-white/60">{monthly?.period ?? "/mo"}</span>
+      </div>
+    </div>
+  );
+}
 
 // Liquid Glass Card Wrapper Component ensuring gorgeous multi-layer thick glossy glass logic without SVG container edge warping
 interface LiquidGlassCardProps {
@@ -81,11 +141,11 @@ const TIER_ORDER: Record<string, number> = {
   pro: 2,
   max: 3,
   studio: 3,
-  lifetime: 4,
 };
 
 export default function PricingPage() {
   const navigate = useNavigate();
+  const { loading: pricingLoading, getPlanPrice } = useTierPricing();
   const [activeTab, setActiveTab] = useState<TabType>("monthly");
   const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
 
@@ -136,12 +196,14 @@ export default function PricingPage() {
   }, []);
 
   const getButtonProps = (tier: string, defaultLabel: string) => {
+    const planKey = activeTab === "annual" ? `${tier}_annual` : `${tier}_monthly`;
+
     if (!isLoggedIn) {
       return {
         label: defaultLabel,
         href: tier === "free"
           ? "/login?mode=signup"
-          : `/checkout?plan=${activeTab === "annual" ? `${tier}_annual` : `${tier}_monthly`}`,
+          : buildPaidPlanLoginHref(planKey),
         disabled: false,
       };
     }
@@ -170,11 +232,15 @@ export default function PricingPage() {
       };
     }
 
+    const direction = planChangeDirection(currentTier, tier);
     const isUpgrade = tileOrder > currentOrder;
-    const planKey = activeTab === "annual" ? `${tier}_annual` : `${tier}_monthly`;
     return {
       label: isUpgrade ? `Upgrade to ${defaultLabel.replace("Get ", "")}` : `Downgrade to ${defaultLabel.replace("Get ", "")}`,
-      href: `/checkout?plan=${planKey}&mode=${isUpgrade ? "upgrade" : "downgrade"}`,
+      href: buildCheckoutHref(
+        planKey,
+        currentTier,
+        direction === "new" ? "new" : direction === "upgrade" ? "upgrade" : "downgrade",
+      ),
       disabled: false,
     };
   };
@@ -353,13 +419,13 @@ export default function PricingPage() {
                           Try Zenvi and explore the canvas.
                         </p>
 
-                        <div className="mb-6">
-                          <div className="flex items-baseline gap-1">
-                            <span className="text-4xl font-bold">$0</span>
-                            <span className="text-xs text-white/60">/mo</span>
-                          </div>
-                          <p className="text-[11px] text-white/50 mt-1">100 credits/month to try things</p>
-                        </div>
+                        <PlanPrice
+                          tier="free"
+                          activeTab={activeTab}
+                          loading={pricingLoading}
+                          getPlanPrice={getPlanPrice}
+                        />
+                        <p className="text-[11px] text-white/50 -mt-4 mb-6">100 credits/month to try things</p>
 
                         {/* Free credit allotment */}
                         <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] p-3.5 backdrop-blur-md">
@@ -408,21 +474,13 @@ export default function PricingPage() {
                           Your own creative workspace.
                         </p>
 
-                        <div className="mb-6">
-                          {activeTab === "annual" ? (
-                            <div className="flex items-baseline gap-2">
-                              <span className="text-4xl font-bold">$25</span>
-                              <span className="text-xs text-white/40 line-through">$29</span>
-                              <span className="text-xs text-white/60">/mo</span>
-                            </div>
-                          ) : (
-                            <div className="flex items-baseline gap-1">
-                              <span className="text-4xl font-bold">$29</span>
-                              <span className="text-xs text-white/60">/mo</span>
-                            </div>
-                          )}
-                          <p className="text-[11px] text-white/50 mt-1">1 seat</p>
-                        </div>
+                        <PlanPrice
+                          tier="starter"
+                          activeTab={activeTab}
+                          loading={pricingLoading}
+                          getPlanPrice={getPlanPrice}
+                        />
+                        <p className="text-[11px] text-white/50 -mt-4 mb-6">1 seat</p>
 
                         {/* Credit allotment */}
                         <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] p-3.5 backdrop-blur-md">
@@ -476,21 +534,13 @@ export default function PricingPage() {
                           Full collaboration and workflow power.
                         </p>
 
-                        <div className="mb-6">
-                          {activeTab === "annual" ? (
-                            <div className="flex items-baseline gap-2">
-                              <span className="text-4xl font-bold">$39</span>
-                              <span className="text-xs text-white/40 line-through">$49</span>
-                              <span className="text-xs text-white/60">/mo</span>
-                            </div>
-                          ) : (
-                            <div className="flex items-baseline gap-1">
-                              <span className="text-4xl font-bold">$49</span>
-                              <span className="text-xs text-white/60">/mo</span>
-                            </div>
-                          )}
-                          <p className="text-[11px] text-white/50 mt-1">3 pooled seats</p>
-                        </div>
+                        <PlanPrice
+                          tier="pro"
+                          activeTab={activeTab}
+                          loading={pricingLoading}
+                          getPlanPrice={getPlanPrice}
+                        />
+                        <p className="text-[11px] text-white/50 -mt-4 mb-6">3 pooled seats</p>
 
                         {/* Credit allotment */}
                         <div className="mb-6 rounded-xl border border-[#3275F8]/30 bg-[#3275F8]/[0.05] p-3.5 backdrop-blur-md shadow-inner">
@@ -539,21 +589,13 @@ export default function PricingPage() {
                           Creative infrastructure at scale.
                         </p>
 
-                        <div className="mb-6">
-                          {activeTab === "annual" ? (
-                            <div className="flex items-baseline gap-2">
-                              <span className="text-4xl font-bold">$149</span>
-                              <span className="text-xs text-white/40 line-through">$199</span>
-                              <span className="text-xs text-white/60">/mo</span>
-                            </div>
-                          ) : (
-                            <div className="flex items-baseline gap-1">
-                              <span className="text-4xl font-bold">$199</span>
-                              <span className="text-xs text-white/60">/mo</span>
-                            </div>
-                          )}
-                          <p className="text-[11px] text-white/50 mt-1">8 pooled seats</p>
-                        </div>
+                        <PlanPrice
+                          tier="max"
+                          activeTab={activeTab}
+                          loading={pricingLoading}
+                          getPlanPrice={getPlanPrice}
+                        />
+                        <p className="text-[11px] text-white/50 -mt-4 mb-6">8 pooled seats</p>
 
                         {/* Credit allotment */}
                         <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] p-3.5 backdrop-blur-md">

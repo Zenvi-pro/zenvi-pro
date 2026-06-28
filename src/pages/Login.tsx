@@ -11,6 +11,7 @@ import { ZenviLogo } from "@/components/ZenviLogo";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { getAuthCallbackUrl, resolvePostLoginPath, stashAuthRedirect } from "@/lib/auth-redirect";
 
 function GoogleIcon() {
   return (
@@ -90,7 +91,8 @@ export default function LoginPage() {
         });
         navigate("/auth/success");
       } else {
-        navigate(next ?? "/download");
+        const dest = await resolvePostLoginPath(next);
+        navigate(dest, { replace: true });
       }
     } catch (err: unknown) {
       const msg =
@@ -111,11 +113,12 @@ export default function LoginPage() {
 
   const handleOAuth = async (provider: "google" | "github") => {
     setOauthLoading(provider);
-    if (next) sessionStorage.setItem("auth_next", next);
-    if (state) sessionStorage.setItem("auth_state", state);
+    stashAuthRedirect({ next, state: state ?? null });
     await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: {
+        redirectTo: getAuthCallbackUrl({ next, state: state ?? null }),
+      },
     });
     setOauthLoading(null);
   };

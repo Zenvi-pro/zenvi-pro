@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { buildCheckoutHref, hasActivePaidSubscription } from "@/lib/checkout-routing";
 
 interface PricingProps {
   onOpenAccessCode: (planKey: string) => void;
@@ -11,19 +12,25 @@ interface PricingProps {
 
 // Tier upgrade hierarchy (higher = better plan)
 const TIER_ORDER: Record<string, number> = {
-  none: 0, creator: 1, pro: 2, studio: 3, lifetime: 4,
+  none: 0, free: 0, starter: 1, creator: 1, pro: 2, max: 3, studio: 3, lifetime: 4,
 };
 
 const Pricing = ({ onOpenAccessCode }: PricingProps) => {
   const navigate = useNavigate();
   const [isAnnual, setIsAnnual] = useState(false);
   const [userTier, setUserTier] = useState<string | null>(null); // null = loading
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) { setUserTier("none"); return; }
+      if (!session) {
+        setIsLoggedIn(false);
+        setUserTier("none");
+        return;
+      }
+      setIsLoggedIn(true);
       const { data } = await supabase.rpc("get_user_subscription");
-      setUserTier(data && data.length > 0 ? (data[0].tier as string) : "none");
+      setUserTier(data && data.length > 0 ? (data[0].tier as string) : "free");
     });
   }, []);
 
@@ -47,8 +54,10 @@ const Pricing = ({ onOpenAccessCode }: PricingProps) => {
       return <Button className={className} disabled>{defaultLabel}</Button>;
     }
 
-    // User already has this tier or better → download dashboard
-    if (userOrder > 0 && planOrder <= userOrder) {
+    const paidUser = hasActivePaidSubscription(userTier ?? "none");
+
+    // Paid user already has this tier or better → download
+    if (paidUser && planOrder <= userOrder) {
       return (
         <Button onClick={() => navigate("/dashboard/download")} className={className}>
           Download Now
@@ -56,11 +65,11 @@ const Pricing = ({ onOpenAccessCode }: PricingProps) => {
       );
     }
 
-    // User has a subscription and this is an upgrade
-    if (userOrder > 0 && planOrder > userOrder) {
+    // Paid user upgrading to a higher tier
+    if (paidUser && planOrder > userOrder) {
       return (
         <Button
-          onClick={() => navigate(`/checkout?plan=${planKey}&mode=upgrade`)}
+          onClick={() => navigate(buildCheckoutHref(planKey, userTier ?? "none", "upgrade"))}
           className={className}
         >
           Upgrade
@@ -68,16 +77,16 @@ const Pricing = ({ onOpenAccessCode }: PricingProps) => {
       );
     }
 
-    // No subscription but logged in → download dashboard (or choice)
-    if (userTier !== "none" && userTier !== null) {
+    // Logged-in free tier → checkout (access code gate on /checkout)
+    if (isLoggedIn && userOrder === 0 && planOrder > 0) {
       return (
-        <Button onClick={() => navigate("/dashboard/download")} className={className}>
-          Download Now
+        <Button onClick={() => navigate(`/checkout?plan=${planKey}`)} className={className}>
+          {defaultLabel}
         </Button>
       );
     }
 
-    // No subscription → access code flow
+    // Logged out → access code modal, then login/checkout
     return (
       <Button onClick={() => onOpenAccessCode(planKey)} className={className}>
         {defaultLabel}

@@ -1,9 +1,8 @@
-import Stripe from "https://esm.sh/stripe@14.21.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createStripeClient, STRIPE_CORS_HEADERS } from "../_shared/stripe-env.ts";
 
 const CORS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  ...STRIPE_CORS_HEADERS,
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
@@ -26,10 +25,7 @@ Deno.serve(async (req) => {
     const { data: customerId } = await supabase.rpc("get_stripe_customer_id");
     if (!customerId) return json({ error: "No billing account found." }, 404);
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
-      apiVersion: "2024-06-20",
-      httpClient: Stripe.createFetchHttpClient(),
-    });
+    const stripe = createStripeClient(req);
 
     const { returnUrl } = await req.json().catch(() => ({}));
 

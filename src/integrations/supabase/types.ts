@@ -64,51 +64,6 @@ export type Database = {
         }
         Relationships: []
       }
-      api_usage: {
-        Row: {
-          app_version: string | null
-          category: string | null
-          cost_usd: number
-          id: string
-          input_tokens: number
-          model: string | null
-          operation: string | null
-          output_tokens: number
-          provider: string
-          recorded_at: string
-          units: number
-          user_id: string
-        }
-        Insert: {
-          app_version?: string | null
-          category?: string | null
-          cost_usd?: number
-          id?: string
-          input_tokens?: number
-          model?: string | null
-          operation?: string | null
-          output_tokens?: number
-          provider: string
-          recorded_at?: string
-          units?: number
-          user_id: string
-        }
-        Update: {
-          app_version?: string | null
-          category?: string | null
-          cost_usd?: number
-          id?: string
-          input_tokens?: number
-          model?: string | null
-          operation?: string | null
-          output_tokens?: number
-          provider?: string
-          recorded_at?: string
-          units?: number
-          user_id?: string
-        }
-        Relationships: []
-      }
       bonus_config: {
         Row: {
           description: string | null
@@ -187,6 +142,39 @@ export type Database = {
         }
         Relationships: []
       }
+      operation_pricing: {
+        Row: {
+          active: boolean
+          category: string
+          description: string | null
+          operation_key: string
+          points_per_unit: number
+          provider: string | null
+          unit_type: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category?: string
+          description?: string | null
+          operation_key: string
+          points_per_unit: number
+          provider?: string | null
+          unit_type?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          description?: string | null
+          operation_key?: string
+          points_per_unit?: number
+          provider?: string | null
+          unit_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       llm_model_tiers: {
         Row: {
           base_credits_per_call: number
@@ -226,14 +214,21 @@ export type Database = {
           bucket: string
           category: string | null
           created_at: string
+          duration_seconds: number | null
           id: string
+          idempotency_key: string | null
+          input_tokens: number | null
+          model: string | null
           note: string | null
           operation: string | null
+          output_tokens: number | null
           overage_usd: number | null
           points_delta: number
           provider: string | null
+          quantity: number | null
           refund_of: string | null
           session_id: string | null
+          total_tokens: number | null
           txn_type: string
           user_id: string
         }
@@ -242,12 +237,18 @@ export type Database = {
           bucket: string
           category?: string | null
           created_at?: string
+          duration_seconds?: number | null
           id?: string
+          idempotency_key?: string | null
+          input_tokens?: number | null
+          model?: string | null
           note?: string | null
           operation?: string | null
+          output_tokens?: number | null
           overage_usd?: number | null
           points_delta: number
           provider?: string | null
+          quantity?: number | null
           refund_of?: string | null
           session_id?: string | null
           txn_type: string
@@ -258,12 +259,18 @@ export type Database = {
           bucket?: string
           category?: string | null
           created_at?: string
+          duration_seconds?: number | null
           id?: string
+          idempotency_key?: string | null
+          input_tokens?: number | null
+          model?: string | null
           note?: string | null
           operation?: string | null
+          output_tokens?: number | null
           overage_usd?: number | null
           points_delta?: number
           provider?: string | null
+          quantity?: number | null
           refund_of?: string | null
           session_id?: string | null
           txn_type?: string
@@ -391,6 +398,10 @@ export type Database = {
           rollover_cap_points: number
           rollover_percentage: number
           seats: number
+          stripe_annual_price_id: string | null
+          stripe_annual_price_id_sandbox: string | null
+          stripe_monthly_price_id: string | null
+          stripe_monthly_price_id_sandbox: string | null
           tier: string
           updated_at: string
         }
@@ -409,6 +420,10 @@ export type Database = {
           rollover_cap_points?: number
           rollover_percentage?: number
           seats?: number
+          stripe_annual_price_id?: string | null
+          stripe_annual_price_id_sandbox?: string | null
+          stripe_monthly_price_id?: string | null
+          stripe_monthly_price_id_sandbox?: string | null
           tier: string
           updated_at?: string
         }
@@ -427,26 +442,12 @@ export type Database = {
           rollover_cap_points?: number
           rollover_percentage?: number
           seats?: number
+          stripe_annual_price_id?: string | null
+          stripe_annual_price_id_sandbox?: string | null
+          stripe_monthly_price_id?: string | null
+          stripe_monthly_price_id_sandbox?: string | null
           tier?: string
           updated_at?: string
-        }
-        Relationships: []
-      }
-      tier_limits: {
-        Row: {
-          description: string | null
-          monthly_usd_limit: number
-          tier: string
-        }
-        Insert: {
-          description?: string | null
-          monthly_usd_limit: number
-          tier: string
-        }
-        Update: {
-          description?: string | null
-          monthly_usd_limit?: number
-          tier?: string
         }
         Relationships: []
       }
@@ -546,6 +547,7 @@ export type Database = {
       waitlist: {
         Row: {
           access_token: string
+          allowed_tier: string | null
           created_at: string
           email: string
           id: string
@@ -556,6 +558,7 @@ export type Database = {
         }
         Insert: {
           access_token?: string
+          allowed_tier?: string | null
           created_at?: string
           email: string
           id?: string
@@ -566,6 +569,7 @@ export type Database = {
         }
         Update: {
           access_token?: string
+          allowed_tier?: string | null
           created_at?: string
           email?: string
           id?: string
@@ -590,7 +594,53 @@ export type Database = {
         Args: { p_event_key?: string; p_event_type: string }
         Returns: number
       }
-      batch_record_api_usage: { Args: { records: Json }; Returns: number }
+      charge_llm_call: {
+        Args: {
+          p_idempotency_key?: string
+          p_input_tokens?: number
+          p_model: string
+          p_note?: string
+          p_output_tokens?: number
+          p_provider?: string
+        }
+        Returns: string
+      }
+      charge_operation: {
+        Args: {
+          p_duration_seconds?: number
+          p_idempotency_key?: string
+          p_note?: string
+          p_operation: string
+          p_provider?: string
+          p_session_id?: string
+          p_units?: number
+        }
+        Returns: string
+      }
+      check_operation_allowed: {
+        Args: {
+          p_duration_seconds?: number
+          p_operation: string
+          p_units?: number
+        }
+        Returns: {
+          allowed: boolean
+          balance: number
+          block_reason: string | null
+          in_standard_mode: boolean
+          overage_enabled: boolean
+          required: number
+          tier: string
+        }[]
+      }
+      resolve_operation_points: {
+        Args: {
+          p_duration_seconds?: number
+          p_operation: string
+          p_units?: number
+        }
+        Returns: number
+      }
       calculate_api_cost: {
         Args: {
           p_input_tokens: number
@@ -611,10 +661,6 @@ export type Database = {
           required: number
           tier: string
         }[]
-      }
-      check_usage_allowed: {
-        Args: { p_estimated_cost?: number }
-        Returns: boolean
       }
       claim_waitlist_token: { Args: { token: string }; Returns: boolean }
       complete_desktop_auth_session: {
@@ -739,24 +785,39 @@ export type Database = {
       get_monthly_totals: {
         Args: never
         Returns: {
-          monthly_limit_usd: number
+          monthly_points_limit: number
           percentage_used: number
           tier: string
-          total_cost_usd: number
+          total_credits_used: number
           total_requests: number
         }[]
       }
       get_point_history: {
-        Args: { p_limit?: number }
+        Args: {
+          p_limit?: number
+          p_month_offset?: number
+          p_txn_type?: string
+        }
         Returns: {
           balance_after: number
           bucket: string
+          category: string
           created_at: string
+          credits_charged: number
+          duration_seconds: number
           id: string
+          idempotency_key: string
+          input_tokens: number
+          model: string
           note: string
           operation: string
+          operation_label: string
+          output_tokens: number
           points_delta: number
           provider: string
+          quantity: number
+          refund_of: string
+          total_tokens: number
           txn_type: string
         }[]
       }
@@ -793,7 +854,7 @@ export type Database = {
         Returns: {
           month: string
           request_count: number
-          total_cost_usd: number
+          total_credits: number
         }[]
       }
       get_usage_summary: {
@@ -801,13 +862,20 @@ export type Database = {
         Returns: {
           provider: string
           request_count: number
-          total_cost_usd: number
+          total_credits: number
           total_input_tokens: number
           total_output_tokens: number
         }[]
       }
       get_user_by_referral_code: { Args: { p_code: string }; Returns: string }
       get_user_download_access: { Args: never; Returns: boolean }
+      lookup_waitlist_token_for_user: { Args: never; Returns: string }
+      get_user_claimed_waitlist_token: { Args: never; Returns: string }
+      get_user_waitlist_allowed_tier: { Args: never; Returns: string }
+      validate_token_for_plan: {
+        Args: { token: string; target_tier: string }
+        Returns: boolean
+      }
       get_user_subscription: {
         Args: never
         Returns: {
@@ -815,6 +883,7 @@ export type Database = {
           current_period_end: string
           status: string
           tier: string
+          stripe_subscription_id: string | null
         }[]
       }
       is_admin: { Args: never; Returns: boolean }
@@ -846,6 +915,7 @@ export type Database = {
       validate_waitlist_token: {
         Args: { token: string }
         Returns: {
+          allowed_tier: string | null
           entry_status: string
           is_valid: boolean
         }[]
