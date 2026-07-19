@@ -76,7 +76,7 @@ async function claimAccessCode(
   if (!accessCode) return;
   await supabase
     .from("waitlist")
-    .update({ used_by: userId, used_at: new Date().toISOString(), status: "used" })
+    .update({ used_by: userId, used_at: new Date().toISOString() })
     .eq("access_token", accessCode)
     .or(`used_by.is.null,used_by.eq.${userId}`);
 }

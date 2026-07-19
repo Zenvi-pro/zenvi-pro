@@ -51,7 +51,7 @@ export default function AccessCodeForm({
           token: trimmed,
         });
         if (claimError || !claimed) {
-          setError("This access code is not valid for your account.");
+          setError("This access code has already been used.");
           return;
         }
       }
