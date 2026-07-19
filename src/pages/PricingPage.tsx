@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, Info } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
-import WaitlistModal from "@/components/landing/WaitlistModal";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useTierPricing, type TierPriceDisplay } from "@/hooks/useTierPricing";
@@ -147,10 +146,6 @@ export default function PricingPage() {
   const navigate = useNavigate();
   const { loading: pricingLoading, getPlanPrice } = useTierPricing();
   const [activeTab, setActiveTab] = useState<TabType>("monthly");
-  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
-
-  const openWaitlist = () => setIsWaitlistOpen(true);
-  const closeWaitlist = () => setIsWaitlistOpen(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentTier, setCurrentTier] = useState<string>("none");
 
@@ -299,7 +294,7 @@ export default function PricingPage() {
       </div>
 
       {/* Main App Navigation wrapper */}
-      <Navbar onOpenWaitlist={openWaitlist} />
+      <Navbar />
 
       {/* Main Layout Container expanded to give magnificent high-end width */}
       <main className="flex-1 pt-36 pb-24 px-6 max-w-[1560px] w-[96%] mx-auto relative z-10 flex flex-col items-center">
@@ -500,7 +495,7 @@ export default function PricingPage() {
                         <ul className="space-y-3.5">
                           {[
                             "All cloud LLMs (light / standard / premium)",
-                            "All Kling video models incl. 2.0",
+                            "Kling O1 Pro video generation (Runware)",
                             "TwelveLabs clip indexing + search",
                             "1-month credit rollover",
                             "Overage opt-in (1.5× sticker)",
@@ -783,7 +778,6 @@ export default function PricingPage() {
 
       {/* Footer Wrapper */}
       <Footer />
-      <WaitlistModal isOpen={isWaitlistOpen} onClose={closeWaitlist} />
     </div>
   );
 }

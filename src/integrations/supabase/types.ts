@@ -549,10 +549,7 @@ export type Database = {
           access_token: string
           allowed_tier: string | null
           created_at: string
-          email: string
           id: string
-          invited_at: string | null
-          status: string
           used_at: string | null
           used_by: string | null
         }
@@ -560,10 +557,7 @@ export type Database = {
           access_token?: string
           allowed_tier?: string | null
           created_at?: string
-          email: string
           id?: string
-          invited_at?: string | null
-          status?: string
           used_at?: string | null
           used_by?: string | null
         }
@@ -571,10 +565,7 @@ export type Database = {
           access_token?: string
           allowed_tier?: string | null
           created_at?: string
-          email?: string
           id?: string
-          invited_at?: string | null
-          status?: string
           used_at?: string | null
           used_by?: string | null
         }
@@ -916,7 +907,6 @@ export type Database = {
         Args: { token: string }
         Returns: {
           allowed_tier: string | null
-          entry_status: string
           is_valid: boolean
         }[]
       }
