@@ -15,6 +15,8 @@ import {
   Calendar,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -511,9 +513,7 @@ export default function DownloadPage() {
               </a>
             </div>
             <div className={`mt-5 p-6 ${glass}`}>
-              <p className="line-clamp-8 whitespace-pre-line text-[13px] leading-[1.7] text-white/65">
-                {release.body}
-              </p>
+              <ReleaseNotesMarkdown content={release.body} />
             </div>
           </motion.section>
         )}
@@ -747,6 +747,95 @@ function StateScreen({ kind }: { kind: "no-plan" | "invalid" }) {
           </Link>
         </motion.div>
       </div>
+    </div>
+  );
+}
+
+// ───────── Release notes markdown ─────────
+
+// Compact markdown renderer for GitHub release bodies, tuned to the glass
+// card in "What's new". Handles headings, bold, links, lists and GFM tables.
+function ReleaseNotesMarkdown({ content }: { content: string }) {
+  return (
+    <div className="text-[13px] leading-[1.7] text-white/65">
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          h1: ({ node, ...props }) => (
+            <h3
+              className="mb-2 mt-6 text-[14px] font-semibold text-white first:mt-0"
+              {...props}
+            />
+          ),
+          h2: ({ node, ...props }) => (
+            <h3
+              className="mb-2 mt-6 text-[11.5px] font-semibold uppercase tracking-[0.16em] text-white/45 first:mt-0"
+              {...props}
+            />
+          ),
+          h3: ({ node, ...props }) => (
+            <h4 className="mb-1.5 mt-5 text-[13px] font-semibold text-white/90" {...props} />
+          ),
+          p: ({ node, ...props }) => <p className="my-2.5" {...props} />,
+          strong: ({ node, ...props }) => (
+            <strong className="font-semibold text-white/90" {...props} />
+          ),
+          em: ({ node, ...props }) => <em className="italic" {...props} />,
+          a: ({ node, ...props }) => (
+            <a
+              className="font-medium text-primary underline-offset-4 hover:underline"
+              target="_blank"
+              rel="noreferrer"
+              {...props}
+            />
+          ),
+          ul: ({ node, ...props }) => (
+            <ul
+              className="my-2.5 list-disc space-y-1.5 pl-5 marker:text-white/30"
+              {...props}
+            />
+          ),
+          ol: ({ node, ...props }) => (
+            <ol
+              className="my-2.5 list-decimal space-y-1.5 pl-5 marker:text-white/30"
+              {...props}
+            />
+          ),
+          li: ({ node, ...props }) => <li className="pl-1 leading-[1.6]" {...props} />,
+          hr: () => <hr className="my-5 border-white/[0.08]" />,
+          code: ({ node, ...props }) => (
+            <code
+              className="rounded-md border border-white/[0.06] bg-white/[0.06] px-1.5 py-0.5 font-mono text-[0.82em] text-[#7DA8FF]"
+              {...props}
+            />
+          ),
+          pre: ({ node, ...props }) => (
+            <pre
+              className="my-3 overflow-x-auto rounded-lg border border-white/[0.08] bg-black/40 p-3.5 text-[12px] leading-relaxed text-white/80 [&_code]:border-0 [&_code]:bg-transparent [&_code]:p-0 [&_code]:text-white/80"
+              {...props}
+            />
+          ),
+          table: ({ node, ...props }) => (
+            <div className="my-4 overflow-x-auto rounded-lg border border-white/[0.08]">
+              <table className="w-full text-left text-[12.5px] text-white/75" {...props} />
+            </div>
+          ),
+          thead: ({ node, ...props }) => (
+            <thead
+              className="bg-white/[0.05] text-[11px] uppercase tracking-wide text-white"
+              {...props}
+            />
+          ),
+          th: ({ node, ...props }) => (
+            <th className="border-b border-white/[0.08] px-3.5 py-2.5 font-semibold" {...props} />
+          ),
+          td: ({ node, ...props }) => (
+            <td className="border-b border-white/[0.06] px-3.5 py-2.5" {...props} />
+          ),
+        }}
+      >
+        {content}
+      </ReactMarkdown>
     </div>
   );
 }
