@@ -19,8 +19,10 @@ interface HeroProps {
 
 const SUB_TEXT = "Edit video at machine speed, not cloud speed.";
 
-const scrollToDemo = () => {
-  document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" });
+const DEMO_URL = "https://youtu.be/feE7LcIpIHs";
+
+const openDemo = () => {
+  window.open(DEMO_URL, "_blank", "noopener,noreferrer");
 };
 
 /**
@@ -244,7 +246,7 @@ const Hero = ({ onOpenWaitlist, onRevealSequenceComplete }: HeroProps) => {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Button
-                onClick={scrollToDemo}
+                onClick={openDemo}
                 variant="outline"
                 size="lg"
                 className="h-12 rounded-full border-white/30 bg-black/30 px-8 text-base text-white backdrop-blur-md hover:bg-white/10"
@@ -284,7 +286,7 @@ const Hero = ({ onOpenWaitlist, onRevealSequenceComplete }: HeroProps) => {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Button
-                onClick={scrollToDemo}
+                onClick={openDemo}
                 variant="outline"
                 size="lg"
                 className="h-12 w-full rounded-full border-white/25 bg-black/25 px-8 text-base text-white hover:bg-white/10"

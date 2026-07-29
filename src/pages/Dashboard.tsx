@@ -416,8 +416,8 @@ export default function DashboardPage() {
       />
 
       {isFreeTier && (
-        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/40 px-6 backdrop-blur-[1px]">
-          <div className="relative w-full max-w-md rounded-2xl border border-white/[0.09] bg-gradient-to-br from-[#0f1116] via-[#0a0c11] to-[#08090c] p-8 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.85)] text-center">
+        <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/40 px-4 sm:px-6 backdrop-blur-[1px]">
+          <div className="relative w-full max-w-md rounded-2xl border border-white/[0.09] bg-gradient-to-br from-[#0f1116] via-[#0a0c11] to-[#08090c] p-6 sm:p-8 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.85)] text-center">
             {/* Edge glow */}
             <div
               aria-hidden
@@ -455,7 +455,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <main className={`relative mx-auto w-full max-w-5xl px-6 py-14 lg:px-10 ${isFreeTier ? "filter blur-[6px] pointer-events-none select-none" : ""}`}>
+      <main className={`relative mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-14 lg:px-10 ${isFreeTier ? "filter blur-[6px] pointer-events-none select-none" : ""}`}>
         {/* ───────── Header ───────── */}
         <motion.header variants={fadeUp} initial="hidden" animate="visible">
           <p className="inline-flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-[0.22em] text-primary">
@@ -465,7 +465,7 @@ export default function DashboardPage() {
             />
             {now.toLocaleString("en-US", { month: "long", year: "numeric" })}
           </p>
-          <h1 className="mt-4 text-balance font-serif text-[40px] font-normal leading-[1.04] tracking-[-0.015em] text-white md:text-[52px]">
+          <h1 className="mt-3 sm:mt-4 text-balance font-serif text-[30px] sm:text-[40px] font-normal leading-[1.04] tracking-[-0.015em] text-white md:text-[52px]">
             Usage. <em className="italic text-white/95">This month.</em>
           </h1>
         </motion.header>
@@ -477,22 +477,24 @@ export default function DashboardPage() {
             initial="hidden"
             animate="visible"
             custom={0.04}
-            className="mt-8 flex items-start gap-3 rounded-xl border border-rose-500/25 bg-rose-500/5 px-5 py-4"
+            className="mt-6 sm:mt-8 flex flex-col gap-3 rounded-xl border border-rose-500/25 bg-rose-500/5 px-4 py-4 sm:flex-row sm:items-start sm:gap-3 sm:px-5"
           >
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-rose-400" />
-            <div className="flex-1">
-              <p className="text-sm font-medium text-white">
-                {pct >= 100 ? "Monthly limit reached" : "Approaching monthly limit"}
-              </p>
-              <p className="mt-0.5 text-xs text-white/55">
-                You&apos;ve used {pct.toFixed(0)}% of your{" "}
-                {TIER_LABELS[totals?.tier ?? "none"]} plan budget. Upgrade to keep using AI features.
-              </p>
+            <div className="flex items-start gap-3 flex-1 min-w-0">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-rose-400" />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-white">
+                  {pct >= 100 ? "Monthly limit reached" : "Approaching monthly limit"}
+                </p>
+                <p className="mt-0.5 text-xs text-white/55">
+                  You&apos;ve used {pct.toFixed(0)}% of your{" "}
+                  {TIER_LABELS[totals?.tier ?? "none"]} plan budget. Upgrade to keep using AI features.
+                </p>
+              </div>
             </div>
-            <Link to="/#pricing">
+            <Link to="/#pricing" className="w-full sm:w-auto shrink-0">
               <Button
                 size="sm"
-                className="h-8 shrink-0 gap-1 bg-primary px-3 text-xs text-primary-foreground hover:bg-primary/90"
+                className="h-9 sm:h-8 w-full sm:w-auto gap-1 bg-primary px-3 text-xs text-primary-foreground hover:bg-primary/90"
               >
                 Upgrade
                 <ArrowUpRight className="h-3 w-3" />
@@ -508,7 +510,7 @@ export default function DashboardPage() {
             initial="hidden"
             animate="visible"
             custom={0.06}
-            className={`relative mt-10 overflow-hidden p-7 md:p-9 ${glass}`}
+            className={`relative mt-8 sm:mt-10 overflow-hidden p-5 sm:p-7 md:p-9 ${glass}`}
           >
             <div
               aria-hidden
@@ -524,13 +526,13 @@ export default function DashboardPage() {
                 <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/45">
                   Credits remaining
                 </p>
-                <p className="mt-2 font-serif text-[56px] font-normal leading-none tracking-[-0.02em] tabular-nums text-white md:text-[72px]">
+                <p className="mt-2 font-serif text-[42px] sm:text-[56px] font-normal leading-none tracking-[-0.02em] tabular-nums text-white md:text-[72px]">
                   {balance.total_points.toLocaleString()}
                 </p>
                 <p className="mt-3 text-[13px] text-white/55">
                   ≈ <span className="text-white/85">${(balance.total_points * 0.01).toFixed(2)}</span> of usage value
                   {balance.in_standard_mode && (
-                    <span className="ml-2 inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-300">
+                    <span className="mt-2 sm:mt-0 sm:ml-2 inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-300">
                       Standard mode — out of credits
                     </span>
                   )}
@@ -617,7 +619,7 @@ export default function DashboardPage() {
           initial="hidden"
           animate="visible"
           custom={0.08}
-          className={`relative mt-6 overflow-hidden p-7 md:p-9 ${glass}`}
+          className={`relative mt-6 overflow-hidden p-5 sm:p-7 md:p-9 ${glass}`}
         >
           {/* Subtle dot grid backdrop — Cursor-inspired but blue */}
           <div
@@ -630,12 +632,12 @@ export default function DashboardPage() {
             className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent"
           />
 
-          <div className="relative grid gap-10 md:grid-cols-[1.5fr_1fr] md:items-center">
+          <div className="relative grid gap-8 sm:gap-10 md:grid-cols-[1.5fr_1fr] md:items-center">
             <div>
               <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-white/45">
                 Credits used this month
               </p>
-              <p className="mt-2 font-serif text-[56px] font-normal leading-none tracking-[-0.02em] tabular-nums text-white md:text-[72px]">
+              <p className="mt-2 font-serif text-[42px] sm:text-[56px] font-normal leading-none tracking-[-0.02em] tabular-nums text-white md:text-[72px]">
                 {(totals?.total_credits_used ?? 0).toLocaleString()}
               </p>
               <p className="mt-3 text-[13px] text-white/55">
@@ -729,7 +731,7 @@ export default function DashboardPage() {
             className="mt-10"
           >
             <SectionHeader title="What you spent on" caption="By category" />
-            <div className={`mt-5 p-6 md:p-7 ${glass}`}>
+            <div className={`mt-5 p-4 sm:p-6 md:p-7 ${glass}`}>
               <div className="space-y-5">
                 {categories
                   .slice()
@@ -742,24 +744,24 @@ export default function DashboardPage() {
                     const label = CATEGORY_LABEL[c.category] ?? c.category;
                     return (
                       <div key={c.category}>
-                        <div className="mb-2 flex items-baseline justify-between gap-4">
-                          <div className="flex items-center gap-2.5">
+                        <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+                          <div className="flex min-w-0 items-center gap-2.5">
                             <span
-                              className="h-2 w-2 rounded-full"
+                              className="h-2 w-2 shrink-0 rounded-full"
                               style={{
                                 backgroundColor: color,
                                 boxShadow: `0 0 10px ${color}80`,
                               }}
                               aria-hidden
                             />
-                            <span className="text-[13.5px] font-medium text-white">
+                            <span className="truncate text-[13.5px] font-medium text-white">
                               {label}
                             </span>
-                            <span className="text-[11px] tabular-nums text-white/35">
+                            <span className="shrink-0 text-[11px] tabular-nums text-white/35">
                               {c.request_count.toLocaleString()} req
                             </span>
                           </div>
-                          <div className="flex items-baseline gap-2">
+                          <div className="flex items-baseline gap-2 pl-4 sm:pl-0">
                             <span className="text-[13.5px] font-medium tabular-nums text-white">
                               {c.total_credits.toLocaleString()} cr
                             </span>
@@ -795,7 +797,7 @@ export default function DashboardPage() {
             className="mt-10"
           >
             <SectionHeader title="Where it went" caption="By provider" />
-            <div className={`mt-5 p-6 md:p-7 ${glass}`}>
+            <div className={`mt-5 p-4 sm:p-6 md:p-7 ${glass}`}>
               <div className="space-y-5">
                 {providers
                   .slice()
@@ -809,24 +811,24 @@ export default function DashboardPage() {
                     const label = PROVIDER_LABEL[p.provider] ?? p.provider;
                     return (
                       <div key={p.provider}>
-                        <div className="mb-2 flex items-baseline justify-between gap-4">
-                          <div className="flex items-center gap-2.5">
+                        <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+                          <div className="flex min-w-0 items-center gap-2.5">
                             <span
-                              className="h-2 w-2 rounded-full"
+                              className="h-2 w-2 shrink-0 rounded-full"
                               style={{
                                 backgroundColor: color,
                                 boxShadow: `0 0 10px ${color}80`,
                               }}
                               aria-hidden
                             />
-                            <span className="text-[13.5px] font-medium text-white">
+                            <span className="truncate text-[13.5px] font-medium text-white">
                               {label}
                             </span>
-                            <span className="text-[11px] tabular-nums text-white/35">
+                            <span className="shrink-0 text-[11px] tabular-nums text-white/35">
                               {p.request_count.toLocaleString()} req
                             </span>
                           </div>
-                          <div className="flex items-baseline gap-2">
+                          <div className="flex items-baseline gap-2 pl-4 sm:pl-0">
                             <span className="text-[13.5px] font-medium tabular-nums text-white">
                               {p.total_credits.toLocaleString()} cr
                             </span>
@@ -864,8 +866,8 @@ export default function DashboardPage() {
             className="mt-10"
           >
             <SectionHeader title="Activity" caption="Last 6 months" />
-            <div className={`mt-5 p-6 md:p-7 ${glass}`}>
-              <div className="flex h-32 items-end gap-3">
+            <div className={`mt-5 overflow-x-auto p-4 sm:p-6 md:p-7 ${glass}`}>
+              <div className="flex h-32 min-w-[280px] items-end gap-2 sm:gap-3">
                 {history.map((h, i) => {
                   const barH =
                     maxHistoryCredits > 0 ? (h.total_credits / maxHistoryCredits) * 100 : 0;
@@ -925,7 +927,7 @@ export default function DashboardPage() {
                   return (
                     <li
                       key={row.id}
-                      className="flex flex-col gap-1 px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between"
+                      className="flex flex-col gap-2 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:gap-1 sm:px-5"
                     >
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
@@ -948,7 +950,7 @@ export default function DashboardPage() {
                           <p className="mt-0.5 pl-3.5 text-[11px] text-white/45">{row.note}</p>
                         )}
                       </div>
-                      <div className="flex shrink-0 items-baseline gap-3 pl-3.5 sm:pl-0 sm:text-right">
+                      <div className="flex flex-wrap shrink-0 items-baseline gap-x-3 gap-y-1 pl-3.5 sm:pl-0 sm:justify-end sm:text-right">
                         <span
                           className={`text-[13.5px] font-medium tabular-nums ${
                             isCredit ? "text-emerald-400" : "text-white"
@@ -1035,16 +1037,16 @@ export default function DashboardPage() {
             initial="hidden"
             animate="visible"
             custom={0.28}
-            className="mt-6 flex items-center justify-between rounded-xl border border-primary/20 bg-primary/[0.04] px-5 py-4"
+            className="mt-6 flex flex-col gap-3 rounded-xl border border-primary/20 bg-primary/[0.04] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5"
           >
             <p className="text-sm text-white">
               At <span className="font-semibold">{pct.toFixed(0)}%</span> of your monthly limit — consider upgrading.
             </p>
-            <Link to="/pricing">
+            <Link to="/pricing" className="w-full sm:w-auto shrink-0">
               <Button
                 size="sm"
                 variant="outline"
-                className="h-8 border-primary/30 text-xs text-primary hover:bg-primary/10"
+                className="h-9 sm:h-8 w-full sm:w-auto border-primary/30 text-xs text-primary hover:bg-primary/10"
               >
                 View plans
               </Button>
@@ -1059,7 +1061,7 @@ export default function DashboardPage() {
             initial="hidden"
             animate="visible"
             custom={0.16}
-            className={`mt-10 flex flex-col items-center px-10 py-14 text-center ${glass}`}
+            className={`mt-10 flex flex-col items-center px-5 py-10 sm:px-10 sm:py-14 text-center ${glass}`}
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.03]">
               <Sparkles className="h-5 w-5 text-primary" />
@@ -1137,7 +1139,7 @@ function StatTile({
   sub?: string;
 }) {
   return (
-    <div className={`flex items-center gap-4 p-5 ${glass}`}>
+    <div className={`flex items-center gap-3 sm:gap-4 p-4 sm:p-5 ${glass}`}>
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/[0.07] bg-white/[0.03] text-primary">
         <Icon className="h-4 w-4" aria-hidden />
       </div>

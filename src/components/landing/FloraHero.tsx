@@ -37,8 +37,10 @@ interface FloraHeroProps {
 
 const SUB_TEXT = "Edit video at machine speed, not cloud speed.";
 
-const scrollToDemo = () => {
-  document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" });
+const DEMO_URL = "https://youtu.be/feE7LcIpIHs";
+
+const openDemo = () => {
+  window.open(DEMO_URL, "_blank", "noopener,noreferrer");
 };
 
 /**
@@ -137,7 +139,7 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
   return (
     <section
       ref={sectionRef}
-      className="relative h-screen bg-[#0A0A0A] font-sans sm:h-[220vh]"
+      className="relative h-screen overflow-x-hidden bg-[#0A0A0A] font-sans sm:h-[220vh]"
     >
       {/* Visually-hidden semantic H1 */}
       <h1 className="sr-only">
@@ -148,19 +150,24 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
 
         {/* === BACKGROUND VIDEO LAYER ===
             TODO(placeholder): /hero-video.mp4 is Zenvi's existing whale clip.
-            Replace with the final showreel master when ready. */}
-        <video
-          className="absolute inset-0 h-full w-full scale-[1.4] object-cover opacity-45 sm:hidden"
-          src="/hero-video.mp4"
-          autoPlay muted loop playsInline preload="metadata"
-        />
-        <div className="pointer-events-none absolute inset-0 z-[1] bg-black/60 sm:hidden" />
+            Replace with the final showreel master when ready.
+            Clip wrappers keep scale-[1.4] from expanding document scroll width. */}
+        <div className="absolute inset-0 overflow-hidden sm:hidden">
+          <video
+            className="absolute inset-0 h-full w-full scale-[1.4] object-cover opacity-45"
+            src="/hero-video.mp4"
+            autoPlay muted loop playsInline preload="metadata"
+          />
+          <div className="pointer-events-none absolute inset-0 z-[1] bg-black/60" />
+        </div>
 
-        <video
-          className="absolute inset-0 hidden h-full w-full scale-[1.4] object-cover sm:block"
-          src="/hero-video.mp4"
-          autoPlay muted loop playsInline preload="metadata"
-        />
+        <div className="absolute inset-0 hidden overflow-hidden sm:block">
+          <video
+            className="absolute inset-0 h-full w-full scale-[1.4] object-cover"
+            src="/hero-video.mp4"
+            autoPlay muted loop playsInline preload="metadata"
+          />
+        </div>
 
         {/* Vignette */}
         <div
@@ -259,7 +266,7 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
               </Link>
               <button
                 type="button"
-                onClick={scrollToDemo}
+                onClick={openDemo}
                 className="inline-flex h-10 items-center gap-1.5 rounded-[12px] border border-white/15 bg-white/[0.06] px-5 text-sm font-medium text-white backdrop-blur-md transition-all hover:bg-white/[0.12] active:scale-[0.98]"
               >
                 <Play className="h-3.5 w-3.5" />
@@ -319,7 +326,7 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
               </Link>
               <button
                 type="button"
-                onClick={scrollToDemo}
+                onClick={openDemo}
                 className="inline-flex h-11 w-full items-center justify-center gap-1.5 rounded-[12px] border border-white/15 bg-white/[0.06] px-5 text-sm font-medium text-white backdrop-blur-md transition-all hover:bg-white/[0.12] active:scale-[0.98]"
               >
                 <Play className="h-3.5 w-3.5" />

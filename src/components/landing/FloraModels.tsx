@@ -108,31 +108,31 @@ export default function FloraModels() {
   const ctaLabel = isLoggedIn ? "Download Now" : "Sign up for free";
 
   return (
-    <section className="bg-black py-24 md:py-28 border-t border-white/5 overflow-hidden">
-      <div className="max-w-[1240px] mx-auto px-6">
+    <section className="bg-black py-16 md:py-28 border-t border-white/5 overflow-hidden">
+      <div className="max-w-[1240px] mx-auto px-5 md:px-6">
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 md:mb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 md:gap-6 mb-8 md:mb-12">
           <div>
-            <h2 className="text-[28px] md:text-[36px] font-medium text-white tracking-tight mb-3 text-balance">
+            <h2 className="text-[24px] sm:text-[28px] md:text-[36px] font-medium text-white tracking-tight mb-3 text-balance">
               Run yours. Or ours.
             </h2>
-            <p className="text-[15px] md:text-[16px] text-white/50 max-w-xl leading-relaxed">
+            <p className="text-[14px] md:text-[16px] text-white/50 max-w-xl leading-relaxed">
               The only subscription that adapts to your tools, not the other way around. Open-weights stay on your machine. Hosted models stay one click away.
             </p>
           </div>
-          <div className="flex items-center gap-6 shrink-0">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 shrink-0 w-full md:w-auto">
             <a
               href="https://calendly.com/nilay800/zenvi"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-white/60 hover:text-white transition-colors text-[13px] font-medium"
+              className="text-white/60 hover:text-white transition-colors text-[13px] font-medium text-center sm:text-left py-2 sm:py-0"
             >
               Contact sales
             </a>
             <Link
               to={ctaHref}
-              className="bg-white/10 hover:bg-white/15 border border-white/10 text-white h-10 inline-flex items-center px-5 rounded-full font-medium text-[13px] transition-colors active:scale-[0.98]"
+              className="bg-white/10 hover:bg-white/15 border border-white/10 text-white h-11 sm:h-10 inline-flex items-center justify-center px-5 rounded-full font-medium text-[13px] transition-colors active:scale-[0.98] w-full sm:w-auto"
             >
               {ctaLabel}
             </Link>
@@ -140,7 +140,7 @@ export default function FloraModels() {
         </div>
 
         {/* Pods — horizontal "1 big + 2 small" each, tighter vertical rhythm */}
-        <div className="flex flex-col gap-5 w-full">
+        <div className="flex flex-col gap-4 md:gap-5 w-full">
           <FluidExpandingGrid items={GROUP_1} id="flora-pod-1" />
           <FluidExpandingGrid items={GROUP_2} id="flora-pod-2" />
           <FluidExpandingGrid items={GROUP_3} id="flora-pod-3" />
