@@ -37,8 +37,10 @@ interface FloraHeroProps {
 
 const SUB_TEXT = "Edit video at machine speed, not cloud speed.";
 
-const scrollToDemo = () => {
-  document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" });
+const DEMO_URL = "https://youtu.be/feE7LcIpIHs";
+
+const openDemo = () => {
+  window.open(DEMO_URL, "_blank", "noopener,noreferrer");
 };
 
 /**
@@ -259,7 +261,7 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
               </Link>
               <button
                 type="button"
-                onClick={scrollToDemo}
+                onClick={openDemo}
                 className="inline-flex h-10 items-center gap-1.5 rounded-[12px] border border-white/15 bg-white/[0.06] px-5 text-sm font-medium text-white backdrop-blur-md transition-all hover:bg-white/[0.12] active:scale-[0.98]"
               >
                 <Play className="h-3.5 w-3.5" />
@@ -319,7 +321,7 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
               </Link>
               <button
                 type="button"
-                onClick={scrollToDemo}
+                onClick={openDemo}
                 className="inline-flex h-11 w-full items-center justify-center gap-1.5 rounded-[12px] border border-white/15 bg-white/[0.06] px-5 text-sm font-medium text-white backdrop-blur-md transition-all hover:bg-white/[0.12] active:scale-[0.98]"
               >
                 <Play className="h-3.5 w-3.5" />

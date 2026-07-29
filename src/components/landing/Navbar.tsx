@@ -63,7 +63,7 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode, isIntroActive }: NavbarProps
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-0 left-0 right-0 z-50 pointer-events-none pt-8 px-8 md:px-12"
+        className="fixed top-0 left-0 right-0 z-50 pointer-events-none pt-5 sm:pt-8 px-4 sm:px-8 md:px-12"
       >
         <div className="flex items-center justify-between relative">
           
@@ -158,7 +158,7 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode, isIntroActive }: NavbarProps
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-3xl pt-28 px-8 flex flex-col gap-6"
+            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-3xl pt-24 sm:pt-28 px-5 sm:px-8 flex flex-col gap-5 sm:gap-6 overflow-y-auto"
           >
              {navLinks.map((link) => (
               <Link

@@ -31,7 +31,7 @@ export default function Footer() {
           <div className="absolute left-[30%] top-1/2 h-[280px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#3275F8]/10 blur-[120px]" />
         </div>
 
-        <div className="relative z-20 mx-auto flex max-w-[1200px] flex-col gap-12 px-6 py-28 md:flex-row md:items-end md:justify-between md:py-36">
+        <div className="relative z-20 mx-auto flex max-w-[1200px] flex-col gap-8 md:gap-12 px-5 sm:px-6 py-20 md:py-36 md:flex-row md:items-end md:justify-between">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -41,7 +41,7 @@ export default function Footer() {
           >
             <h2
               id="footer-cta-heading"
-              className="font-serif text-balance text-[44px] leading-[1.02] tracking-[-0.015em] text-white md:text-[60px] lg:text-[72px]"
+              className="font-serif text-balance text-[36px] leading-[1.02] tracking-[-0.015em] text-white sm:text-[44px] md:text-[60px] lg:text-[72px]"
             >
               Yours by default.
               <span className="block italic text-white/95">Early access.</span>
@@ -56,13 +56,13 @@ export default function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.7, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
-            className="flex shrink-0 items-center gap-7"
+            className="flex flex-col sm:flex-row shrink-0 items-stretch sm:items-center gap-4 sm:gap-7 w-full md:w-auto"
           >
             <a
               href="https://calendly.com/nilay800/zenvi"
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative text-[13px] font-medium text-white/65 transition-colors hover:text-white"
+              className="group relative text-[13px] font-medium text-white/65 transition-colors hover:text-white text-center sm:text-left py-2 sm:py-0"
             >
               Talk to us
               <span
@@ -72,7 +72,7 @@ export default function Footer() {
             </a>
             <Link
               to={ctaHref}
-              className="group inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-[13px] font-semibold tracking-tight text-black shadow-[0_8px_28px_-8px_rgba(255,255,255,0.3)] transition-all duration-300 hover:shadow-[0_14px_42px_-8px_rgba(50,117,248,0.4)] active:scale-[0.98]"
+              className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-[13px] font-semibold tracking-tight text-black shadow-[0_8px_28px_-8px_rgba(255,255,255,0.3)] transition-all duration-300 hover:shadow-[0_14px_42px_-8px_rgba(50,117,248,0.4)] active:scale-[0.98] w-full sm:w-auto"
             >
               {ctaLabel}
               <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -85,7 +85,7 @@ export default function Footer() {
       <div className="w-full relative mt-10">
 
         {/* Outer Rounded Container with Background Image/Video Placeholder */}
-        <div className="relative w-full min-h-[500px] rounded-t-[40px] overflow-hidden border-t border-x border-white/10 bg-[#050505]">
+        <div className="relative w-full min-h-[500px] rounded-t-[28px] md:rounded-t-[40px] overflow-hidden border-t border-x border-white/10 bg-[#050505]">
 
           {/* Background Video Placeholder */}
           <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-black opacity-30" />
@@ -95,14 +95,14 @@ export default function Footer() {
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-black/40" />
 
           {/* Huge Faint Background Text */}
-          <div className="absolute bottom-[-10%] left-0 right-0 flex justify-center pointer-events-none select-none opacity-[0.04]">
-            <span className="text-[200px] md:text-[350px] font-serif tracking-widest text-white leading-none whitespace-nowrap">
+          <div className="absolute bottom-[-10%] left-0 right-0 flex justify-center pointer-events-none select-none opacity-[0.04] overflow-hidden">
+            <span className="text-[120px] sm:text-[200px] md:text-[350px] font-serif tracking-widest text-white leading-none whitespace-nowrap">
               ZENVI
             </span>
           </div>
 
           {/* Footer Content */}
-          <div className="relative z-10 max-w-[1200px] mx-auto px-6 py-20 flex flex-col md:flex-row justify-between gap-16">
+          <div className="relative z-10 max-w-[1200px] mx-auto px-5 sm:px-6 py-14 md:py-20 flex flex-col md:flex-row justify-between gap-12 md:gap-16">
 
             {/* Left Column: Logo, Copyright, Socials */}
             <div className="flex flex-col gap-8">
@@ -128,7 +128,7 @@ export default function Footer() {
             </div>
 
             {/* Right Column: Links Grid */}
-            <div className="flex flex-wrap gap-16 md:gap-24 text-[12px]">
+            <div className="flex flex-wrap gap-10 sm:gap-16 md:gap-24 text-[12px]">
 
               {/* Product */}
               <div className="flex flex-col gap-3">
