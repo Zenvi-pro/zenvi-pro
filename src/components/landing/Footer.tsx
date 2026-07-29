@@ -28,7 +28,7 @@ export default function Footer() {
       >
         {/* Soft brand-blue glow, off-center for depth without screaming */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute left-[30%] top-1/2 h-[280px] w-[720px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#3275F8]/10 blur-[120px]" />
+          <div className="absolute left-[30%] top-1/2 h-[280px] w-[min(720px,100vw)] max-w-none -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#3275F8]/10 blur-[120px]" />
         </div>
 
         <div className="relative z-20 mx-auto flex max-w-[1200px] flex-col gap-8 md:gap-12 px-5 sm:px-6 py-20 md:py-36 md:flex-row md:items-end md:justify-between">
