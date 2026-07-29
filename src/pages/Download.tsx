@@ -325,17 +325,17 @@ export default function DownloadPage() {
         className="pointer-events-none absolute inset-x-0 top-0 h-[460px] bg-[radial-gradient(ellipse_60%_44%_at_50%_-6%,rgba(50,117,248,0.18),transparent_70%)]"
       />
 
-      <main className="relative mx-auto w-full max-w-3xl px-6 py-14 lg:px-10">
+      <main className="relative mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-14 lg:px-10">
         {/* ───────── Header ───────── */}
         <motion.header variants={fadeUp} initial="hidden" animate="visible">
           <p className="inline-flex items-center gap-2 text-[10.5px] font-semibold uppercase tracking-[0.22em] text-primary">
             <CheckCircle className="h-3 w-3" />
             Early access · confirmed
           </p>
-          <h1 className="mt-4 text-balance font-serif text-[44px] font-normal leading-[1.04] tracking-[-0.015em] text-white md:text-[60px]">
+          <h1 className="mt-3 sm:mt-4 text-balance font-serif text-[32px] sm:text-[44px] font-normal leading-[1.04] tracking-[-0.015em] text-white md:text-[60px]">
             You&apos;re in. <em className="italic text-white/95">Welcome.</em>
           </h1>
-          <p className="mt-4 max-w-md text-[14.5px] leading-relaxed text-white/55">
+          <p className="mt-3 sm:mt-4 max-w-md text-[14px] sm:text-[14.5px] leading-relaxed text-white/55">
             Download Zenvi for{" "}
             <span className="text-white">{primaryMeta.label}</span> and start editing
             with AI — locally, on your hardware.
@@ -348,7 +348,7 @@ export default function DownloadPage() {
           initial="hidden"
           animate="visible"
           custom={0.08}
-          className={`relative mt-10 overflow-hidden p-7 md:p-8 ${glass}`}
+          className={`relative mt-8 sm:mt-10 overflow-hidden p-5 sm:p-7 md:p-8 ${glass}`}
         >
           {/* Top edge highlight */}
           <div
@@ -362,19 +362,19 @@ export default function DownloadPage() {
           />
 
           <div className="relative">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.025] text-white">
-                  <primaryMeta.icon className="h-6 w-6" />
+            <div className="flex items-start justify-between gap-3 sm:gap-4">
+              <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+                <div className="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl border border-white/[0.07] bg-white/[0.025] text-white">
+                  <primaryMeta.icon className="h-5 w-5 sm:h-6 sm:w-6" />
                 </div>
-                <div>
-                  <p className="font-serif text-[22px] leading-tight text-white">
+                <div className="min-w-0">
+                  <p className="font-serif text-[18px] sm:text-[22px] leading-tight text-white">
                     Zenvi for {primaryMeta.label}
                   </p>
-                  <p className="mt-1 text-[12.5px] text-white/50">{primaryMeta.sublabel}</p>
+                  <p className="mt-1 text-[12px] sm:text-[12.5px] text-white/50">{primaryMeta.sublabel}</p>
                 </div>
               </div>
-              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2.5 py-1 text-[10.5px] font-semibold uppercase tracking-wider text-primary tabular-nums">
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-primary/30 bg-primary/10 px-2 sm:px-2.5 py-1 text-[10px] sm:text-[10.5px] font-semibold uppercase tracking-wider text-primary tabular-nums">
                 {release?.tag_name ?? "Beta"}
               </span>
             </div>
@@ -512,7 +512,7 @@ export default function DownloadPage() {
                 Full notes ↗
               </a>
             </div>
-            <div className={`mt-5 p-6 ${glass}`}>
+            <div className={`mt-5 p-4 sm:p-6 ${glass}`}>
               <ReleaseNotesMarkdown content={release.body} />
             </div>
           </motion.section>
@@ -558,16 +558,16 @@ export default function DownloadPage() {
           initial="hidden"
           animate="visible"
           custom={0.26}
-          className="mt-10 flex items-center justify-center gap-4 border-t border-white/[0.06] pt-8 text-[12.5px] text-white/45"
+          className="mt-8 sm:mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4 border-t border-white/[0.06] pt-6 sm:pt-8 text-[12.5px] text-white/45"
         >
           <Link to="/dashboard/usage" className="hover:text-white transition-colors">
             Check your usage
           </Link>
-          <span aria-hidden className="text-white/15">·</span>
+          <span aria-hidden className="hidden text-white/15 sm:inline">·</span>
           <Link to="/docs" className="hover:text-white transition-colors">
             Read the docs
           </Link>
-          <span aria-hidden className="text-white/15">·</span>
+          <span aria-hidden className="hidden text-white/15 sm:inline">·</span>
           <a
             href="https://github.com/Zenvi-pro/zenvi-core"
             target="_blank"
@@ -604,7 +604,7 @@ export default function DownloadPage() {
                 transition={{ duration: 0.2 }}
                 className="w-full max-w-md pointer-events-auto"
               >
-                <div className="relative rounded-2xl border border-white/[0.07] bg-[#0c0c16]/95 bg-gradient-to-br from-white/[0.045] via-white/[0.018] to-white/[0.005] backdrop-blur-xl p-8 shadow-2xl">
+                <div className="relative rounded-2xl border border-white/[0.07] bg-[#0c0c16]/95 bg-gradient-to-br from-white/[0.045] via-white/[0.018] to-white/[0.005] backdrop-blur-xl p-5 sm:p-8 shadow-2xl">
                   <button
                     onClick={() => {
                       setIsModalOpen(false);
