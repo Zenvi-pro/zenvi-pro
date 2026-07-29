@@ -550,6 +550,7 @@ export type Database = {
           allowed_tier: string | null
           created_at: string
           id: string
+          source_code_id: string | null
           used_at: string | null
           used_by: string | null
         }
@@ -558,6 +559,7 @@ export type Database = {
           allowed_tier?: string | null
           created_at?: string
           id?: string
+          source_code_id?: string | null
           used_at?: string | null
           used_by?: string | null
         }
@@ -566,8 +568,45 @@ export type Database = {
           allowed_tier?: string | null
           created_at?: string
           id?: string
+          source_code_id?: string | null
           used_at?: string | null
           used_by?: string | null
+        }
+        Relationships: []
+      }
+      access_codes: {
+        Row: {
+          allowed_tier: string | null
+          code: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          max_uses: number | null
+          note: string | null
+          uses: number
+        }
+        Insert: {
+          allowed_tier?: string | null
+          code: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          note?: string | null
+          uses?: number
+        }
+        Update: {
+          allowed_tier?: string | null
+          code?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          note?: string | null
+          uses?: number
         }
         Relationships: []
       }
@@ -862,6 +901,7 @@ export type Database = {
       get_user_download_access: { Args: never; Returns: boolean }
       lookup_waitlist_token_for_user: { Args: never; Returns: string }
       get_user_claimed_waitlist_token: { Args: never; Returns: string }
+      get_claimed_token_for_code: { Args: { p_code: string }; Returns: string }
       get_user_waitlist_allowed_tier: { Args: never; Returns: string }
       validate_token_for_plan: {
         Args: { token: string; target_tier: string }

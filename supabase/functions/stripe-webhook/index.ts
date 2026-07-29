@@ -74,11 +74,13 @@ async function claimAccessCode(
   userId: string,
 ) {
   if (!accessCode) return;
-  await supabase
-    .from("waitlist")
-    .update({ used_by: userId, used_at: new Date().toISOString() })
-    .eq("access_token", accessCode)
-    .or(`used_by.is.null,used_by.eq.${userId}`);
+  // Handles both single-use UUID invites and shared named codes (e.g. YC_FALL);
+  // a direct .eq("access_token", ...) would fail the uuid cast on a named code.
+  const { error } = await supabase.rpc("claim_access_code_for_user", {
+    p_code: accessCode,
+    p_user: userId,
+  });
+  if (error) console.error("claim_access_code_for_user failed:", error.message);
 }
 
 Deno.serve(async (req) => {

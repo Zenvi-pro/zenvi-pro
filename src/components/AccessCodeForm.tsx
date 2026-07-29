@@ -27,7 +27,9 @@ export default function AccessCodeForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const trimmed = code.trim().toLowerCase();
+    // Codes are matched case- and whitespace-insensitively server side, so the
+    // raw entry is passed through as typed (UUID invite or named code alike).
+    const trimmed = code.trim();
     if (!trimmed) return;
 
     setIsLoading(true);
@@ -45,6 +47,11 @@ export default function AccessCodeForm({
 
       const allowedTier = (data[0]?.allowed_tier as string | null) ?? null;
 
+      // Reusable codes (e.g. YC_FALL) mint a per-user UUID token on claim.
+      // Propagate that token rather than the entered code so checkout and the
+      // Stripe webhook keep working against a real waitlist row.
+      let resolved = trimmed;
+
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         const { data: claimed, error: claimError } = await supabase.rpc("claim_waitlist_token", {
@@ -54,10 +61,15 @@ export default function AccessCodeForm({
           setError("This access code has already been used.");
           return;
         }
+
+        const { data: claimedToken } = await supabase.rpc("get_claimed_token_for_code", {
+          p_code: trimmed,
+        });
+        if (claimedToken) resolved = String(claimedToken);
       }
 
-      sessionStorage.setItem(storageKey, trimmed);
-      onValidated(trimmed, allowedTier);
+      sessionStorage.setItem(storageKey, resolved);
+      onValidated(resolved, allowedTier);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -68,7 +80,7 @@ export default function AccessCodeForm({
   return (
     <form onSubmit={handleSubmit} className={compact ? "space-y-3" : "space-y-3"}>
       <Input
-        placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        placeholder="Access code or invite token"
         value={code}
         onChange={(e) => {
           setCode(e.target.value);

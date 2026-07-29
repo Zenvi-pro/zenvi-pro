@@ -276,13 +276,8 @@ export default function DownloadPage() {
     const trimmed = accessCode.trim();
     if (!trimmed) return;
 
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(trimmed)) {
-      setModalError("Reach out to the founders for early access or questions.");
-      setIsIncorrectCode(true);
-      return;
-    }
-
+    // No client-side shape check: claim_waitlist_token accepts both single-use
+    // UUID invites and shared named codes (e.g. YC_FALL), so the server decides.
     setIsSubmittingCode(true);
     setModalError("");
     setIsIncorrectCode(false);
