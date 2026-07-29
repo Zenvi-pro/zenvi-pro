@@ -67,12 +67,19 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
-    overflow-x: hidden;
   }
 
   html {
     scroll-behavior: smooth;
-    overflow-x: hidden;
+  }
+
+  /* Mobile-only: clip horizontal overflow without breaking desktop sticky scroll.
+     overflow-x on html/body creates a scroll containment that kills position:sticky. */
+  @media (max-width: 767px) {
+    html,
+    body {
+      overflow-x: hidden;
+    }
   }
 }
 

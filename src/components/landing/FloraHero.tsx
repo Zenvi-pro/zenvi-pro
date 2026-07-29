@@ -139,7 +139,7 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
   return (
     <section
       ref={sectionRef}
-      className="relative h-screen overflow-x-hidden bg-[#0A0A0A] font-sans sm:h-[220vh]"
+      className="relative h-screen bg-[#0A0A0A] font-sans sm:h-[220vh]"
     >
       {/* Visually-hidden semantic H1 */}
       <h1 className="sr-only">
@@ -150,8 +150,8 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
 
         {/* === BACKGROUND VIDEO LAYER ===
             TODO(placeholder): /hero-video.mp4 is Zenvi's existing whale clip.
-            Replace with the final showreel master when ready.
-            Clip wrappers keep scale-[1.4] from expanding document scroll width. */}
+            Replace with the final showreel master when ready. */}
+        {/* Mobile: clip scaled video so it can't expand page width */}
         <div className="absolute inset-0 overflow-hidden sm:hidden">
           <video
             className="absolute inset-0 h-full w-full scale-[1.4] object-cover opacity-45"
@@ -161,13 +161,12 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
           <div className="pointer-events-none absolute inset-0 z-[1] bg-black/60" />
         </div>
 
-        <div className="absolute inset-0 hidden overflow-hidden sm:block">
-          <video
-            className="absolute inset-0 h-full w-full scale-[1.4] object-cover"
-            src="/hero-video.mp4"
-            autoPlay muted loop playsInline preload="metadata"
-          />
-        </div>
+        {/* Desktop: original markup so sticky scroll choreography is unchanged */}
+        <video
+          className="absolute inset-0 hidden h-full w-full scale-[1.4] object-cover sm:block"
+          src="/hero-video.mp4"
+          autoPlay muted loop playsInline preload="metadata"
+        />
 
         {/* Vignette */}
         <div

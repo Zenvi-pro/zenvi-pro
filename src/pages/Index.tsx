@@ -63,7 +63,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black overflow-x-hidden">
+    <div className="min-h-screen bg-black max-md:overflow-x-hidden">
       {introVisible && <IntroOverlay onComplete={handleIntroComplete} />}
       <Navbar onOpenWaitlist={openWaitlist} onOpenAccessCode={handleHeroDownload} isIntroActive={introVisible} />
       <FloraHero onOpenWaitlist={openWaitlist} />
