@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildPriceDisplay,
   buildPriceIdMap,
   formatCents,
   parsePlanKey,
@@ -32,6 +33,42 @@ describe("formatCents", () => {
 
   it("no longer divides zero-decimal currencies by 100", () => {
     expect(formatCents(4500, "jpy")).toContain("4,500");
+  });
+});
+
+describe("buildPriceDisplay", () => {
+  it("renders a monthly price", () => {
+    expect(buildPriceDisplay(4900, "usd", "month")).toEqual({
+      amount_cents: 4900,
+      currency: "usd",
+      display: "$49",
+      period: "/mo",
+      minor_unit_exponent: 2,
+    });
+  });
+
+  it("adds a monthly equivalent to annual prices", () => {
+    const annual = buildPriceDisplay(46800, "usd", "year");
+    expect(annual.period).toBe("/yr");
+    expect(annual.display).toBe("$468");
+    expect(annual.monthly_equivalent_cents).toBe(3900);
+    expect(annual.monthly_equivalent_display).toBe("$39");
+    expect(annual.monthly_equivalent_period).toBe("/mo");
+  });
+
+  it("carries the minor-unit exponent for zero-decimal currencies", () => {
+    const jpy = buildPriceDisplay(4500, "jpy", "month");
+    expect(jpy.minor_unit_exponent).toBe(0);
+    expect(jpy.display).toContain("4,500");
+  });
+
+  it("reports a non-recurring price with no period", () => {
+    expect(buildPriceDisplay(9900, "usd", undefined).period).toBe("");
+  });
+
+  it("renders CAD amounts from the currency_options table", () => {
+    expect(buildPriceDisplay(27900, "cad", "month").amount_cents).toBe(27900);
+    expect(buildPriceDisplay(249900, "cad", "year").monthly_equivalent_cents).toBe(20825);
   });
 });
 
