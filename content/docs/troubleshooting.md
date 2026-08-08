@@ -8,9 +8,9 @@ Check **Preferences** for the provider you selected (**OpenAI**, **Anthropic**, 
 
 If features need **zenvi-backend**, verify it is running and that **ZENVI_BACKEND_URL** in your environment matches. Firewall and VPN rules sometimes block local ports.
 
-## Remotion fetch failed
+## HyperFrames fetch failed
 
-Confirm **REMOTION_*** URLs in `.env` and that the render service completed. Retry once the asset exists in the bucket your backend expects.
+Confirm **HYPERFRAMES_URL** in `.env` and that the render service completed (`GET /api/v1/health`). Retry once the asset exists in the bucket your backend expects.
 
 ## Manim or Cairo errors
 

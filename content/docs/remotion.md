@@ -1,15 +1,15 @@
-# Remotion
+# HyperFrames motion graphics
 
-**Remotion** is a React based way to describe motion graphics as code. In Zenvi, some flows **render** Remotion projects on a service, then **pull the finished video** into your library or timeline through backend integration (for example Supabase hosted assets).
+**HyperFrames** turns HTML/CSS + seekable animation into deterministic MP4 videos. In Zenvi, the motion-graphics agent uses a seeded **motion-block catalog** (titles, lower-thirds, charts, social overlays) and can fall through to custom HyperFrames HTML when needed. URL product demos plan via the backend, then render on the HyperFrames service and import into your library.
 
-## When you care about Remotion
+## When you care about HyperFrames
 
-If a feature mentions a **Remotion render** or **fetching a Remotion video**, you need the right **backend** and **service URLs** running, as in **zenvi-core** `.env.example` (`REMOTION_PRODUCT_LAUNCH_URL`, backend URL). You do not have to write React inside Zenvi for basic editing; Remotion is for template driven motion pieces your stack already knows about.
+If a feature mentions a **motion graphic**, **product demo from URL**, or **fetching a HyperFrames video**, you need the **backend** and **`HYPERFRAMES_URL`** pointing at the render service (see **zenvi-core** / **zenvi-backend** `.env.example`). You do not author React compositions in Zenvi — HyperFrames compositions are HTML.
 
-## Learning Remotion itself
+## Learning HyperFrames itself
 
-For the programming model (compositions, sequences, props), use the official Remotion documentation. Zenvi docs stay focused on **how we pull the result into the app**, not how to author every composition.
+For the programming model (data attributes, GSAP timelines, catalog blocks), use the official HyperFrames documentation.
 
-[Remotion documentation](https://www.remotion.dev/docs)
+[HyperFrames documentation](https://hyperframes.heygen.com/introduction)
 
-> **Tip:** If fetch fails, confirm the Remotion server is up and that your backend URL matches the environment the desktop app uses.
+> **Tip:** If fetch fails, confirm the HyperFrames server is up (`GET /api/v1/health`) and that `HYPERFRAMES_URL` matches the environment the desktop app uses.

@@ -5,10 +5,10 @@
 -- Phase 0 audit (Python POINTS → DB seed, $0.01/pt display convention):
 --   video_generation    10 pts  | runware flat ~$0.35–0.85  | flat
 --   morph_generation    10 pts  | runware morph ~$0.35      | flat
---   indexing_per_minute  8 pts  | twelvelabs $0.09/min      | per_minute (min 1)
+--   indexing_per_minute  8 pts  | gemini embedding/flash    | per_minute (min 1)
 --   research_query       2 pts  | perplexity ~$0.005–0.008  | flat
---   stock_add            3 pts  | —                         | flat
---   product_demo         5 pts  | —                         | flat
+--   stock_add            3 pts  | pexels|freesound at charge| flat
+--   product_demo         5 pts  | hyperframes               | flat
 --   chat                 0 pts  | llm_model_tiers           | via charge_llm_call
 --
 -- Clients must use charge_operation / check_operation_allowed — not raw points.
@@ -42,10 +42,10 @@ INSERT INTO public.operation_pricing (
 ) VALUES
   ('video_generation',    10, 'flat',        'video',    'runware',    'Text/image-to-video generation'),
   ('morph_generation',    10, 'flat',        'video',    'runware',    'Morph / transition generation'),
-  ('indexing_per_minute',  8, 'per_minute',  'indexing', 'twelvelabs', 'TwelveLabs Marengo indexing'),
+  ('indexing_per_minute',  8, 'per_minute',  'indexing', 'gemini',     'Gemini embedding + Flash analyze indexing'),
   ('research_query',       2, 'flat',        'research', 'perplexity', 'Perplexity Sonar research'),
-  ('stock_add',            3, 'flat',        'other',    NULL,         'Pexels / Freesound import'),
-  ('product_demo',         5, 'flat',        'other',    'remotion',   'Remotion product demo render'),
+  ('stock_add',            3, 'flat',        'other',    NULL,         'Stock import — charge-time provider is pexels (video) or freesound (audio)'),
+  ('product_demo',         5, 'flat',        'other',    'hyperframes','HyperFrames product demo render'),
   ('chat',                 0, 'flat',        'llm',      NULL,         'LLM chat — billed via charge_llm_call')
 ON CONFLICT (operation_key) DO UPDATE SET
   points_per_unit = EXCLUDED.points_per_unit,

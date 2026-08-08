@@ -34,4 +34,4 @@ pip install -r requirements-manim.txt
 
 ## Environment variables (self hosting backend)
 
-If you point the app at your own **zenvi-backend**, set the backend URL in your environment or project config as documented in **zenvi-core** `.env.example` (`ZENVI_BACKEND_URL`). Remotion related URLs are only needed if you use those integrations.
+If you point the app at your own **zenvi-backend**, set the backend URL in your environment or project config as documented in **zenvi-core** `.env.example` (`ZENVI_BACKEND_URL`). HyperFrames (`HYPERFRAMES_URL`) is only needed if you use motion graphics / product demo integrations.
