@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import type Stripe from "https://esm.sh/stripe@14.21.0";
 import { isStripeTestMode } from "./stripe-env.ts";
+import { formatMoney } from "./currency.ts";
 
 export type BillingInterval = "monthly" | "annual";
 export type CanonicalTier = "free" | "starter" | "pro" | "max";
@@ -59,18 +60,12 @@ export function parsePlanKey(plan: string): { tier: string; interval: BillingInt
   return { tier: plan.replace(/_monthly$/, ""), interval: "monthly" };
 }
 
+/**
+ * Server-side canonical formatting. The client re-formats in its own locale from
+ * `amount_cents` + `currency`; this string is the fallback for anything that can't.
+ */
 export function formatCents(amountCents: number, currency: string): string {
-  const amount = amountCents / 100;
-  try {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency.toUpperCase(),
-      minimumFractionDigits: amount % 1 === 0 ? 0 : 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
-  } catch {
-    return `$${amount.toFixed(2)}`;
-  }
+  return formatMoney(amountCents, currency);
 }
 
 /** Active Stripe price ID for checkout/pricing (sandbox vs live). */
