@@ -28,5 +28,11 @@ export default defineConfig({
       "src/**/*.test.{ts,tsx}",
       "supabase/functions/_shared/**/*.test.ts",
     ],
+    setupFiles: ["./src/test/setup.ts"],
+    alias: {
+      // The edge functions import Deno-resolvable URL specifiers. Stub them so the
+      // pure helpers in _shared can be unit tested without a network fetch.
+      "https://esm.sh/stripe@14.21.0": path.resolve(__dirname, "./src/test/stubs/stripe.ts"),
+    },
   },
 });
