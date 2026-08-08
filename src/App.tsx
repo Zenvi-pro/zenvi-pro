@@ -21,12 +21,14 @@ import DocsPage from "./pages/DocsPage";
 import PricingPage from "./pages/PricingPage";
 import DashboardLayout from "./components/dashboard/DashboardLayout";
 import AdminBilling from "./pages/AdminBilling";
+import { CurrencyProvider } from "./contexts/CurrencyContext";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <CurrencyProvider>
       <Toaster />
       <Sonner />
       <BrowserRouter>
@@ -62,6 +64,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+      </CurrencyProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
