@@ -197,7 +197,7 @@ export default function OutOfCreditsModal({
               className="h-10 w-full gap-2 border-white/[0.1] bg-transparent text-[13px] font-medium text-white hover:bg-white/[0.05]"
             >
               {enablingOverage ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-              Enable overage (${OVERAGE_DEFAULT_CAP[tier] ?? 50} cap)
+              Enable overage (${OVERAGE_DEFAULT_CAP[tier] ?? 50} USD cap)
             </Button>
           )}
 

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { useTierPricing } from "@/hooks/useTierPricing";
 import OutOfCreditsModal, { shouldShowOocModal, markOocModalDismissed } from "@/components/OutOfCreditsModal";
 import { useQueryClient } from "@tanstack/react-query";
 import { buildCheckoutHref } from "@/lib/checkout-routing";
@@ -214,6 +215,7 @@ const glass =
 export default function DashboardPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { getPlanPrice } = useTierPricing();
   const [billingLoading, setBillingLoading] = useState(false);
   const [oocOpen, setOocOpen] = useState(false);
 
@@ -1003,8 +1005,8 @@ export default function DashboardPage() {
               tier="starter"
               currentTier={totals?.tier ?? "none"}
               name="Starter"
-              price="$29"
-              cadence="/mo"
+              price={getPlanPrice("starter", "monthly")?.display ?? "—"}
+              cadence={getPlanPrice("starter", "monthly")?.period ?? "/mo"}
               tagline="Solo creators"
               bullets={["2,500 credits/mo", "1 seat", "All cloud models"]}
             />
@@ -1012,8 +1014,8 @@ export default function DashboardPage() {
               tier="pro"
               currentTier={totals?.tier ?? "none"}
               name="Pro"
-              price="$49"
-              cadence="/mo"
+              price={getPlanPrice("pro", "monthly")?.display ?? "—"}
+              cadence={getPlanPrice("pro", "monthly")?.period ?? "/mo"}
               tagline="Pooled team usage"
               bullets={["5,500 credits/mo", "3 pooled seats", "Priority queue at peak"]}
               accent
@@ -1022,8 +1024,8 @@ export default function DashboardPage() {
               tier="max"
               currentTier={totals?.tier ?? "none"}
               name="Max"
-              price="$199"
-              cadence="/mo"
+              price={getPlanPrice("max", "monthly")?.display ?? "—"}
+              cadence={getPlanPrice("max", "monthly")?.period ?? "/mo"}
               tagline="Agency-scale"
               bullets={["25,000 credits/mo", "8 pooled seats", "Priority queue 24/7"]}
             />
