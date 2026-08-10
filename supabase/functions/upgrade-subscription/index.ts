@@ -1,5 +1,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { resolveStripePriceIdFromPlan, resolveTierName } from "../_shared/tier-prices.ts";
+import {
+  fetchPriceCurrencies,
+  resolveStripePriceIdFromPlan,
+  resolveTierName,
+} from "../_shared/tier-prices.ts";
 import { createStripeClient, STRIPE_CORS_HEADERS } from "../_shared/stripe-env.ts";
 
 const CORS = {
@@ -52,18 +56,44 @@ Deno.serve(async (req) => {
     const itemId = currentSub.items.data[0]?.id;
     if (!itemId) return json({ error: "Could not find subscription item." }, 500);
 
-    await stripe.subscriptions.update(stripeSubId, {
-      items: [{ id: itemId, price: priceId }],
-      proration_behavior: "create_prorations",
-      metadata: {
-        ...currentSub.metadata,
-        supabase_user_id: user.id,
-        plan: String(resolveTierName(tier)),
-        billing_interval: interval,
-      },
-    });
+    // A subscription's currency is immutable. Stripe rejects a price that cannot be
+    // billed in it, so check before attempting the swap and return something a user
+    // can act on instead of a raw Stripe error. Do not "fix" this by passing a
+    // currency — there is no such parameter on subscription update.
+    const { currencies } = await fetchPriceCurrencies(stripe, priceId);
+    const subCurrency = currentSub.currency?.toLowerCase();
+    if (subCurrency && !currencies.has(subCurrency)) {
+      return json({
+        error: `Your subscription is billed in ${subCurrency.toUpperCase()}, and this plan ` +
+          `isn't available in that currency. Contact support and we'll move you over.`,
+      }, 409);
+    }
 
-    return json({ success: true });
+    try {
+      await stripe.subscriptions.update(stripeSubId, {
+        items: [{ id: itemId, price: priceId }],
+        proration_behavior: "create_prorations",
+        metadata: {
+          ...currentSub.metadata,
+          supabase_user_id: user.id,
+          plan: String(resolveTierName(tier)),
+          billing_interval: interval,
+        },
+      });
+    } catch (err) {
+      // Safety net for any currency mismatch the pre-check missed.
+      const message = (err as Error).message ?? "";
+      if (/combine currencies|currency/i.test(message)) {
+        console.error("upgrade-subscription: currency mismatch:", message);
+        return json({
+          error: "This plan isn't available in your subscription's billing currency. " +
+            "Contact support and we'll move you over.",
+        }, 409);
+      }
+      throw err;
+    }
+
+    return json({ success: true, currency: subCurrency ?? null });
   } catch (err) {
     console.error("upgrade-subscription error:", err);
     return json({ error: (err as Error).message }, 500);

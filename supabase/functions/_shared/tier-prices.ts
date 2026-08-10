@@ -198,6 +198,23 @@ export function buildPriceDisplay(
 }
 
 /**
+ * Currencies a price can actually be billed in: its default plus any currency_options.
+ * Anything outside this set must be left to Adaptive Pricing rather than forced onto
+ * the Checkout Session, which Stripe would reject.
+ */
+export async function fetchPriceCurrencies(
+  stripe: Stripe,
+  priceId: string,
+): Promise<{ defaultCurrency: string; currencies: Set<string> }> {
+  const price = await stripe.prices.retrieve(priceId, { expand: ["currency_options"] });
+  const currencies = new Set<string>([price.currency]);
+  for (const currency of Object.keys(price.currency_options ?? {})) {
+    currencies.add(currency);
+  }
+  return { defaultCurrency: price.currency, currencies };
+}
+
+/**
  * Fetch a price rendered in every currency it offers.
  *
  * `currency_options` is an expandable field — without the explicit `expand` it comes
