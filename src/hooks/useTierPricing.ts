@@ -1,7 +1,8 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { isStripeDevMode, stripeEdgeFunctionUrl, stripeEdgeHeaders } from "@/lib/stripe-edge";
 import { DEFAULT_CURRENCY, formatMoney } from "@shared/currency.ts";
-import { useCurrency } from "@/contexts/CurrencyContext";
+import { useCurrency } from "@/hooks/useCurrency";
+import { resolveOfferedCurrency } from "@/lib/detect-currency";
 
 export interface TierPriceDisplay {
   amount_cents: number;
@@ -92,19 +93,38 @@ export function useTierPricing() {
     return () => { cancelled = true; };
   }, []);
 
+  /**
+   * The currency actually used for display.
+   *
+   * detectCurrency can legitimately return something the tiers aren't priced in —
+   * jpy when the payload offers only usd and cad. Resolving that here keeps the
+   * selector, the price lookup and the "billed in X" label on one value, instead of
+   * labelling a USD amount as JPY.
+   */
+  const effectiveCurrency = useMemo(
+    () => resolveOfferedCurrency(currency, supportedCurrencies),
+    [currency, supportedCurrencies],
+  );
+
   const getPlanPrice = useCallback(
     (tier: string, interval: BillingInterval): TierPriceDisplay | null => {
       const row = tiers?.[tier];
       if (!row) return null;
       const price = interval === "annual" ? row.annual : row.monthly;
       if (!price) return null;
-      // Fall back to the price's own default rather than showing nothing — a currency
-      // we don't have an exact amount for is handled by Adaptive Pricing at checkout.
-      const selected = price.currencies[currency] ?? price.currencies[price.default_currency];
+      const selected = price.currencies[effectiveCurrency]
+        ?? price.currencies[price.default_currency];
       return selected ? localize(selected) : null;
     },
-    [tiers, currency],
+    [tiers, effectiveCurrency],
   );
 
-  return { tiers, loading, error, getPlanPrice, supportedCurrencies, currency };
+  return {
+    tiers,
+    loading,
+    error,
+    getPlanPrice,
+    supportedCurrencies,
+    currency: effectiveCurrency,
+  };
 }

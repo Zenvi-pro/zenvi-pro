@@ -120,8 +120,10 @@ Two properties that are easy to break:
   without fixing the cache key, or one visitor's currency is served to another.
 
 A Stripe **Customer is locked** to the currency of its first subscription. Switching
-requires cancelling and re-subscribing on a *new* Customer, then updating
-`profiles.stripe_customer_id`.
+normally means cancelling and re-subscribing on a *new* Customer, then updating
+`profiles.stripe_customer_id`. Stripe's **Multi-currency customers** feature lifts this
+for accounts that have it enabled — check *Settings → Payments* before assuming a
+replacement Customer is required.
 
 Settlement matters as much as presentment: a currency you charge in but don't settle
 in gets converted by Stripe at your cost. Check *Settings → Bank accounts and

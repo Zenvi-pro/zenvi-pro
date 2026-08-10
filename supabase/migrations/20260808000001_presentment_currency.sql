@@ -62,4 +62,10 @@ BEGIN
 END;
 $$;
 
+-- CREATE OR REPLACE re-grants EXECUTE to PUBLIC, so revoke before granting. On
+-- Supabase, revoking PUBLIC alone is not enough — anon and authenticated hold their
+-- own default grants and must be named explicitly.
+REVOKE EXECUTE ON FUNCTION public.get_user_subscription() FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION public.get_user_subscription() FROM anon;
+
 GRANT EXECUTE ON FUNCTION public.get_user_subscription() TO authenticated;

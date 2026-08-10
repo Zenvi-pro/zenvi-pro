@@ -103,7 +103,7 @@ describe("formatMoney", () => {
   it("names an unrecognised but well-formed code instead of guessing a symbol", () => {
     // Intl accepts any three-letter code and renders it literally (with an NBSP),
     // so this stays inside the try branch. It must still never produce a "$".
-    const formatted = formatMoney(1234, "zzz").replace(/\u00a0/g, " ");
+    const formatted = formatMoney(1234, "zzz", "en-US").replace(/\u00a0/g, " ");
     expect(formatted).toBe("ZZZ 12.34");
   });
 

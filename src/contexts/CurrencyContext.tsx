@@ -1,37 +1,10 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { DEFAULT_CURRENCY, normalizeCurrency } from "@shared/currency.ts";
 import { detectCurrency } from "@/lib/detect-currency";
 import { supabase } from "@/integrations/supabase/client";
+import { CurrencyContext, type CurrencyContextValue } from "@/contexts/currency-context";
 
 const STORAGE_KEY = "zenvi.currency";
-
-interface CurrencyContextValue {
-  /** Currency to render prices in. */
-  currency: string;
-  /** Persist an explicit choice. No-op while locked. */
-  setCurrency: (currency: string) => void;
-  /**
-   * True once an active subscription pins the currency. Stripe will not change a
-   * running subscription's currency, so the picker must not imply otherwise.
-   */
-  locked: boolean;
-  lockedReason: string | null;
-}
-
-const CurrencyContext = createContext<CurrencyContextValue>({
-  currency: DEFAULT_CURRENCY,
-  setCurrency: () => {},
-  locked: false,
-  lockedReason: null,
-});
 
 function readStoredOverride(): string | null {
   try {
@@ -66,7 +39,15 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
 
     async function loadAccountSignals() {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session || cancelled) return;
+      if (cancelled) return;
+
+      // Clear on sign-out, otherwise the next account to use this tab inherits the
+      // previous one's lock and preference.
+      if (!session) {
+        setSubscriptionCurrency(null);
+        setProfileCurrency(null);
+        return;
+      }
 
       const [{ data: subscription }, { data: profile }] = await Promise.all([
         supabase.rpc("get_user_subscription"),
@@ -75,19 +56,18 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
       if (cancelled) return;
 
       const row = Array.isArray(subscription) && subscription.length > 0 ? subscription[0] : null;
-      // Only a real Stripe subscription pins the currency. Free-tier rows carry no
-      // stripe_subscription_id and must leave the picker usable.
-      if (row?.stripe_subscription_id) {
-        setSubscriptionCurrency(
-          normalizeCurrency((row as { presentment_currency?: string }).presentment_currency)
-            ?? DEFAULT_CURRENCY,
-        );
-      }
+      // Assigned unconditionally so a cancelled subscription releases the lock without
+      // needing a reload. Free-tier rows carry no stripe_subscription_id and stay unlocked.
+      setSubscriptionCurrency(
+        row?.stripe_subscription_id
+          ? normalizeCurrency(row.presentment_currency) ?? DEFAULT_CURRENCY
+          : null,
+      );
       setProfileCurrency(normalizeCurrency(profile?.preferred_currency));
     }
 
     loadAccountSignals().catch(() => {
-      // Signed-out or offline: fall through to environment detection.
+      // Offline or RPC failure: fall through to environment detection.
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange(() => {
@@ -139,8 +119,4 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   }), [currency, setCurrency, subscriptionCurrency]);
 
   return <CurrencyContext.Provider value={value}>{children}</CurrencyContext.Provider>;
-}
-
-export function useCurrency() {
-  return useContext(CurrencyContext);
 }

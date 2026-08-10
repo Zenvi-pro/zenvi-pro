@@ -75,11 +75,15 @@ export function parsePlanKey(plan: string): { tier: string; interval: BillingInt
 }
 
 /**
- * Server-side canonical formatting. The client re-formats in its own locale from
+ * Locale the server formats in. Pinned so the cached pricing payload is byte-identical
+ * across deployments and CI — without it the string would follow whatever locale the
+ * Deno runtime happens to report. Clients re-format in their own locale from
  * `amount_cents` + `currency`; this string is the fallback for anything that can't.
  */
+const CANONICAL_LOCALE = "en-US";
+
 export function formatCents(amountCents: number, currency: string): string {
-  return formatMoney(amountCents, currency);
+  return formatMoney(amountCents, currency, CANONICAL_LOCALE);
 }
 
 /** Active Stripe price ID for checkout/pricing (sandbox vs live). */

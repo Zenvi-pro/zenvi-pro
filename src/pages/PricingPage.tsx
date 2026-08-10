@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useTierPricing, type TierPriceDisplay } from "@/hooks/useTierPricing";
 import { buildCheckoutHref, buildPaidPlanLoginHref, planChangeDirection } from "@/lib/checkout-routing";
-import { useCurrency } from "@/contexts/CurrencyContext";
 import { currencyMeta, formatMoney } from "@shared/currency.ts";
 import CurrencySelect from "@/components/CurrencySelect";
 
@@ -149,8 +148,7 @@ const TIER_ORDER: Record<string, number> = {
 
 export default function PricingPage() {
   const navigate = useNavigate();
-  const { loading: pricingLoading, getPlanPrice, supportedCurrencies } = useTierPricing();
-  const { currency } = useCurrency();
+  const { loading: pricingLoading, getPlanPrice, supportedCurrencies, currency } = useTierPricing();
   const [activeTab, setActiveTab] = useState<TabType>("monthly");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentTier, setCurrentTier] = useState<string>("none");
@@ -398,10 +396,11 @@ export default function PricingPage() {
 
           {activeTab !== "enterprise" && (
             <div className="mt-4 flex items-center justify-center gap-2">
-              <CurrencySelect options={supportedCurrencies} />
+              <CurrencySelect options={supportedCurrencies} value={currency} />
               {currency !== "usd" && (
                 <span className="text-[11px] text-white/45">
-                  Billed in {currencyMeta(currency)?.label ?? currency.toUpperCase()} — no foreign transaction fee
+                  Billed in {currencyMeta(currency)?.label ?? currency.toUpperCase()}, so your card
+                  issuer has nothing to convert
                 </span>
               )}
             </div>

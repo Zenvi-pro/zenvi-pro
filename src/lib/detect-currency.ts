@@ -116,6 +116,22 @@ export interface DetectCurrencyInput {
   languages?: readonly string[] | null;
 }
 
+/**
+ * Narrow a detected currency to one the tiers are actually priced in.
+ *
+ * detectCurrency answers "what would this visitor like to see", which can be a
+ * currency the catalogue does not offer. This answers "what can we actually show",
+ * keeping the picker, the price lookup and the billing label on a single value.
+ */
+export function resolveOfferedCurrency(
+  currency: string,
+  supported: readonly string[],
+): string {
+  if (supported.includes(currency)) return currency;
+  if (supported.includes(DEFAULT_CURRENCY)) return DEFAULT_CURRENCY;
+  return supported[0] ?? DEFAULT_CURRENCY;
+}
+
 export function detectCurrency(input: DetectCurrencyInput = {}): string {
   return (
     normalizeCurrency(input.subscriptionCurrency) ??

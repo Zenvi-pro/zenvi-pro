@@ -1,5 +1,5 @@
 import { currencyMeta } from "@shared/currency.ts";
-import { useCurrency } from "@/contexts/CurrencyContext";
+import { useCurrency } from "@/hooks/useCurrency";
 import { cn } from "@/lib/utils";
 
 /**
@@ -11,12 +11,16 @@ import { cn } from "@/lib/utils";
  */
 export default function CurrencySelect({
   options,
+  value,
   className,
 }: {
   options: string[];
+  /** Resolved display currency — always one of `options`. */
+  value: string;
   className?: string;
 }) {
-  const { currency, setCurrency, locked, lockedReason } = useCurrency();
+  const { setCurrency, locked, lockedReason } = useCurrency();
+  const currency = value;
 
   if (options.length <= 1) return null;
 

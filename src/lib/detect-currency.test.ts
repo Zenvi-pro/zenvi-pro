@@ -5,6 +5,7 @@ import {
   currencyForCountry,
   currencyForTimeZone,
   detectCurrency,
+  resolveOfferedCurrency,
 } from "./detect-currency";
 
 describe("countryForTimeZone", () => {
@@ -135,5 +136,25 @@ describe("detectCurrency precedence", () => {
 
   it("tolerates casing and whitespace in stored values", () => {
     expect(detectCurrency({ override: "  CAD " })).toBe("cad");
+  });
+});
+
+describe("resolveOfferedCurrency", () => {
+  it("keeps a currency the catalogue offers", () => {
+    expect(resolveOfferedCurrency("cad", ["usd", "cad"])).toBe("cad");
+  });
+
+  it("falls back to usd when the detected currency isn't priced", () => {
+    // The regression: detection can return jpy while only usd/cad are priced. Without
+    // this, the page renders a USD amount while labelling it JPY.
+    expect(resolveOfferedCurrency("jpy", ["usd", "cad"])).toBe("usd");
+  });
+
+  it("falls back to the first offered currency when usd isn't offered", () => {
+    expect(resolveOfferedCurrency("jpy", ["cad", "eur"])).toBe("cad");
+  });
+
+  it("falls back to the default on an empty catalogue", () => {
+    expect(resolveOfferedCurrency("cad", [])).toBe("usd");
   });
 });

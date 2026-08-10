@@ -19,7 +19,7 @@ import {
 } from "@/lib/checkout-access";
 import { useTierPricing } from "@/hooks/useTierPricing";
 import { stripeEdgeFunctionUrl, stripeEdgeHeaders } from "@/lib/stripe-edge";
-import { useCurrency } from "@/contexts/CurrencyContext";
+import { useCurrency } from "@/hooks/useCurrency";
 import { currencyMeta } from "@shared/currency.ts";
 
 const PLANS = {
@@ -452,8 +452,8 @@ export default function CheckoutPage() {
               </div>
               {livePrice && livePrice.currency !== "usd" && (
                 <p className="text-[11px] text-white/45 mt-1">
-                  Billed in {currencyMeta(livePrice.currency)?.label ?? livePrice.currency.toUpperCase()} —
-                  your bank won't add a foreign transaction fee.
+                  Billed in {currencyMeta(livePrice.currency)?.label ?? livePrice.currency.toUpperCase()},
+                  so your card issuer has no currency to convert.
                 </p>
               )}
             </div>
