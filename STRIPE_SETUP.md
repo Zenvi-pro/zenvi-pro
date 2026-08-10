@@ -82,6 +82,53 @@ supabase functions deploy get-tier-pricing
 
 ---
 
+## Multi-currency
+
+Customers are billed in their own currency so their bank never converts. Two
+mechanisms, in priority order:
+
+1. **Hand-set `currency_options`** on the tier prices — an exact, charm-rounded local
+   amount. `/pricing` shows precisely what Stripe will charge.
+2. **Adaptive Pricing** (Dashboard toggle, *Settings → Payments → Adaptive Pricing*)
+   for every other currency. Stripe picks the rate, guarantees it for 24h, and
+   critically **refunds at the original transaction's rate** so a refund returns the
+   exact amount paid. Manual `currency_options` override it for those currencies only.
+
+Currencies live in `supabase/functions/_shared/currency.ts` (the allowlist) and in
+`scripts/stripe-set-currency-options.mjs` (the amounts). To add or reprice one, edit
+the script's `PRICE_TABLE` and re-run:
+
+```bash
+# dry run — prints a diff, writes nothing
+STRIPE_TEST_SECRET_KEY=... SUPABASE_SERVICE_ROLE_KEY=... \
+  node scripts/stripe-set-currency-options.mjs --mode=test
+# apply, then repeat with --mode=live
+... node scripts/stripe-set-currency-options.mjs --mode=test --apply
+```
+
+The script refuses to run if the table disagrees with a price's live USD amount, and
+aborts rather than half-applying. **Every tier and interval must offer the same
+currency set** — Stripe will not move a subscription to a price lacking its currency,
+so a partial rollout breaks plan changes for anyone in the missing one.
+
+Two properties that are easy to break:
+
+- `prices.retrieve` needs `expand: ["currency_options"]`. Without it the field is
+  `undefined` and every currency silently collapses to USD.
+- `get-tier-pricing` returns an identical body to every caller and is cached publicly
+  for an hour. Do not add a per-caller dimension (query param, header, geo lookup)
+  without fixing the cache key, or one visitor's currency is served to another.
+
+A Stripe **Customer is locked** to the currency of its first subscription. Switching
+requires cancelling and re-subscribing on a *new* Customer, then updating
+`profiles.stripe_customer_id`.
+
+Settlement matters as much as presentment: a currency you charge in but don't settle
+in gets converted by Stripe at your cost. Check *Settings → Bank accounts and
+currencies* against the currencies in `PRICE_TABLE`.
+
+---
+
 ## Test locally (sandbox)
 
 1. `npm run dev` — frontend automatically sends `x-stripe-test-mode: true`.
@@ -89,6 +136,10 @@ supabase functions deploy get-tier-pricing
 3. Use test card `4242 4242 4242 4242`.
 4. `/checkout/success` polls until `get_user_subscription` returns your tier, then redirects to `/download`.
 5. `/dashboard` should show Max tier limits (not free-tier defaults).
+
+To exercise a non-USD flow, sign up with a `+location_CA@example.com` style address —
+Stripe uses the tag to simulate customer location for Adaptive Pricing. Confirm the
+Checkout page shows CAD, then that `subscriptions.presentment_currency` is `cad`.
 
 If the subscription row is missing after ~30s:
 
