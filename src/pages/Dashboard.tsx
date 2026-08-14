@@ -145,6 +145,7 @@ const PROVIDER_LABEL: Record<string, string> = {
   anthropic: "Anthropic",
   runware: "Runware",
   google: "Google",
+  xai: "xAI",
   ollama: "Ollama (local)",
   "nvidia-edge": "NVIDIA Edge",
 };
@@ -155,6 +156,7 @@ const PROVIDER_HEX: Record<string, string> = {
   anthropic: "#C4926A",
   runware: "#A78BFA",
   google: "#5FBF8F",
+  xai: "#E5E7EB",
   ollama: "#9CA3AF",
   "nvidia-edge": "#67E8F9",
 };
