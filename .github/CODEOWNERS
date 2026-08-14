@@ -1,0 +1,16 @@
+# Code owners for zenvi-pro (Zenvi website)
+#
+# @jashanpratapsingh is requested on every pull request. Area owners below are
+# added from who has actually been writing that code.
+
+*                     @jashanpratapsingh
+
+# Front end — split roughly evenly with @nilay-goyal
+/src/components/      @jashanpratapsingh @nilay-goyal
+/src/pages/           @jashanpratapsingh @nilay-goyal
+
+# Supabase schema, RPCs and edge functions — @Harkit2004 and @nilay-goyal lead
+/supabase/            @jashanpratapsingh @Harkit2004 @nilay-goyal
+
+# Audit reports — written entirely by @nilay-goyal
+/audit/               @jashanpratapsingh @nilay-goyal
