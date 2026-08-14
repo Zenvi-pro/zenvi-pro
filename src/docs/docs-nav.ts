@@ -39,7 +39,7 @@ export const docsNavGroups: DocsNavGroup[] = [
   {
     label: "Advanced",
     items: [
-      { slug: "remotion", title: "Remotion" },
+      { slug: "remotion", title: "HyperFrames" },
       { slug: "manim", title: "Manim" },
       { slug: "director-analysis", title: "Director analysis" },
     ],
