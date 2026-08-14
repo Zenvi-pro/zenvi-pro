@@ -69,10 +69,7 @@ const ALL_PROVIDERS = [
     company: "KlingAI",
     bg: "from-blue-900/60",
     models: [
-      { name: "Kling 3.0", desc: "Refined cinematic video model" },
-      { name: "Kling 2.0 Master", desc: "Advanced cinematic video model" },
-      { name: "Kling Pro 1.5", desc: "Prior-gen high-quality video model" },
-      { name: "Kling Pro 1.6", desc: "High-quality video generation" }
+      { name: "Kling O1 Pro", desc: "AI video generation, morph transitions, and clip editing via Runware" },
     ]
   },
   {
