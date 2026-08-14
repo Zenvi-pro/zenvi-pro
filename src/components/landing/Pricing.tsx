@@ -297,7 +297,7 @@ const Pricing = ({ onOpenAccessCode }: PricingProps) => {
             </ul>
 
             {isAnnual ? (
-              <a href="mailto:sales@zenvi.app?subject=Zenvi%20Studio%20Annual">
+              <a href="mailto:admin@zenvi.pro?subject=Zenvi%20Studio%20Annual">
                 <Button className="w-full rounded-lg font-medium bg-white/[0.05] hover:bg-white/[0.08] text-white border border-white/[0.06]">
                   Contact Sales
                 </Button>
