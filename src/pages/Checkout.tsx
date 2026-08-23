@@ -19,6 +19,8 @@ import {
 } from "@/lib/checkout-access";
 import { useTierPricing } from "@/hooks/useTierPricing";
 import { stripeEdgeFunctionUrl, stripeEdgeHeaders } from "@/lib/stripe-edge";
+import { useCurrency } from "@/hooks/useCurrency";
+import { currencyMeta } from "@shared/currency.ts";
 
 const PLANS = {
   starter_monthly: {
@@ -27,14 +29,14 @@ const PLANS = {
     interval: "monthly" as const,
     description: "Your AI video editor, always on.",
     features: [
-      "2,500 credits/month (~$25 of AI usage)",
+      "2,500 credits/month (~$25 USD of AI usage)",
       "≈ 50 AI clips OR 2,500 chats OR 60 min indexing",
       "1 seat",
       "All cloud LLMs (light / standard / premium)",
       "Kling O1 Pro video generation (Runware)",
       "TwelveLabs clip indexing + smart search",
       "1-month credit rollover",
-      "Overage opt-in (1.5× sticker, $50 cap)",
+      "Overage opt-in (1.5× sticker, $50 USD cap)",
       "No watermark",
     ],
   },
@@ -59,14 +61,14 @@ const PLANS = {
     interval: "monthly" as const,
     description: "Studio-ready power, pooled across your team.",
     features: [
-      "5,500 credits/month (~$55 of AI usage)",
+      "5,500 credits/month (~$55 USD of AI usage)",
       "≈ 110 AI clips OR 5,500 chats OR 250 min indexing",
       "3 pooled seats",
       "Everything in Starter",
       "Priority Runware queue at peak",
       "Per-seat usage analytics",
       "2-month credit rollover",
-      "Overage opt-in (1.3× sticker, $150 cap)",
+      "Overage opt-in (1.3× sticker, $150 USD cap)",
     ],
   },
   pro_annual: {
@@ -89,13 +91,13 @@ const PLANS = {
     interval: "monthly" as const,
     description: "One pool. Eight editors. Unlimited creativity.",
     features: [
-      "25,000 credits/month (~$250 of AI usage)",
+      "25,000 credits/month (~$250 USD of AI usage)",
       "≈ 500 AI clips OR 25k chats OR 1,600 min indexing",
       "8 pooled seats",
       "Everything in Pro",
       "Priority Runware queue 24/7",
       "3-month credit rollover",
-      "Overage opt-in (1.2× sticker, $500 cap)",
+      "Overage opt-in (1.2× sticker, $500 USD cap)",
       "Custom voices (3/org)",
       "Beta access to new models",
     ],
@@ -137,6 +139,7 @@ export default function CheckoutPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { loading: pricingLoading, getPlanPrice } = useTierPricing();
+  const { currency } = useCurrency();
 
   const rawPlan = searchParams.get("plan");
   const planKey = resolvePlanKey(rawPlan);
@@ -301,6 +304,7 @@ export default function CheckoutPage() {
           body: JSON.stringify({
             plan: planKey,
             accessCode: resolvedCode,
+            currency,
             successUrl: `${window.location.origin}/checkout/success?plan=${planKey}`,
             cancelUrl: `${window.location.origin}/pricing`,
           }),
@@ -327,6 +331,20 @@ export default function CheckoutPage() {
 
       if (!res.ok) throw new Error(payload?.error ?? `Request failed (HTTP ${res.status})`);
       if (!payload?.url) throw new Error("No checkout URL returned.");
+
+      // The server has the last word on currency: an existing Stripe Customer is
+      // locked to the one it first transacted in. Say so before the redirect rather
+      // than letting Stripe show a price the page didn't.
+      if (payload.currency && payload.currency !== currency) {
+        const shown = currencyMeta(currency)?.label ?? currency.toUpperCase();
+        const actual = currencyMeta(payload.currency)?.label ?? String(payload.currency).toUpperCase();
+        toast({
+          title: `Billed in ${actual}`,
+          description: payload.currency_locked
+            ? `Your account already bills in ${actual}, so we can't switch it to ${shown}.`
+            : `${shown} isn't available for this plan, so checkout will use ${actual}.`,
+        });
+      }
 
       window.location.href = payload.url;
     } catch (err: unknown) {
@@ -432,6 +450,12 @@ export default function CheckoutPage() {
                   </>
                 )}
               </div>
+              {livePrice && livePrice.currency !== "usd" && (
+                <p className="text-[11px] text-white/45 mt-1">
+                  Billed in {currencyMeta(livePrice.currency)?.label ?? livePrice.currency.toUpperCase()},
+                  so your card issuer has no currency to convert.
+                </p>
+              )}
             </div>
 
             <ul className="space-y-2.5 mb-6 border-t border-white/[0.06] pt-6">

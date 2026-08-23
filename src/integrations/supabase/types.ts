@@ -289,28 +289,34 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          billing_country: string | null
           created_at: string
           email: string | null
           full_name: string | null
           id: string
+          preferred_currency: string | null
           stripe_customer_id: string | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
+          billing_country?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id: string
+          preferred_currency?: string | null
           stripe_customer_id?: string | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
+          billing_country?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
+          preferred_currency?: string | null
           stripe_customer_id?: string | null
           updated_at?: string
         }
@@ -347,6 +353,7 @@ export type Database = {
           created_at: string
           current_period_end: string | null
           id: string
+          presentment_currency: string | null
           status: string
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
@@ -360,6 +367,7 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           id?: string
+          presentment_currency?: string | null
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -373,6 +381,7 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           id?: string
+          presentment_currency?: string | null
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -875,6 +884,7 @@ export type Database = {
           status: string
           tier: string
           stripe_subscription_id: string | null
+          presentment_currency: string | null
         }[]
       }
       is_admin: { Args: never; Returns: boolean }

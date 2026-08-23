@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
 import type Stripe from "https://esm.sh/stripe@14.21.0";
 import { isStripeTestMode } from "./stripe-env.ts";
+import { formatMoney, minorUnitExponent } from "./currency.ts";
 
 export type BillingInterval = "monthly" | "annual";
 export type CanonicalTier = "free" | "starter" | "pro" | "max";
@@ -21,9 +22,23 @@ export interface PriceDisplay {
   currency: string;
   display: string;
   period: string;
+  /** 0 for zero-decimal currencies. Lets the client reformat without its own table. */
+  minor_unit_exponent: number;
   monthly_equivalent_cents?: number;
   monthly_equivalent_display?: string;
   monthly_equivalent_period?: string;
+}
+
+/**
+ * A price rendered in every currency it is offered in.
+ *
+ * `currencies` is built from the Stripe Price's `currency_options`, so it is the
+ * authoritative list of what a customer can actually be charged. Currencies absent
+ * here fall through to Stripe Adaptive Pricing at checkout.
+ */
+export interface MultiCurrencyPriceDisplay {
+  default_currency: string;
+  currencies: Record<string, PriceDisplay>;
 }
 
 export interface TierPriceLookup {
@@ -59,18 +74,16 @@ export function parsePlanKey(plan: string): { tier: string; interval: BillingInt
   return { tier: plan.replace(/_monthly$/, ""), interval: "monthly" };
 }
 
+/**
+ * Locale the server formats in. Pinned so the cached pricing payload is byte-identical
+ * across deployments and CI — without it the string would follow whatever locale the
+ * Deno runtime happens to report. Clients re-format in their own locale from
+ * `amount_cents` + `currency`; this string is the fallback for anything that can't.
+ */
+const CANONICAL_LOCALE = "en-US";
+
 export function formatCents(amountCents: number, currency: string): string {
-  const amount = amountCents / 100;
-  try {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: currency.toUpperCase(),
-      minimumFractionDigits: amount % 1 === 0 ? 0 : 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
-  } catch {
-    return `$${amount.toFixed(2)}`;
-  }
+  return formatMoney(amountCents, currency, CANONICAL_LOCALE);
 }
 
 /** Active Stripe price ID for checkout/pricing (sandbox vs live). */
@@ -161,45 +174,76 @@ export async function resolveStripePriceIdFromPlan(
   return { tier: String(resolveTierName(tier)), interval, priceId };
 }
 
-export async function fetchStripePriceDisplay(
-  stripe: Stripe,
-  priceId: string,
-): Promise<PriceDisplay | null> {
-  const price = await stripe.prices.retrieve(priceId);
-  if (price.unit_amount == null) return null;
-
-  const currency = price.currency;
-  const amountCents = price.unit_amount;
-  const recurring = price.recurring;
-
-  if (recurring?.interval === "year") {
-    const monthlyEquivalentCents = Math.round(amountCents / 12);
-    return {
-      amount_cents: amountCents,
-      currency,
-      display: formatCents(amountCents, currency),
-      period: "/yr",
-      monthly_equivalent_cents: monthlyEquivalentCents,
-      monthly_equivalent_display: formatCents(monthlyEquivalentCents, currency),
-      monthly_equivalent_period: "/mo",
-    };
-  }
-
-  if (recurring?.interval === "month") {
-    return {
-      amount_cents: amountCents,
-      currency,
-      display: formatCents(amountCents, currency),
-      period: "/mo",
-    };
-  }
-
-  return {
+/** Render one amount in one currency. `recurringInterval` comes from the Price. */
+export function buildPriceDisplay(
+  amountCents: number,
+  currency: string,
+  recurringInterval: string | undefined,
+): PriceDisplay {
+  const base: PriceDisplay = {
     amount_cents: amountCents,
     currency,
     display: formatCents(amountCents, currency),
-    period: "",
+    period: recurringInterval === "year" ? "/yr" : recurringInterval === "month" ? "/mo" : "",
+    minor_unit_exponent: minorUnitExponent(currency),
   };
+
+  if (recurringInterval !== "year") return base;
+
+  // Display-only figure: it is never charged, and 12x it will not always equal the
+  // annual price. Rounding happens in minor units, so zero-decimal currencies are fine.
+  const monthlyEquivalentCents = Math.round(amountCents / 12);
+  return {
+    ...base,
+    monthly_equivalent_cents: monthlyEquivalentCents,
+    monthly_equivalent_display: formatCents(monthlyEquivalentCents, currency),
+    monthly_equivalent_period: "/mo",
+  };
+}
+
+/**
+ * Currencies a price can actually be billed in: its default plus any currency_options.
+ * Anything outside this set must be left to Adaptive Pricing rather than forced onto
+ * the Checkout Session, which Stripe would reject.
+ */
+export async function fetchPriceCurrencies(
+  stripe: Stripe,
+  priceId: string,
+): Promise<{ defaultCurrency: string; currencies: Set<string> }> {
+  const price = await stripe.prices.retrieve(priceId, { expand: ["currency_options"] });
+  const currencies = new Set<string>([price.currency]);
+  for (const currency of Object.keys(price.currency_options ?? {})) {
+    currencies.add(currency);
+  }
+  return { defaultCurrency: price.currency, currencies };
+}
+
+/**
+ * Fetch a price rendered in every currency it offers.
+ *
+ * `currency_options` is an expandable field — without the explicit `expand` it comes
+ * back undefined and every currency silently collapses to the default. That failure
+ * is invisible in the response shape, so do not remove it.
+ */
+export async function fetchStripePriceDisplays(
+  stripe: Stripe,
+  priceId: string,
+): Promise<MultiCurrencyPriceDisplay | null> {
+  const price = await stripe.prices.retrieve(priceId, { expand: ["currency_options"] });
+  if (price.unit_amount == null) return null;
+
+  const recurringInterval = price.recurring?.interval;
+  const currencies: Record<string, PriceDisplay> = {
+    [price.currency]: buildPriceDisplay(price.unit_amount, price.currency, recurringInterval),
+  };
+
+  const options = (price.currency_options ?? {}) as Record<string, { unit_amount: number | null }>;
+  for (const [currency, option] of Object.entries(options)) {
+    if (currency === price.currency || option?.unit_amount == null) continue;
+    currencies[currency] = buildPriceDisplay(option.unit_amount, currency, recurringInterval);
+  }
+
+  return { default_currency: price.currency, currencies };
 }
 
 export function tierAndIntervalFromMetadata(
