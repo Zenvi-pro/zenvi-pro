@@ -97,6 +97,31 @@ If the subscription row is missing after ~30s:
 
 ---
 
+## Promotion codes
+
+`create-checkout-session` already sets `allow_promotion_codes: true`, so any code
+below just works at checkout — no code changes needed to add or remove one.
+
+Active codes (Starter only, $9.99 flat first month, one redemption per customer):
+
+| Code | Purpose |
+|------|---------|
+| `SHOPIFYSUNDAY10` | Shopify Sunday promo |
+| `AJNA10` | Ajna partner code |
+| `INSIDER10` | Beta/test users |
+
+All three share one coupon (live: `jsPLQPkh`, test: `KJy17y88`) with per-currency
+`amount_off` (USD and CAD both land on exactly $9.99) and `applies_to.products`
+restricted to the Starter product. Manage or add more at
+https://dashboard.stripe.com/coupons — a new promotion code pointed at the same
+coupon id needs no other setup.
+
+Known limitation: the coupon can only be restricted to the *product* (Starter),
+not a specific price. Applied to Starter *annual* instead of monthly, it knocks
+the same flat dollar amount off $300/$399 rather than landing at $9.99.
+
+---
+
 ## Debugging
 
 | Symptom | Likely cause |
