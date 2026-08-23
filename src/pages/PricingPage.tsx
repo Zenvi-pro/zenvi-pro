@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Info } from "lucide-react";
@@ -8,8 +8,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useTierPricing, type TierPriceDisplay } from "@/hooks/useTierPricing";
 import { buildCheckoutHref, buildPaidPlanLoginHref, planChangeDirection } from "@/lib/checkout-routing";
-import { currencyMeta, formatMoney } from "@shared/currency.ts";
-import CurrencySelect from "@/components/CurrencySelect";
+import { DEFAULT_CURRENCY, formatMoney } from "@shared/currency.ts";
 
 type TabType = "monthly" | "annual" | "enterprise";
 type PaidTier = "starter" | "pro" | "max";
@@ -19,13 +18,11 @@ function PlanPrice({
   activeTab,
   loading,
   getPlanPrice,
-  currency,
 }: {
   tier: "free" | PaidTier;
   activeTab: TabType;
   loading: boolean;
   getPlanPrice: (tier: string, interval: "monthly" | "annual") => TierPriceDisplay | null;
-  currency: string;
 }) {
   if (loading) {
     return (
@@ -39,7 +36,7 @@ function PlanPrice({
     return (
       <div className="mb-6">
         <div className="flex items-baseline gap-1">
-          <span className="text-4xl font-bold">{formatMoney(0, currency, navigator.language)}</span>
+          <span className="text-4xl font-bold">{formatMoney(0, DEFAULT_CURRENCY, navigator.language)}</span>
           <span className="text-xs text-white/60">/mo</span>
         </div>
       </div>
@@ -148,7 +145,13 @@ const TIER_ORDER: Record<string, number> = {
 
 export default function PricingPage() {
   const navigate = useNavigate();
-  const { loading: pricingLoading, getPlanPrice, supportedCurrencies, currency } = useTierPricing();
+  // /pricing always shows the flat USD reference price, regardless of visitor
+  // location — only /checkout localizes to the resolved billing currency.
+  const { loading: pricingLoading, getPlanPrice } = useTierPricing();
+  const getUsdPrice = useCallback(
+    (tier: string, interval: "monthly" | "annual") => getPlanPrice(tier, interval, DEFAULT_CURRENCY),
+    [getPlanPrice],
+  );
   const [activeTab, setActiveTab] = useState<TabType>("monthly");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentTier, setCurrentTier] = useState<string>("none");
@@ -393,18 +396,6 @@ export default function PricingPage() {
               <span className="relative z-10">Enterprise</span>
             </button>
           </div>
-
-          {activeTab !== "enterprise" && (
-            <div className="mt-4 flex items-center justify-center gap-2">
-              <CurrencySelect options={supportedCurrencies} value={currency} />
-              {currency !== "usd" && (
-                <span className="text-[11px] text-white/45">
-                  Billed in {currencyMeta(currency)?.label ?? currency.toUpperCase()}, so your card
-                  issuer has nothing to convert
-                </span>
-              )}
-            </div>
-          )}
         </motion.div>
 
         {/* Tab Content Layouts */}
@@ -434,8 +425,7 @@ export default function PricingPage() {
                           tier="free"
                           activeTab={activeTab}
                           loading={pricingLoading}
-                          getPlanPrice={getPlanPrice}
-                          currency={currency}
+                          getPlanPrice={getUsdPrice}
                         />
                         <p className="text-[11px] text-white/50 -mt-4 mb-6">100 credits/month to try things</p>
 
@@ -490,8 +480,7 @@ export default function PricingPage() {
                           tier="starter"
                           activeTab={activeTab}
                           loading={pricingLoading}
-                          getPlanPrice={getPlanPrice}
-                          currency={currency}
+                          getPlanPrice={getUsdPrice}
                         />
                         <p className="text-[11px] text-white/50 -mt-4 mb-6">1 seat</p>
 
@@ -551,8 +540,7 @@ export default function PricingPage() {
                           tier="pro"
                           activeTab={activeTab}
                           loading={pricingLoading}
-                          getPlanPrice={getPlanPrice}
-                          currency={currency}
+                          getPlanPrice={getUsdPrice}
                         />
                         <p className="text-[11px] text-white/50 -mt-4 mb-6">3 pooled seats</p>
 
@@ -607,8 +595,7 @@ export default function PricingPage() {
                           tier="max"
                           activeTab={activeTab}
                           loading={pricingLoading}
-                          getPlanPrice={getPlanPrice}
-                          currency={currency}
+                          getPlanPrice={getUsdPrice}
                         />
                         <p className="text-[11px] text-white/50 -mt-4 mb-6">8 pooled seats</p>
 

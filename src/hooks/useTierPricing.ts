@@ -107,12 +107,13 @@ export function useTierPricing() {
   );
 
   const getPlanPrice = useCallback(
-    (tier: string, interval: BillingInterval): TierPriceDisplay | null => {
+    (tier: string, interval: BillingInterval, currencyOverride?: string): TierPriceDisplay | null => {
       const row = tiers?.[tier];
       if (!row) return null;
       const price = interval === "annual" ? row.annual : row.monthly;
       if (!price) return null;
-      const selected = price.currencies[effectiveCurrency]
+      const wanted = currencyOverride ?? effectiveCurrency;
+      const selected = price.currencies[wanted]
         ?? price.currencies[price.default_currency];
       return selected ? localize(selected) : null;
     },
