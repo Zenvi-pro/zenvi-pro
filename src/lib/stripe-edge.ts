@@ -19,9 +19,21 @@ export function stripeEdgeHeaders(
   return result;
 }
 
-/** Append stripe_test=1 when running via npm run dev (query param survives Supabase gateway). */
-export function stripeEdgeFunctionUrl(functionName: string): string {
+/**
+ * Build a Supabase edge function URL.
+ *
+ * Appends stripe_test=1 when running via npm run dev (the query param survives the
+ * Supabase gateway, unlike a custom header on a GET). Callers must pass extra query
+ * params through `params` rather than concatenating a "?" themselves — in dev the
+ * base already carries one, and `?stripe_test=1?foo=bar` silently swallows foo.
+ */
+export function stripeEdgeFunctionUrl(
+  functionName: string,
+  params?: Record<string, string>,
+): string {
   const base = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/${functionName}`;
-  if (!isStripeDevMode) return base;
-  return `${base}?stripe_test=1`;
+  const search = new URLSearchParams(params);
+  if (isStripeDevMode) search.set("stripe_test", "1");
+  const query = search.toString();
+  return query ? `${base}?${query}` : base;
 }

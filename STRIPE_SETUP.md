@@ -82,6 +82,75 @@ supabase functions deploy get-tier-pricing
 
 ---
 
+## Multi-currency
+
+Zenvi's Stripe account (`acct_1TAJMBFwJmSMjJoS`) is Canadian: country `CA`, default
+currency `cad`, and its only bank account is CAD. That means, absent anything below,
+**every** charge — USD included — gets FX-converted to CAD by Stripe at payout, at
+Zenvi's cost. There's no USD bank account, so USD settlement conversion is unavoidable
+today; the goal here is narrower: stop *Canadian customers* from being charged in USD
+and hitting a foreign-transaction fee on their own end, by billing them in CAD
+natively. Two mechanisms, in priority order:
+
+1. **Hand-set `currency_options`** on the tier prices — an exact CAD amount, currently
+   the only currency this is set for. `/pricing` deliberately does **not** localize —
+   it always shows the flat USD reference price. Only `/checkout` (and the Stripe
+   Checkout page it redirects to) resolves and shows the actual billing currency.
+2. **Adaptive Pricing** (Dashboard toggle, *Settings → Payments → Adaptive Pricing*)
+   for every other currency `create-checkout-session` might detect. Stripe picks the
+   rate, guarantees it for 24h, and critically **refunds at the original
+   transaction's rate** so a refund returns the exact amount paid. This is a fallback
+   for currencies without hand-set `currency_options` — for CAD, mechanism 1 takes
+   priority since it's an exact amount rather than Stripe's live estimate.
+
+Currencies live in `supabase/functions/_shared/currency.ts` (the allowlist) and in
+`scripts/stripe-set-currency-options.mjs` (the amounts). The script computes each
+tier/interval's CAD amount from **that price's own live USD `unit_amount`** and a
+live USD→CAD rate fetched at run time (no hand-maintained table to drift out of
+sync) — re-run it periodically (e.g. monthly) to keep the CAD amount near the real
+rate:
+
+```bash
+# dry run — prints a diff, writes nothing
+SUPABASE_SERVICE_ROLE_KEY=... STRIPE_TEST_SECRET_KEY=sk_test_... \
+  node scripts/stripe-set-currency-options.mjs --mode=test
+# apply, then repeat with --mode=live using STRIPE_SECRET_KEY=sk_live_...
+... node scripts/stripe-set-currency-options.mjs --mode=test --apply
+```
+
+It reads all six tier/interval prices from `tier_config` and Stripe before writing
+anything, and aborts without writing if the tier set is incomplete or any price is
+missing or not USD-denominated. The six writes themselves are independent Stripe
+calls and can't be made atomic — if one fails partway through, the script keeps
+going through the rest and prints exactly which succeeded and which didn't, so a
+partial run is never ambiguous about what to re-run. **Every tier and interval
+must offer the same currency set** —
+Stripe will not move a subscription to a price lacking its currency, so a partial
+rollout breaks plan changes for anyone in the missing one.
+
+Two properties that are easy to break:
+
+- `prices.retrieve` needs `expand: ["currency_options"]`. Without it the field is
+  `undefined` and every currency silently collapses to USD.
+- `get-tier-pricing` returns an identical body to every caller and is cached publicly
+  for an hour. Do not add a per-caller dimension (query param, header, geo lookup)
+  without fixing the cache key, or one visitor's currency is served to another.
+
+A Stripe **Customer is locked** to the currency of its first subscription. Switching
+normally means cancelling and re-subscribing on a *new* Customer, then updating
+`profiles.stripe_customer_id`. Stripe's **Multi-currency customers** feature lifts this
+for accounts that have it enabled — check *Settings → Payments* before assuming a
+replacement Customer is required.
+
+Settlement matters as much as presentment: a currency you charge in but don't settle
+in gets converted by Stripe at your cost. Zenvi's only bank account on file is CAD
+(*Settings → Bank accounts and currencies*), so today USD charges convert to CAD at
+payout regardless of anything in this doc — that's an accepted tradeoff for now, not
+a bug. CAD charges settle natively with no conversion, which is the whole point of
+mechanism 1 above.
+
+---
+
 ## Test locally (sandbox)
 
 1. `npm run dev` — frontend automatically sends `x-stripe-test-mode: true`.
@@ -89,6 +158,10 @@ supabase functions deploy get-tier-pricing
 3. Use test card `4242 4242 4242 4242`.
 4. `/checkout/success` polls until `get_user_subscription` returns your tier, then redirects to `/download`.
 5. `/dashboard` should show Max tier limits (not free-tier defaults).
+
+To exercise a non-USD flow, sign up with a `+location_CA@example.com` style address —
+Stripe uses the tag to simulate customer location for Adaptive Pricing. Confirm the
+Checkout page shows CAD, then that `subscriptions.presentment_currency` is `cad`.
 
 If the subscription row is missing after ~30s:
 

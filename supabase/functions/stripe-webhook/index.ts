@@ -23,6 +23,28 @@ import {
 type Interval = BillingInterval | "lifetime";
 type SupabaseAdmin = ReturnType<typeof createClient>;
 
+/**
+ * The currency the customer was actually charged in.
+ *
+ * Under Adaptive Pricing the Subscription stays denominated in the account currency
+ * while the customer pays locally, and the local code lives on `presentment_details`.
+ * With our own currency_options the Subscription itself carries the local currency.
+ * Prefer presentment_details, fall back to the subscription currency, and return null
+ * rather than guessing so the column stays honest.
+ */
+function presentmentCurrency(
+  sub: Stripe.Subscription,
+  session?: Stripe.Checkout.Session,
+): string | null {
+  const fromSession = (session as unknown as {
+    presentment_details?: { presentment_currency?: string };
+  } | undefined)?.presentment_details?.presentment_currency;
+  const fromSub = (sub as unknown as {
+    presentment_details?: { presentment_currency?: string };
+  }).presentment_details?.presentment_currency;
+  return (fromSession ?? fromSub ?? sub.currency ?? null)?.toLowerCase() ?? null;
+}
+
 function subscriptionPeriodEndIso(sub: Stripe.Subscription): string | null {
   const unix = sub.current_period_end
     ?? sub.items?.data?.[0]?.current_period_end
@@ -185,6 +207,7 @@ Deno.serve(async (req) => {
             current_period_end: subscriptionPeriodEndIso(sub),
             cancel_at_period_end: sub.cancel_at_period_end,
             billing_interval: billingInterval,
+            presentment_currency: presentmentCurrency(sub, session),
           },
           { onConflict: "user_id" },
         );
@@ -226,6 +249,7 @@ Deno.serve(async (req) => {
             current_period_end: subscriptionPeriodEndIso(sub),
             cancel_at_period_end: sub.cancel_at_period_end,
             billing_interval: billingInterval,
+            presentment_currency: presentmentCurrency(sub),
           },
           { onConflict: "user_id" },
         );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Info } from "lucide-react";
@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useTierPricing, type TierPriceDisplay } from "@/hooks/useTierPricing";
 import { buildCheckoutHref, buildPaidPlanLoginHref, planChangeDirection } from "@/lib/checkout-routing";
+import { DEFAULT_CURRENCY, formatMoney } from "@shared/currency.ts";
 
 type TabType = "monthly" | "annual" | "enterprise";
 type PaidTier = "starter" | "pro" | "max";
@@ -35,7 +36,7 @@ function PlanPrice({
     return (
       <div className="mb-6">
         <div className="flex items-baseline gap-1">
-          <span className="text-4xl font-bold">$0</span>
+          <span className="text-4xl font-bold">{formatMoney(0, DEFAULT_CURRENCY, navigator.language)}</span>
           <span className="text-xs text-white/60">/mo</span>
         </div>
       </div>
@@ -144,7 +145,13 @@ const TIER_ORDER: Record<string, number> = {
 
 export default function PricingPage() {
   const navigate = useNavigate();
+  // /pricing always shows the flat USD reference price, regardless of visitor
+  // location — only /checkout localizes to the resolved billing currency.
   const { loading: pricingLoading, getPlanPrice } = useTierPricing();
+  const getUsdPrice = useCallback(
+    (tier: string, interval: "monthly" | "annual") => getPlanPrice(tier, interval, DEFAULT_CURRENCY),
+    [getPlanPrice],
+  );
   const [activeTab, setActiveTab] = useState<TabType>("monthly");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentTier, setCurrentTier] = useState<string>("none");
@@ -418,7 +425,7 @@ export default function PricingPage() {
                           tier="free"
                           activeTab={activeTab}
                           loading={pricingLoading}
-                          getPlanPrice={getPlanPrice}
+                          getPlanPrice={getUsdPrice}
                         />
                         <p className="text-[11px] text-white/50 -mt-4 mb-6">100 credits/month to try things</p>
 
@@ -473,7 +480,7 @@ export default function PricingPage() {
                           tier="starter"
                           activeTab={activeTab}
                           loading={pricingLoading}
-                          getPlanPrice={getPlanPrice}
+                          getPlanPrice={getUsdPrice}
                         />
                         <p className="text-[11px] text-white/50 -mt-4 mb-6">1 seat</p>
 
@@ -485,7 +492,7 @@ export default function PricingPage() {
                           </div>
                           <div className="flex items-baseline gap-2">
                             <span className="text-2xl font-bold text-white">2,500</span>
-                            <span className="text-[11px] text-white/55">≈ $25 of AI</span>
+                            <span className="text-[11px] text-white/55">≈ $25 USD of AI</span>
                           </div>
                           <p className="mt-1.5 text-[10.5px] text-white/45 leading-snug">
                             ~50 AI video clips · or 2,500 chats · or 60 min of indexing · mix &amp; match
@@ -533,7 +540,7 @@ export default function PricingPage() {
                           tier="pro"
                           activeTab={activeTab}
                           loading={pricingLoading}
-                          getPlanPrice={getPlanPrice}
+                          getPlanPrice={getUsdPrice}
                         />
                         <p className="text-[11px] text-white/50 -mt-4 mb-6">3 pooled seats</p>
 
@@ -545,7 +552,7 @@ export default function PricingPage() {
                           </div>
                           <div className="flex items-baseline gap-2">
                             <span className="text-2xl font-bold text-white">5,500</span>
-                            <span className="text-[11px] text-white/55">≈ $55 of AI</span>
+                            <span className="text-[11px] text-white/55">≈ $55 USD of AI</span>
                           </div>
                           <p className="mt-1.5 text-[10.5px] text-white/55 leading-snug">
                             ~110 AI clips · or 5,500 chats · or 250 min indexing · pooled across seats
@@ -588,7 +595,7 @@ export default function PricingPage() {
                           tier="max"
                           activeTab={activeTab}
                           loading={pricingLoading}
-                          getPlanPrice={getPlanPrice}
+                          getPlanPrice={getUsdPrice}
                         />
                         <p className="text-[11px] text-white/50 -mt-4 mb-6">8 pooled seats</p>
 
@@ -600,7 +607,7 @@ export default function PricingPage() {
                           </div>
                           <div className="flex items-baseline gap-2">
                             <span className="text-2xl font-bold text-white">25,000</span>
-                            <span className="text-[11px] text-white/55">≈ $250 of AI</span>
+                            <span className="text-[11px] text-white/55">≈ $250 USD of AI</span>
                           </div>
                           <p className="mt-1.5 text-[10.5px] text-white/55 leading-snug">
                             ~500 AI clips · or 25k chats · or 1,600 min indexing · 8-seat pool

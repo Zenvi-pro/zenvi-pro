@@ -228,9 +228,9 @@ export default function AdminBillingPage() {
             <div className="mt-6 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6">
               <h2 className="text-sm font-medium text-white/90">Tier breakdown</h2>
               <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-5">
-                <TierTile label="Starter $29" count={s.starter_count} />
-                <TierTile label="Pro $49" count={s.pro_count} highlight />
-                <TierTile label="Max $199" count={s.max_count} />
+                <TierTile label="Starter" count={s.starter_count} />
+                <TierTile label="Pro" count={s.pro_count} highlight />
+                <TierTile label="Max" count={s.max_count} />
                 <TierTile label="Lifetime" count={s.lifetime_count} />
                 <TierTile label="Legacy" count={s.legacy_count} muted />
               </div>
