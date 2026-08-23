@@ -84,32 +84,45 @@ supabase functions deploy get-tier-pricing
 
 ## Multi-currency
 
-Customers are billed in their own currency so their bank never converts. Two
-mechanisms, in priority order:
+Zenvi's Stripe account (`acct_1TAJMBFwJmSMjJoS`) is Canadian: country `CA`, default
+currency `cad`, and its only bank account is CAD. That means, absent anything below,
+**every** charge — USD included — gets FX-converted to CAD by Stripe at payout, at
+Zenvi's cost. There's no USD bank account, so USD settlement conversion is unavoidable
+today; the goal here is narrower: stop *Canadian customers* from being charged in USD
+and hitting a foreign-transaction fee on their own end, by billing them in CAD
+natively. Two mechanisms, in priority order:
 
-1. **Hand-set `currency_options`** on the tier prices — an exact, charm-rounded local
-   amount. `/pricing` shows precisely what Stripe will charge.
+1. **Hand-set `currency_options`** on the tier prices — an exact CAD amount, currently
+   the only currency this is set for. `/pricing` deliberately does **not** localize —
+   it always shows the flat USD reference price. Only `/checkout` (and the Stripe
+   Checkout page it redirects to) resolves and shows the actual billing currency.
 2. **Adaptive Pricing** (Dashboard toggle, *Settings → Payments → Adaptive Pricing*)
-   for every other currency. Stripe picks the rate, guarantees it for 24h, and
-   critically **refunds at the original transaction's rate** so a refund returns the
-   exact amount paid. Manual `currency_options` override it for those currencies only.
+   for every other currency `create-checkout-session` might detect. Stripe picks the
+   rate, guarantees it for 24h, and critically **refunds at the original
+   transaction's rate** so a refund returns the exact amount paid. This is a fallback
+   for currencies without hand-set `currency_options` — for CAD, mechanism 1 takes
+   priority since it's an exact amount rather than Stripe's live estimate.
 
 Currencies live in `supabase/functions/_shared/currency.ts` (the allowlist) and in
-`scripts/stripe-set-currency-options.mjs` (the amounts). To add or reprice one, edit
-the script's `PRICE_TABLE` and re-run:
+`scripts/stripe-set-currency-options.mjs` (the amounts). The script computes each
+tier/interval's CAD amount from **that price's own live USD `unit_amount`** and a
+live USD→CAD rate fetched at run time (no hand-maintained table to drift out of
+sync) — re-run it periodically (e.g. monthly) to keep the CAD amount near the real
+rate:
 
 ```bash
 # dry run — prints a diff, writes nothing
-STRIPE_TEST_SECRET_KEY=... SUPABASE_SERVICE_ROLE_KEY=... \
+SUPABASE_SERVICE_ROLE_KEY=... STRIPE_TEST_SECRET_KEY=sk_test_... \
   node scripts/stripe-set-currency-options.mjs --mode=test
-# apply, then repeat with --mode=live
+# apply, then repeat with --mode=live using STRIPE_SECRET_KEY=sk_live_...
 ... node scripts/stripe-set-currency-options.mjs --mode=test --apply
 ```
 
-The script refuses to run if the table disagrees with a price's live USD amount, and
-aborts rather than half-applying. **Every tier and interval must offer the same
-currency set** — Stripe will not move a subscription to a price lacking its currency,
-so a partial rollout breaks plan changes for anyone in the missing one.
+It reads all six tier/interval prices from `tier_config` and Stripe before writing
+anything, and aborts without writing if any price is missing or not USD-denominated
+— never half-applies. **Every tier and interval must offer the same currency set** —
+Stripe will not move a subscription to a price lacking its currency, so a partial
+rollout breaks plan changes for anyone in the missing one.
 
 Two properties that are easy to break:
 
@@ -126,8 +139,11 @@ for accounts that have it enabled — check *Settings → Payments* before assum
 replacement Customer is required.
 
 Settlement matters as much as presentment: a currency you charge in but don't settle
-in gets converted by Stripe at your cost. Check *Settings → Bank accounts and
-currencies* against the currencies in `PRICE_TABLE`.
+in gets converted by Stripe at your cost. Zenvi's only bank account on file is CAD
+(*Settings → Bank accounts and currencies*), so today USD charges convert to CAD at
+payout regardless of anything in this doc — that's an accepted tradeoff for now, not
+a bug. CAD charges settle natively with no conversion, which is the whole point of
+mechanism 1 above.
 
 ---
 
