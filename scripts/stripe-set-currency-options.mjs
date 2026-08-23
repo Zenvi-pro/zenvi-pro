@@ -107,6 +107,14 @@ async function fetchUsdToCadRate() {
 
   const rows = await fetchTierConfig();
 
+  if (rows.length !== TIERS.length) {
+    const found = rows.map((r) => r.tier).sort().join(", ") || "(none)";
+    throw new Error(
+      `Expected exactly ${TIERS.length} tier_config rows (${TIERS.join(", ")}), got ${rows.length}: ${found}. ` +
+      "Refusing to proceed with an incomplete tier set.",
+    );
+  }
+
   // Read everything and compute the full plan before writing anything, so a bad
   // price ID aborts the whole run instead of leaving some tiers updated and others not.
   const plan = [];
@@ -138,11 +146,32 @@ async function fetchUsdToCadRate() {
     return;
   }
 
+  // The read/plan phase above is all-or-nothing (throws before any write). The
+  // writes themselves are six independent Stripe API calls and cannot be made
+  // atomic — if one fails partway through, the ones before it are already live.
+  // So: keep going through the rest rather than stopping on the first failure,
+  // and print an explicit succeeded/failed summary so a partial run is never
+  // silently ambiguous about what still needs re-running.
   console.log("\nApplying...");
+  const failures = [];
   for (const p of plan) {
-    await stripeUpdateCadOption(p.priceId, p.proposedCad);
-    console.log(`  ✓ ${p.tier}/${p.interval} (${p.priceId}) → cad ${p.proposedCad}`);
+    try {
+      await stripeUpdateCadOption(p.priceId, p.proposedCad);
+      console.log(`  ✓ ${p.tier}/${p.interval} (${p.priceId}) → cad ${p.proposedCad}`);
+    } catch (err) {
+      failures.push({ ...p, error: err.message });
+      console.log(`  ✗ ${p.tier}/${p.interval} (${p.priceId}): ${err.message}`);
+    }
   }
+
+  if (failures.length > 0) {
+    console.error(
+      `\n${failures.length}/${plan.length} updates failed. The ones marked ✓ above are already live in Stripe — ` +
+      "re-run this script to retry just the ✗ ones (already-applied prices simply get overwritten with the same value).",
+    );
+    process.exit(1);
+  }
+
   console.log("\nDone.");
 })().catch((err) => {
   console.error("\nAborted:", err.message);

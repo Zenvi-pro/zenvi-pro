@@ -119,8 +119,12 @@ SUPABASE_SERVICE_ROLE_KEY=... STRIPE_TEST_SECRET_KEY=sk_test_... \
 ```
 
 It reads all six tier/interval prices from `tier_config` and Stripe before writing
-anything, and aborts without writing if any price is missing or not USD-denominated
-— never half-applies. **Every tier and interval must offer the same currency set** —
+anything, and aborts without writing if the tier set is incomplete or any price is
+missing or not USD-denominated. The six writes themselves are independent Stripe
+calls and can't be made atomic — if one fails partway through, the script keeps
+going through the rest and prints exactly which succeeded and which didn't, so a
+partial run is never ambiguous about what to re-run. **Every tier and interval
+must offer the same currency set** —
 Stripe will not move a subscription to a price lacking its currency, so a partial
 rollout breaks plan changes for anyone in the missing one.
 

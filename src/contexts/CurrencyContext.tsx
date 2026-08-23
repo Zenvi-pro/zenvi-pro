@@ -36,10 +36,16 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
+    // Auth state (sign-out, account switch) can fire while a signals fetch is
+    // still in flight. A stale response landing after that would overwrite the
+    // new session's state with the previous one's currency lock, so only the
+    // most recently *started* request is allowed to apply its result.
+    let requestGeneration = 0;
 
     async function loadAccountSignals() {
+      const generation = ++requestGeneration;
       const { data: { session } } = await supabase.auth.getSession();
-      if (cancelled) return;
+      if (cancelled || generation !== requestGeneration) return;
 
       // Clear on sign-out, otherwise the next account to use this tab inherits the
       // previous one's lock and preference.
@@ -53,7 +59,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
         supabase.rpc("get_user_subscription"),
         supabase.from("profiles").select("preferred_currency").eq("id", session.user.id).maybeSingle(),
       ]);
-      if (cancelled) return;
+      if (cancelled || generation !== requestGeneration) return;
 
       const row = Array.isArray(subscription) && subscription.length > 0 ? subscription[0] : null;
       // Assigned unconditionally so a cancelled subscription releases the lock without

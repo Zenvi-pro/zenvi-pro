@@ -95,13 +95,20 @@ Deno.serve(async (req) => {
       // combine currencies on a single customer", so read it and defer to it.
       try {
         const customer = await stripe.customers.retrieve(customerId);
-        if (!("deleted" in customer && customer.deleted)) {
+        if ("deleted" in customer && customer.deleted) {
+          // Stripe rejects a deleted Customer ID outright on a new Checkout
+          // Session — fall through to creating a replacement below, same as a
+          // profile that never had one.
+          customerId = undefined;
+        } else {
           customerCurrency = normalizeCurrency(customer.currency) ?? null;
         }
       } catch (err) {
         console.warn(`create-checkout-session: customer ${customerId} unreadable:`, err);
       }
-    } else {
+    }
+
+    if (!customerId) {
       const customer = await stripe.customers.create({
         email: user.email,
         metadata: { supabase_user_id: user.id },

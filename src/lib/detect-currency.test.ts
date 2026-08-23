@@ -16,6 +16,14 @@ describe("countryForTimeZone", () => {
     expect(countryForTimeZone("Asia/Kolkata")).toBe("IN");
   });
 
+  it("resolves the smaller Canadian zones", () => {
+    // Real IANA zones outside the Toronto/Vancouver-scale cities. A visitor here
+    // with an en-US browser language previously fell through to USD.
+    expect(countryForTimeZone("America/Thunder_Bay")).toBe("CA");
+    expect(countryForTimeZone("America/Rankin_Inlet")).toBe("CA");
+    expect(countryForTimeZone("America/Resolute")).toBe("CA");
+  });
+
   it("resolves prefix zones", () => {
     expect(countryForTimeZone("Australia/Sydney")).toBe("AU");
     expect(countryForTimeZone("Australia/Perth")).toBe("AU");

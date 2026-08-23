@@ -42,6 +42,7 @@ const TIMEZONE_COUNTRY: Record<string, string> = {
   "America/Edmonton": "CA", "America/Winnipeg": "CA", "America/Halifax": "CA",
   "America/St_Johns": "CA", "America/Regina": "CA", "America/Moncton": "CA",
   "America/Whitehorse": "CA", "America/Yellowknife": "CA", "America/Iqaluit": "CA",
+  "America/Thunder_Bay": "CA", "America/Rankin_Inlet": "CA", "America/Resolute": "CA",
   "America/Dawson_Creek": "CA", "America/Glace_Bay": "CA", "America/Goose_Bay": "CA",
   // United Kingdom
   "Europe/London": "GB", "Europe/Belfast": "GB",

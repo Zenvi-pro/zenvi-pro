@@ -334,7 +334,9 @@ export default function CheckoutPage() {
 
       // The server has the last word on currency: an existing Stripe Customer is
       // locked to the one it first transacted in. Say so before the redirect rather
-      // than letting Stripe show a price the page didn't.
+      // than letting Stripe show a price the page didn't. The toast schedules a
+      // React render, but window.location.href navigates away immediately — give
+      // it a moment to actually paint before leaving the page.
       if (payload.currency && payload.currency !== currency) {
         const shown = currencyMeta(currency)?.label ?? currency.toUpperCase();
         const actual = currencyMeta(payload.currency)?.label ?? String(payload.currency).toUpperCase();
@@ -344,6 +346,7 @@ export default function CheckoutPage() {
             ? `Your account already bills in ${actual}, so we can't switch it to ${shown}.`
             : `${shown} isn't available for this plan, so checkout will use ${actual}.`,
         });
+        await new Promise((resolve) => window.setTimeout(resolve, 1500));
       }
 
       window.location.href = payload.url;
@@ -452,8 +455,7 @@ export default function CheckoutPage() {
               </div>
               {livePrice && livePrice.currency !== "usd" && (
                 <p className="text-[11px] text-white/45 mt-1">
-                  Billed in {currencyMeta(livePrice.currency)?.label ?? livePrice.currency.toUpperCase()},
-                  so your card issuer has no currency to convert.
+                  Billed in {currencyMeta(livePrice.currency)?.label ?? livePrice.currency.toUpperCase()}.
                 </p>
               )}
             </div>
