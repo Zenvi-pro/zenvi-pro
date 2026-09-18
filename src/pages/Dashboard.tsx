@@ -1009,8 +1009,8 @@ export default function DashboardPage() {
               name="Starter"
               price={getPlanPrice("starter", "monthly")?.display ?? "—"}
               cadence={getPlanPrice("starter", "monthly")?.period ?? "/mo"}
-              tagline="Solo creators"
-              bullets={["2,500 credits/mo", "1 seat", "All cloud models"]}
+              tagline="Ship every week"
+              bullets={["2,500 credits · 25+ AI clips", "35+ Assistant edits", "Unlimited timeline edits free"]}
             />
             <PlanTile
               tier="pro"
@@ -1018,8 +1018,8 @@ export default function DashboardPage() {
               name="Pro"
               price={getPlanPrice("pro", "monthly")?.display ?? "—"}
               cadence={getPlanPrice("pro", "monthly")?.period ?? "/mo"}
-              tagline="Pooled team usage"
-              bullets={["5,500 credits/mo", "3 pooled seats", "Priority queue at peak"]}
+              tagline="The production workhorse"
+              bullets={["5,500 credits · 50+ AI clips", "80+ Assistant edits", "3 seats · stop rationing"]}
               accent
             />
             <PlanTile
@@ -1028,8 +1028,8 @@ export default function DashboardPage() {
               name="Max"
               price={getPlanPrice("max", "monthly")?.display ?? "—"}
               cadence={getPlanPrice("max", "monthly")?.period ?? "/mo"}
-              tagline="Agency-scale"
-              bullets={["25,000 credits/mo", "8 pooled seats", "Priority queue 24/7"]}
+              tagline="Never think about the meter"
+              bullets={["25,000 credits · 220+ AI clips", "350+ Assistant edits", "8 seats · agency runway"]}
             />
           </div>
         </motion.section>
