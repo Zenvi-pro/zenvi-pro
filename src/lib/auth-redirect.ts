@@ -16,6 +16,13 @@ export function getAuthCallbackUrl(opts?: {
   return url.toString();
 }
 
+/** Password-recovery landing URL (must be allowlisted in Supabase Auth). */
+export function getPasswordResetUrl(opts?: { state?: string | null }): string {
+  const url = new URL(`${window.location.origin}/reset-password`);
+  if (opts?.state) url.searchParams.set("state", opts.state);
+  return url.toString();
+}
+
 /** Persist post-auth destination before OAuth (sessionStorage + callback query param). */
 export function stashAuthRedirect(opts: { next?: string | null; state?: string | null }): void {
   if (opts.next) sessionStorage.setItem("auth_next", opts.next);

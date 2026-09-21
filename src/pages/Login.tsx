@@ -11,7 +11,7 @@ import { ZenviLogo } from "@/components/ZenviLogo";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { getAuthCallbackUrl, resolvePostLoginPath, stashAuthRedirect } from "@/lib/auth-redirect";
+import { getAuthCallbackUrl, getPasswordResetUrl, resolvePostLoginPath, stashAuthRedirect } from "@/lib/auth-redirect";
 
 function GoogleIcon() {
   return (
@@ -51,6 +51,8 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<"google" | "github" | null>(null);
   const [isVerifyStep, setIsVerifyStep] = useState(false);
+  const [isForgotStep, setIsForgotStep] = useState(false);
+  const [isForgotSent, setIsForgotSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,6 +125,30 @@ export default function LoginPage() {
     setOauthLoading(null);
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+        redirectTo: getPasswordResetUrl({ state }),
+      });
+      if (error) throw error;
+      setIsForgotSent(true);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Could not send a reset email.";
+      toast({ title: "Reset failed", description: msg, variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const backToSignIn = () => {
+    setIsVerifyStep(false);
+    setIsForgotStep(false);
+    setIsForgotSent(false);
+    setAuthMode("signin");
+  };
+
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#0A0A0A] px-4 py-0 sm:px-6 sm:py-0 lg:px-0 lg:py-0">
       <Link
@@ -192,11 +218,13 @@ export default function LoginPage() {
                 size="default"
                 onClick={() => {
                   setIsVerifyStep(false);
-                  setAuthMode((prev) => (prev === "signin" ? "signup" : "signin"));
+                  setIsForgotStep(false);
+                  setIsForgotSent(false);
+                  setAuthMode((prev) => (isForgotStep || isForgotSent || prev === "signin" ? "signup" : "signin"));
                 }}
                 className="h-10 rounded-lg border-primary/35 bg-primary/10 px-4 text-sm font-semibold text-white shadow-[0_0_0_1px_rgba(0,102,255,0.2),0_6px_28px_rgba(0,102,255,0.2)] hover:bg-primary/20 hover:border-primary/55"
               >
-                {authMode === "signin" ? "Sign up" : "Sign in"}
+                {authMode === "signin" && !isForgotStep ? "Sign up" : "Sign in"}
               </Button>
             </div>
 
@@ -217,27 +245,72 @@ export default function LoginPage() {
               )}
 
               <div className="rounded-xl border border-transparent bg-transparent p-0 md:p-5">
-                {isVerifyStep ? (
+                {isVerifyStep || isForgotSent ? (
                   <div className="text-center py-2">
                     <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-primary/30 bg-primary/10">
                       <CheckCircle className="h-7 w-7 text-primary" />
                     </div>
                     <h1 className="mb-2 text-[20px] font-semibold tracking-tight text-white">Check your inbox</h1>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                      We sent a confirmation link to <span className="text-white font-medium">{email}</span>.
+                      {isForgotSent
+                        ? "If an account exists for "
+                        : "We sent a confirmation link to "}
+                      <span className="text-white font-medium">{email}</span>
+                      {isForgotSent ? ", we sent a reset link." : "."}
                     </p>
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => {
-                        setIsVerifyStep(false);
-                        setAuthMode("signin");
-                      }}
+                      onClick={backToSignIn}
                       className="mt-6 h-9 w-full border-white/[0.12] bg-white/[0.02] text-sm text-white hover:bg-white/[0.08]"
                     >
                       Back to sign in
                     </Button>
                   </div>
+                ) : isForgotStep ? (
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.div
+                      key="forgot"
+                      initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+                      transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      <h1 className="mb-1 text-[20px] font-semibold tracking-tight text-white drop-shadow-[0_0_16px_rgba(0,102,255,0.22)]">
+                        Reset password
+                      </h1>
+                      <p className="mb-5 text-[13px] text-muted-foreground">
+                        Enter your email and we will send a reset link.
+                      </p>
+                      <form onSubmit={handleForgotPassword} className="space-y-3">
+                        <Input
+                          type="email"
+                          placeholder="Enter your email address"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                          autoFocus
+                          className="h-9 bg-white/[0.03] border-white/[0.07] focus:border-primary focus-visible:ring-1 focus-visible:ring-primary/40 text-sm text-white placeholder:text-muted-foreground"
+                        />
+                        <Button
+                          type="submit"
+                          disabled={isLoading}
+                          className="mt-1 h-9 w-full bg-white text-sm font-medium text-black hover:bg-white/90"
+                        >
+                          {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send reset link"}
+                        </Button>
+                      </form>
+                      <p className="mt-5 text-center text-xs text-muted-foreground/70">
+                        <button
+                          type="button"
+                          onClick={backToSignIn}
+                          className="font-medium text-white hover:text-primary transition-colors"
+                        >
+                          Back to sign in
+                        </button>
+                      </p>
+                    </motion.div>
+                  </AnimatePresence>
                 ) : (
                   <AnimatePresence mode="wait" initial={false}>
                     <motion.div
@@ -283,6 +356,17 @@ export default function LoginPage() {
                             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                           </button>
                         </div>
+                        {authMode === "signin" && (
+                          <div className="flex justify-end">
+                            <button
+                              type="button"
+                              onClick={() => setIsForgotStep(true)}
+                              className="text-[12px] font-medium text-muted-foreground hover:text-white transition-colors"
+                            >
+                              Forgot password?
+                            </button>
+                          </div>
+                        )}
                         <Button
                           type="submit"
                           disabled={isLoading}
@@ -332,6 +416,8 @@ export default function LoginPage() {
                           type="button"
                           onClick={() => {
                             setIsVerifyStep(false);
+                            setIsForgotStep(false);
+                            setIsForgotSent(false);
                             setAuthMode((prev) => (prev === "signin" ? "signup" : "signin"));
                           }}
                           className="font-medium text-white hover:text-primary transition-colors"
