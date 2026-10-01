@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { getAuthCallbackUrl, resolvePostLoginPath, stashAuthRedirect } from "@/lib/auth-redirect";
+import {
+  getAuthCallbackUrl,
+  goToPostLoginPath,
+  resolvePostLoginPath,
+  safeNextPath,
+  stashAuthRedirect,
+} from "@/lib/auth-redirect";
 
 function GoogleIcon() {
   return (
@@ -25,7 +31,7 @@ export default function SignupPage() {
   const { toast } = useToast();
 
   const state = searchParams.get("state");
-  const next = searchParams.get("next");
+  const next = safeNextPath(searchParams.get("next"));
   const isDesktop = !!state;
 
   const [email, setEmail] = useState("");
@@ -66,7 +72,7 @@ export default function SignupPage() {
           navigate("/auth/success");
         } else {
           const dest = await resolvePostLoginPath(next);
-          navigate(dest, { replace: true });
+          goToPostLoginPath(dest, navigate);
         }
       }
     } catch (err: unknown) {

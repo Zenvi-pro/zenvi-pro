@@ -12,9 +12,12 @@ You need **Node.js 22 or newer** and **FFmpeg**:
 - Windows: `winget install OpenJS.NodeJS FFmpeg`
 - Linux: install `nodejs` (22+) and `ffmpeg` from your distribution
 
-If you use Claude Code, installing the Zenvi plugin also installs `zenvi`
-(see [Use Zenvi from Claude and ChatGPT](/docs/ai-assistants)). Run
-`zenvi doctor` to check that everything is in place.
+`zenvi` is in early access. Today it ships inside the Zenvi plugin for Claude
+Code (see [Use Zenvi from Claude and ChatGPT](/docs/ai-assistants)); the plugin
+contains the whole command line as one file, `dist/zenvi.mjs`, which you can
+also run directly with `node zenvi.mjs`. A standalone installer for terminals,
+Codex and Cursor is coming; until then, ask the Zenvi team for early access.
+Run `zenvi doctor` to check that everything is in place.
 
 ## A first edit
 
@@ -25,8 +28,9 @@ zenvi add ~/Movies/trip/sunset.mp4            # goes after the last clip
 zenvi title "Lisbon, 2026" --at 0 --duration 4
 zenvi split --at 6                            # cut everything under 6 s
 zenvi clips                                   # list clips and their ids
-zenvi fade <clip-id> --out 2                  # fade one clip out
-zenvi transition <clip-id> --name fade        # fade into the next clip
+CLIP=K3J9X0Q2LM                               # an id printed by `zenvi clips`
+zenvi fade "$CLIP" --out 2                    # fade that clip out
+zenvi transition "$CLIP" --name fade          # fade into the next clip
 zenvi frame 2.5 preview.png                   # look at one frame
 zenvi render trip.mp4
 ```

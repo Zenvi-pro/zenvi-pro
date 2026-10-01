@@ -3,6 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import { Link } from "react-router-dom";
+import { isExternalAppPath } from "@/lib/auth-redirect";
 import { DocsCallout } from "./DocsCallout";
 import { DocsCodeBlock } from "./DocsCodeBlock";
 import { cn } from "@/lib/utils";
@@ -23,7 +24,7 @@ export const DocsMarkdown = forwardRef<HTMLElement, DocsMarkdownProps>(function 
         children,
         ...props
       }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { children?: React.ReactNode }) => {
-        if (href?.startsWith("/")) {
+        if (href?.startsWith("/") && !isExternalAppPath(href)) {
           return (
             <Link to={href} className="text-primary underline-offset-4 hover:underline font-medium" {...props}>
               {children}

@@ -37,7 +37,8 @@ straight into the app, so you can watch them land on the timeline.
 Custom connectors need ChatGPT's developer mode (Plus, Pro, Business,
 Enterprise or Edu, on the web).
 
-1. In ChatGPT, open **Settings → Security and login** and turn on **Developer mode**.
+1. In ChatGPT, open **Settings → Security and login** and turn on **Developer mode**
+   (on some plans it sits under **Settings → Apps → Advanced settings**).
 2. Go to **chatgpt.com/plugins**, press **+**, and add a remote MCP server named
    **Zenvi** with this URL:
 

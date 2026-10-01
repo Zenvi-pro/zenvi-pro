@@ -24,7 +24,8 @@ const EXTERNAL_APP_PREFIXES = ["/editor"];
 
 export function isExternalAppPath(path: string): boolean {
   return EXTERNAL_APP_PREFIXES.some(
-    (prefix) => path === prefix || path.startsWith(`${prefix}/`) || path.startsWith(`${prefix}?`),
+    (prefix) =>
+      path === prefix || path.startsWith(`${prefix}/`) || path.startsWith(`${prefix}?`) || path.startsWith(`${prefix}#`),
   );
 }
 

@@ -36,6 +36,7 @@ describe("post-login destinations", () => {
     expect(isExternalAppPath("/editor/")).toBe(true);
     expect(isExternalAppPath("/editor/p/abc")).toBe(true);
     expect(isExternalAppPath("/editor?x=1")).toBe(true);
+    expect(isExternalAppPath("/editor#timeline")).toBe(true);
     expect(isExternalAppPath("/editorial")).toBe(false);
     expect(isExternalAppPath("/download")).toBe(false);
   });
