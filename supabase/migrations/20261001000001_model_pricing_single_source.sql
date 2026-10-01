@@ -23,10 +23,16 @@
 -- the longest model_pattern that matches within its provider. Credits are
 -- CEIL(usd * 100 * 2.0), as before. llm_model_tiers is dropped.
 --
+-- The assistant's model picker reads this table too (zenvi-backend
+-- core/providers/pricing.py): a model is offered only when a row other than
+-- its provider's '%' matches it. So adding a model to Zenvi is adding its row
+-- here, and a release a provider ships before it has a row stays out of the
+-- picker instead of billing at a guess. The '%' rows remain as the safety net
+-- that keeps an unpriced model from ever running free.
+--
 -- Prices are USD per 1M tokens, list price, from the models.dev catalogue on
 -- 2026-10-01. input is fresh (uncached) input; cache_read / cache_write are
--- priced separately. Rows marked (*) were not in that catalogue and carry the
--- provider's published price instead -- check them.
+-- priced separately. Rows marked (*) were not in that catalogue -- check them.
 -- ============================================================================
 
 INSERT INTO public.api_pricing (
@@ -39,7 +45,7 @@ INSERT INTO public.api_pricing (
   ('openai', 'gpt-4o-mini%',       0.15,   0.60, 0.075,  0),
   ('openai', 'gpt-4.1%',           2.00,   8.00, 0.50,   0),
   ('openai', 'gpt-4.1-mini%',      0.40,   1.60, 0.10,   0),
-  ('openai', 'gpt-4.1-nano%',      0.10,   0.40, 0.025,  0),   -- (*)
+  ('openai', 'gpt-4.1-nano%',      0.10,   0.40, 0.025,  0),
   -- gpt-5 and gpt-5.1 share a price; later point releases have their own row.
   ('openai', 'gpt-5%',             1.25,  10.00, 0.125,  0),
   ('openai', 'gpt-5-mini%',        0.25,   2.00, 0.025,  0),
@@ -47,6 +53,7 @@ INSERT INTO public.api_pricing (
   ('openai', 'gpt-5-pro%',        15.00, 120.00, 0,      0),
   ('openai', 'gpt-5.2%',           1.75,  14.00, 0.175,  0),
   ('openai', 'gpt-5.2-pro%',      21.00, 168.00, 0,      0),
+  ('openai', 'gpt-5.3%',           1.75,  14.00, 0.175,  0),
   ('openai', 'gpt-5.4%',           2.50,  15.00, 0.25,   0),
   ('openai', 'gpt-5.4-mini%',      0.75,   4.50, 0.075,  0),
   ('openai', 'gpt-5.4-nano%',      0.20,   1.25, 0.02,   0),
@@ -57,9 +64,17 @@ INSERT INTO public.api_pricing (
   ('openai', 'gpt-5.6%',           4.00,  20.00, 0.40,   5.00),
   ('openai', 'gpt-5.6-terra%',     2.00,  12.00, 0.20,   2.50),
   ('openai', 'gpt-5.6-luna%',      0.20,   1.20, 0.02,   0.25),
+  -- GPT-6 (2026-09). No 'gpt-6%' baseline on purpose: a new variant stays out
+  -- of the picker until it has a price.
+  ('openai', 'gpt-6-astra%',      10.00,  50.00, 1.00,  12.50),
+  ('openai', 'gpt-6-sol%',         2.00,  10.00, 0.20,   2.50),
+  ('openai', 'gpt-6-luna%',        0.10,   0.50, 0.01,   0.125),
+  ('openai', 'gpt-6.1-sol%',       2.00,  10.00, 0.10,   2.50),
+  ('openai', 'o1-pro%',          150.00, 600.00, 0,      0),
   ('openai', 'o3%',                2.00,   8.00, 0.50,   0),
+  ('openai', 'o3-mini%',           1.10,   4.40, 0.55,   0),
   ('openai', 'o3-pro%',           20.00,  80.00, 0,      0),
-  ('openai', 'o4-mini%',           1.10,   4.40, 0.275,  0),   -- (*)
+  ('openai', 'o4-mini%',           1.10,   4.40, 0.275,  0),
 
   -- ---- Anthropic ---------------------------------------------------------
   -- Opus has listed at $5 / $25 since 4.5. The two older generations that
@@ -77,10 +92,6 @@ INSERT INTO public.api_pricing (
   ('google', 'gemini-2.5-flash%',       0.30,  2.50, 0.03,  0),
   ('google', 'gemini-2.5-flash-lite%',  0.10,  0.40, 0.01,  0),
   ('google', 'gemini-2.5-pro%',         1.25, 10.00, 0.125, 0),
-  -- Baseline for any 3.x model without a row: the Pro price, so a model added
-  -- to the picker before it is added here over-bills slightly rather than
-  -- running at the '%' row's Flash 1.5 price.
-  ('google', 'gemini-3%',               2.00, 12.00, 0.20,  0),
   ('google', 'gemini-3-flash%',         0.50,  3.00, 0.05,  0),
   ('google', 'gemini-3-pro%',           2.00, 12.00, 0.20,  0),   -- (*)
   ('google', 'gemini-3.1-pro%',         2.00, 12.00, 0.20,  0),
@@ -91,16 +102,29 @@ INSERT INTO public.api_pricing (
   ('google', 'gemini-3.7-flash%',       0.75,  3.75, 0.075, 0),
   ('google', 'gemini-3.8-flash%',       0.75,  3.75, 0.075, 0),
   ('google', 'gemini-flash-latest%',    0.75,  3.75, 0.075, 0),
+  ('google', 'gemini-flash-lite-latest%', 0.30, 2.50, 0.03, 0),
   ('google', 'gemini-pro-latest%',      2.00, 12.00, 0.20,  0),   -- (*)
 
   -- ---- xAI ---------------------------------------------------------------
-  -- (*) Grok had no provider of its own and was priced by the openai '%' row.
-  -- This row keeps that price so nothing changes for Grok today; replace it
-  -- with per-model rows once the list prices are confirmed.
+  -- Grok had no provider of its own and was priced by the openai '%' row.
+  ('xai', 'grok-4.20%',            1.25,   2.50, 0.20,   0),
+  ('xai', 'grok-4.3%',             1.25,   2.50, 0.20,   0),
+  ('xai', 'grok-4.5%',             2.00,   6.00, 0.30,   0),
+  ('xai', 'grok-4.6%',             2.00,   6.00, 0.50,   0),
+  ('xai', 'grok-4.7%',             2.00,   6.00, 0.50,   0),
+  ('xai', 'grok-build%',           1.00,   2.00, 0.20,   0),
+  -- Safety net only: what an unpriced Grok model billed at before this change.
   ('xai', '%',                     5.00,  15.00, 2.50,   5.00),
 
   -- ---- Local models ------------------------------------------------------
-  -- Free. Was the 'local' band in llm_model_tiers.
+  -- Free. Was the 'local' band in llm_model_tiers; the same name prefixes
+  -- compute_llm_credits maps to this provider.
+  ('ollama', 'llama%',             0,      0,    0,      0),
+  ('ollama', 'mistral%',           0,      0,    0,      0),
+  ('ollama', 'qwen%',              0,      0,    0,      0),
+  ('ollama', 'gemma%',             0,      0,    0,      0),
+  ('ollama', 'phi%',               0,      0,    0,      0),
+  ('ollama', 'deepseek%',          0,      0,    0,      0),
   ('ollama', '%',                  0,      0,    0,      0)
 ON CONFLICT (provider, model_pattern) DO UPDATE SET
   input_cost_per_million       = EXCLUDED.input_cost_per_million,
