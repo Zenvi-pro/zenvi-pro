@@ -21,7 +21,8 @@
 --
 -- After this migration a chat model is priced by exactly one api_pricing row:
 -- the longest model_pattern that matches within its provider. Credits are
--- CEIL(usd * 100 * 2.0), as before. llm_model_tiers is dropped.
+-- CEIL(usd * 100 * 2.0), as before. Nothing reads llm_model_tiers after this; the
+-- next migration drops it.
 --
 -- The assistant's model picker reads this table too (zenvi-backend
 -- core/providers/pricing.py): a model is offered only when a row other than
@@ -196,6 +197,3 @@ BEGIN
 END;
 $function$;
 
-
--- Nothing reads it any more: compute_llm_credits was its only consumer.
-DROP TABLE IF EXISTS public.llm_model_tiers;

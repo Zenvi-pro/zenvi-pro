@@ -15,6 +15,9 @@
 --                          writes video_catalog / video_rag_nodes. Only
 --                          match_video_shots touches it, and nothing calls it.
 --
+--   llm_model_tiers        50 rows. compute_llm_credits was its only reader and
+--                          now prices from api_pricing alone (previous migration).
+--
 -- Not dropped, though they look quiet -- each still has a live reader or writer:
 --   api_usage (backend usage flush), usage_anomalies (admin billing page),
 --   hyperframes_routing_events (hyperframes job store), checkpoints* (LangChain
@@ -28,3 +31,5 @@ DROP TABLE IF EXISTS public.zenvi_session_memory;
 
 DROP FUNCTION IF EXISTS public.match_video_shots(vector, uuid, text, integer, double precision);
 DROP TABLE IF EXISTS public.video_shots;
+
+DROP TABLE IF EXISTS public.llm_model_tiers;
