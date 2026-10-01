@@ -22,6 +22,8 @@ export const docsNavGroups: DocsNavGroup[] = [
     label: "Zenvi everywhere",
     items: [
       { slug: "web-editor", title: "Web editor" },
+      { slug: "ai-assistants", title: "Claude and ChatGPT" },
+      { slug: "zenvi-cli", title: "Command line" },
     ],
   },
   {
