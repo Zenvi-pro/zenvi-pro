@@ -580,10 +580,10 @@ DROP FUNCTION IF EXISTS public.compute_llm_credits(TEXT, INTEGER, INTEGER);
 
 CREATE OR REPLACE FUNCTION public.compute_llm_credits(
   p_model TEXT,
-  p_input_tokens INTEGER DEFAULT 0,
-  p_output_tokens INTEGER DEFAULT 0,
-  p_cache_read_tokens INTEGER DEFAULT 0,
-  p_cache_write_tokens INTEGER DEFAULT 0
+  p_input_tokens INTEGER,
+  p_output_tokens INTEGER,
+  p_cache_read_tokens INTEGER,
+  p_cache_write_tokens INTEGER
 )
 RETURNS TABLE(
   credits     INTEGER,

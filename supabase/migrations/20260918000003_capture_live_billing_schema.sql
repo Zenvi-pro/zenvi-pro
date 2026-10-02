@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS public.operation_pricing (
   margin_multiplier   NUMERIC(6, 3) DEFAULT 2.0,
   CONSTRAINT operation_pricing_points_per_unit_check CHECK (points_per_unit >= 0),
   CONSTRAINT operation_pricing_unit_type_check CHECK (
-    unit_type = ANY (ARRAY['flat'::text, 'per_minute'::text, 'per_unit'::text])
+    unit_type = ANY (ARRAY['flat'::text, 'per_minute'::text, 'per_unit'::text, 'per_second'::text])
   ),
   CONSTRAINT operation_pricing_category_check CHECK (
     category = ANY (ARRAY[
@@ -35,6 +35,14 @@ CREATE TABLE IF NOT EXISTS public.operation_pricing (
 ALTER TABLE public.operation_pricing
   ADD COLUMN IF NOT EXISTS usd_cost_per_unit NUMERIC(12, 6),
   ADD COLUMN IF NOT EXISTS margin_multiplier NUMERIC(6, 3) DEFAULT 2.0;
+
+-- Live tables created before per_second existed still have the old CHECK.
+ALTER TABLE public.operation_pricing
+  DROP CONSTRAINT IF EXISTS operation_pricing_unit_type_check;
+ALTER TABLE public.operation_pricing
+  ADD CONSTRAINT operation_pricing_unit_type_check CHECK (
+    unit_type = ANY (ARRAY['flat'::text, 'per_minute'::text, 'per_unit'::text, 'per_second'::text])
+  );
 
 ALTER TABLE public.operation_pricing ENABLE ROW LEVEL SECURITY;
 
@@ -220,7 +228,7 @@ AS $$
     WHEN 'creator' THEN 'starter'
     WHEN 'studio'  THEN 'max'
     WHEN 'none'     THEN 'free'
-    ELSE lower(p_tier)
+    ELSE lower(coalesce(p_tier, 'free'))
   END;
 $$;
 
@@ -355,6 +363,7 @@ DECLARE
   v_from_roll INTEGER := 0; v_from_sub INTEGER := 0;
   v_from_bonus INTEGER := 0; v_from_topup INTEGER := 0;
   v_total_avail INTEGER; v_category TEXT; v_balance_after INTEGER;
+  v_overage_usd NUMERIC(10, 6) := 0;
 BEGIN
   IF p_points <= 0 THEN RETURN 'ok'; END IF;
   IF p_idempotency_key IS NOT NULL AND EXISTS (
@@ -381,11 +390,24 @@ BEGIN
   IF v_remaining > 0 AND v_uc.topup_points > 0 THEN
     v_from_topup := LEAST(v_remaining, v_uc.topup_points); v_remaining := v_remaining - v_from_topup;
   END IF;
+  -- Uncovered remainder bills as overage USD ($0.01 / credit). Cap when set.
+  IF v_remaining > 0 THEN
+    IF NOT v_uc.overage_enabled THEN
+      UPDATE public.user_credits SET in_standard_mode = TRUE WHERE user_id = auth.uid();
+      RETURN 'standard_mode';
+    END IF;
+    v_overage_usd := round(v_remaining * 0.01, 6);
+    IF v_uc.overage_limit_usd > 0
+       AND (COALESCE(v_uc.overage_spent_cycle, 0) + v_overage_usd) > v_uc.overage_limit_usd THEN
+      RETURN 'overage_cap';
+    END IF;
+  END IF;
   UPDATE public.user_credits SET
     rollover_points = rollover_points - v_from_roll,
     subscription_points = subscription_points - v_from_sub,
     bonus_points = bonus_points - v_from_bonus,
     topup_points = topup_points - v_from_topup,
+    overage_spent_cycle = overage_spent_cycle + v_overage_usd,
     in_standard_mode = (
       (rollover_points - v_from_roll) + (subscription_points - v_from_sub) +
       (bonus_points - v_from_bonus) + (topup_points - v_from_topup) = 0 AND NOT overage_enabled
@@ -395,13 +417,14 @@ BEGIN
   INSERT INTO public.point_transactions (
     user_id, txn_type, points_delta, bucket, operation, provider, session_id,
     balance_after, note, category, idempotency_key,
-    model, input_tokens, output_tokens, quantity, duration_seconds
+    model, input_tokens, output_tokens, quantity, duration_seconds, overage_usd
   ) VALUES (
     auth.uid(), 'deduction', -p_points, 'subscription',
     p_operation, p_provider, p_session_id, v_balance_after, p_note,
     v_category, p_idempotency_key, p_model,
     COALESCE(p_input_tokens, 0), COALESCE(p_output_tokens, 0),
-    COALESCE(p_quantity, 1), p_duration_seconds
+    COALESCE(p_quantity, 1), p_duration_seconds,
+    NULLIF(v_overage_usd, 0)
   );
   RETURN 'ok';
 END;
@@ -703,6 +726,10 @@ GRANT EXECUTE ON FUNCTION public.charge_operation(text, integer, numeric, text, 
 GRANT EXECUTE ON FUNCTION public.check_operation_allowed(text, integer, numeric) TO anon, authenticated, service_role;
 GRANT EXECUTE ON FUNCTION public.check_credits_allowed(integer) TO anon, authenticated, service_role;
 GRANT EXECUTE ON FUNCTION public.get_credits_balance() TO anon, authenticated, service_role;
-GRANT EXECUTE ON FUNCTION public.refund_points(integer, text, uuid, text) TO anon, authenticated, service_role;
-GRANT EXECUTE ON FUNCTION public.credit_points(uuid, integer, text, text, text, text) TO anon, authenticated, service_role;
-GRANT EXECUTE ON FUNCTION public.allocate_monthly_points(uuid, text, text) TO anon, authenticated, service_role;
+-- Credit-minting / cycle allocation: service_role only (SECURITY DEFINER).
+REVOKE ALL ON FUNCTION public.refund_points(integer, text, uuid, text) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.credit_points(uuid, integer, text, text, text, text) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.allocate_monthly_points(uuid, text, text) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.refund_points(integer, text, uuid, text) TO service_role;
+GRANT EXECUTE ON FUNCTION public.credit_points(uuid, integer, text, text, text, text) TO service_role;
+GRANT EXECUTE ON FUNCTION public.allocate_monthly_points(uuid, text, text) TO service_role;
