@@ -22,6 +22,26 @@ ALTER TABLE public.api_pricing
   ADD COLUMN IF NOT EXISTS cache_write_cost_per_million NUMERIC(12, 6) DEFAULT 0;
 
 
+-- The same 2026-09-17 change gave the rows that existed then their cache
+-- rates: Anthropic reads at 10% of input and writes at 125%, OpenAI reads at
+-- 50%. Without this, on a database built from this repository the older, more
+-- specific rows (claude-haiku-4-5%, claude-sonnet-4-6%, ...) keep a cache price
+-- of zero and, being the longest match, bill cached tokens as free. Only rows
+-- with no cache price yet are touched; the next migration then sets exact
+-- rates for the models it lists.
+UPDATE public.api_pricing
+SET cache_read_cost_per_million  = input_cost_per_million * 0.10,
+    cache_write_cost_per_million = input_cost_per_million * 1.25
+WHERE provider = 'anthropic'
+  AND cache_read_cost_per_million = 0 AND cache_write_cost_per_million = 0;
+
+UPDATE public.api_pricing
+SET cache_read_cost_per_million  = input_cost_per_million * 0.50,
+    cache_write_cost_per_million = input_cost_per_million
+WHERE provider = 'openai' AND input_cost_per_million > 0
+  AND cache_read_cost_per_million = 0 AND cache_write_cost_per_million = 0;
+
+
 -- credits = CEIL(usd * 100 * margin): 100 credits per dollar of user spend,
 -- never less than 1 for a call that cost anything.
 CREATE OR REPLACE FUNCTION public.compute_usd_credits(
