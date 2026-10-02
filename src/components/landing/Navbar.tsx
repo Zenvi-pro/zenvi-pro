@@ -12,9 +12,17 @@ interface NavbarProps {
   isIntroActive?: boolean;
 }
 
-const navLinks = [
+interface NavLinkItem {
+  label: string;
+  href: string;
+  /** Served by another app behind a rewrite (e.g. the web editor): needs a full page load. */
+  external?: boolean;
+}
+
+const navLinks: NavLinkItem[] = [
   { label: "Features", href: "/#features" },
   { label: "Showcase", href: "/#showcase" },
+  { label: "Web editor", href: "/editor/", external: true },
   { label: "Pricing", href: "/pricing" },
   { label: "Docs", href: "/docs" },
 ];
@@ -86,16 +94,26 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode, isIntroActive }: NavbarProps
               containerClassName="rounded-[32px] p-0 border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)] backdrop-blur-xl"
               className="flex items-center gap-8 bg-[#0F0F0F] px-8 py-3"
             >
-              {navLinks.map((link) => (
-                <Link
-                  key={link.label}
-                  to={link.href}
-                  onClick={handleAnchorClick(link.href)}
-                  className="text-[13px] font-medium text-white/60 hover:text-white transition-colors"
-                >
-                  {link.label}
-                </Link>
-              ))}
+              {navLinks.map((link) =>
+                link.external ? (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    className="text-[13px] font-medium text-white/60 hover:text-white transition-colors"
+                  >
+                    {link.label}
+                  </a>
+                ) : (
+                  <Link
+                    key={link.label}
+                    to={link.href}
+                    onClick={handleAnchorClick(link.href)}
+                    className="text-[13px] font-medium text-white/60 hover:text-white transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ),
+              )}
             </HoverBorderGradient>
           </div>
 
@@ -160,16 +178,26 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode, isIntroActive }: NavbarProps
             exit={{ opacity: 0, y: -20 }}
             className="fixed inset-0 z-40 bg-black/95 backdrop-blur-3xl pt-24 sm:pt-28 px-5 sm:px-8 flex flex-col gap-5 sm:gap-6 overflow-y-auto"
           >
-             {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                to={link.href}
-                onClick={handleAnchorClick(link.href)}
-                className="text-2xl font-medium text-white/80 hover:text-white flex items-center justify-between"
-              >
-                {link.label}
-              </Link>
-            ))}
+             {navLinks.map((link) =>
+              link.external ? (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className="text-2xl font-medium text-white/80 hover:text-white flex items-center justify-between"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.label}
+                  to={link.href}
+                  onClick={handleAnchorClick(link.href)}
+                  className="text-2xl font-medium text-white/80 hover:text-white flex items-center justify-between"
+                >
+                  {link.label}
+                </Link>
+              ),
+            )}
             <div className="w-full h-px bg-white/10 my-4" />
             {session ? (
               <>
