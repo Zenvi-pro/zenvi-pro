@@ -16,6 +16,13 @@ export function getAuthCallbackUrl(opts?: {
   return url.toString();
 }
 
+/** Password-recovery landing URL (must be allowlisted in Supabase Auth). */
+export function getPasswordResetUrl(opts?: { state?: string | null }): string {
+  const url = new URL(`${window.location.origin}/reset-password`);
+  if (opts?.state) url.searchParams.set("state", opts.state);
+  return url.toString();
+}
+
 /**
  * Paths served by other apps behind a Vercel rewrite (the web editor at
  * /editor). React Router cannot render them, so they need a full page load.

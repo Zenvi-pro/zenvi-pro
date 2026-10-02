@@ -11,8 +11,33 @@ export default function AuthCallbackPage() {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
+    const isRecovery =
+      searchParams.get("type") === "recovery" ||
+      new URLSearchParams(window.location.hash.replace(/^#/, "")).get("type") === "recovery";
+
+    const goToReset = () => {
+      const reset = new URL("/reset-password", window.location.origin);
+      const desktopState = searchParams.get("state");
+      if (desktopState) reset.searchParams.set("state", desktopState);
+      navigate(`${reset.pathname}${reset.search}${window.location.hash}`, { replace: true });
+    };
+
+    let handled = false;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (handled) return;
+
+      if (event === "PASSWORD_RECOVERY" || (session && isRecovery)) {
+        handled = true;
+        subscription.unsubscribe();
+        goToReset();
+        return;
+      }
+
       if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
+        await new Promise((resolve) => window.setTimeout(resolve, 150));
+        if (handled) return;
+        handled = true;
         subscription.unsubscribe();
         const { next, state: desktopState } = consumeAuthRedirect(searchParams);
 
@@ -28,6 +53,10 @@ export default function AuthCallbackPage() {
           goToPostLoginPath(dest, navigate);
         }
       } else if (event === "INITIAL_SESSION" && !session) {
+        if (searchParams.get("code") || window.location.hash.includes("access_token")) {
+          return;
+        }
+        handled = true;
         subscription.unsubscribe();
         navigate("/", { replace: true });
       }
