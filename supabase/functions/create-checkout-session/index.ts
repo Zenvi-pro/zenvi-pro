@@ -114,7 +114,9 @@ Deno.serve(async (req) => {
         metadata: { supabase_user_id: user.id },
       });
       customerId = customer.id;
-      await supabase.from("profiles").upsert({ id: user.id, stripe_customer_id: customerId });
+      // With the service role: stripe_customer_id is server-managed and not
+      // writable from the user's own session.
+      await serviceSupabase.from("profiles").upsert({ id: user.id, stripe_customer_id: customerId });
     }
 
     // Resolve the currency to present. Anything the price cannot be billed in is
@@ -187,4 +189,4 @@ function json(body: unknown, status = 200) {
     headers: { ...CORS, "Content-Type": "application/json" },
   });
 }
-
+
