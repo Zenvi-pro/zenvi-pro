@@ -16,7 +16,9 @@
 --                          match_video_shots touches it, and nothing calls it.
 --
 --   llm_model_tiers        50 rows. compute_llm_credits was its only reader and
---                          now prices from api_pricing alone (previous migration).
+--                          now prices from api_pricing alone; the last overload
+--                          that still read it is dropped by the migration before
+--                          this one.
 --
 -- Not dropped, though they look quiet -- each still has a live reader or writer:
 --   api_usage (backend usage flush), usage_anomalies (admin billing page),
