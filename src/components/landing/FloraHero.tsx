@@ -272,6 +272,14 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
                 Watch Demo
               </button>
             </div>
+            {/* The web editor is a separate app behind a rewrite: plain link, full page load. */}
+            <a
+              href="/editor/"
+              className="mt-4 inline-flex items-center gap-1 text-[13px] font-medium text-white/55 transition-colors hover:text-white"
+            >
+              Or open Zenvi in your browser
+              <ArrowRight className="h-3 w-3" />
+            </a>
 
             {/* Trust strip */}
             <div className="mt-12 flex flex-col items-center gap-3">
@@ -331,6 +339,13 @@ const FloraHero = ({ onOpenWaitlist }: FloraHeroProps) => {
                 <Play className="h-3.5 w-3.5" />
                 Watch Demo
               </button>
+              <a
+                href="/editor/"
+                className="mt-1 inline-flex items-center gap-1 text-[13px] font-medium text-white/55 transition-colors hover:text-white"
+              >
+                Or open Zenvi in your browser
+                <ArrowRight className="h-3 w-3" />
+              </a>
             </div>
             <div className="mt-9 flex flex-col items-center gap-2">
               <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-white/45">Edited by creators at</p>
