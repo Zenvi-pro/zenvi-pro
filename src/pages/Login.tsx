@@ -11,8 +11,14 @@ import { ZenviLogo } from "@/components/ZenviLogo";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { getAuthCallbackUrl, getPasswordResetUrl, resolvePostLoginPath, stashAuthRedirect } from "@/lib/auth-redirect";
-
+import {
+  getAuthCallbackUrl,
+  getPasswordResetUrl,
+  goToPostLoginPath,
+  resolvePostLoginPath,
+  safeNextPath,
+  stashAuthRedirect,
+} from "@/lib/auth-redirect";
 function GoogleIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
@@ -30,7 +36,7 @@ export default function LoginPage() {
   const { toast } = useToast();
 
   const state = searchParams.get("state");
-  const next = searchParams.get("next");
+  const next = safeNextPath(searchParams.get("next"));
   const isDesktop = !!state;
 
   const modeParam = searchParams.get("mode");
@@ -94,7 +100,7 @@ export default function LoginPage() {
         navigate("/auth/success");
       } else {
         const dest = await resolvePostLoginPath(next);
-        navigate(dest, { replace: true });
+        goToPostLoginPath(dest, navigate);
       }
     } catch (err: unknown) {
       const msg =

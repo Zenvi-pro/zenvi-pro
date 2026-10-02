@@ -23,6 +23,45 @@ export function getPasswordResetUrl(opts?: { state?: string | null }): string {
   return url.toString();
 }
 
+/**
+ * Paths served by other apps behind a Vercel rewrite (the web editor at
+ * /editor). React Router cannot render them, so they need a full page load.
+ */
+const EXTERNAL_APP_PREFIXES = ["/editor"];
+
+export function isExternalAppPath(path: string): boolean {
+  return EXTERNAL_APP_PREFIXES.some(
+    (prefix) =>
+      path === prefix || path.startsWith(`${prefix}/`) || path.startsWith(`${prefix}?`) || path.startsWith(`${prefix}#`),
+  );
+}
+
+/**
+ * Only same-origin, absolute paths are valid post-login destinations. Rejects
+ * full URLs and protocol-relative `//host` paths so `?next=` cannot be used as
+ * an open redirect once the destination is followed with a full page load.
+ */
+export function safeNextPath(next: string | null | undefined): string | null {
+  if (!next) return null;
+  if (!next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\")) return null;
+  try {
+    const url = new URL(next, window.location.origin);
+    if (url.origin !== window.location.origin) return null;
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return null;
+  }
+}
+
+/** Follow a post-login destination: router navigation, or a full load for other apps. */
+export function goToPostLoginPath(dest: string, navigate: (to: string, opts?: { replace?: boolean }) => void): void {
+  if (isExternalAppPath(dest)) {
+    window.location.replace(dest);
+    return;
+  }
+  navigate(dest, { replace: true });
+}
+
 /** Persist post-auth destination before OAuth (sessionStorage + callback query param). */
 export function stashAuthRedirect(opts: { next?: string | null; state?: string | null }): void {
   if (opts.next) sessionStorage.setItem("auth_next", opts.next);
@@ -44,7 +83,7 @@ export function consumeAuthRedirect(searchParams: URLSearchParams): {
   sessionStorage.removeItem("auth_state");
 
   return {
-    next: nextFromUrl ?? nextFromStorage,
+    next: safeNextPath(nextFromUrl ?? nextFromStorage),
     state: stateFromUrl ?? stateFromStorage,
   };
 }
