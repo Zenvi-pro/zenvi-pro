@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTierPricing, type TierPriceDisplay } from "@/hooks/useTierPricing";
 import { buildCheckoutHref, buildPaidPlanLoginHref, planChangeDirection } from "@/lib/checkout-routing";
 import { DEFAULT_CURRENCY, formatMoney } from "@shared/currency.ts";
+import { PLAN_CAPACITY, CREDITS_FOOTNOTE } from "@/lib/planCapacity";
 
 type TabType = "monthly" | "annual" | "enterprise";
 type PaidTier = "starter" | "pro" | "max";
@@ -427,32 +428,24 @@ export default function PricingPage() {
                           loading={pricingLoading}
                           getPlanPrice={getUsdPrice}
                         />
-                        <p className="text-[11px] text-white/50 -mt-4 mb-6">100 credits/month to try things</p>
+                        <p className="text-[11px] text-white/50 -mt-4 mb-6">200 credits/month — jump in and create</p>
 
-                        {/* Free credit allotment */}
                         <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] p-3.5 backdrop-blur-md">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-[10px] font-bold text-white/60 uppercase tracking-wider">Monthly trial</span>
+                            <span className="text-[10px] font-bold text-white/60 uppercase tracking-wider">What you get</span>
                             <Info className="w-3 h-3 text-white/40" />
                           </div>
                           <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-bold text-white">100</span>
-                            <span className="text-[11px] text-white/55">credits / mo</span>
+                            <span className="text-2xl font-bold text-white">{PLAN_CAPACITY.free.creditsLabel}</span>
+                            <span className="text-[11px] text-white/55">{PLAN_CAPACITY.free.creditsSub}</span>
                           </div>
                           <p className="mt-1.5 text-[10.5px] text-white/45 leading-snug">
-                            ~2 AI clips · or 100 chats · or 6 min indexing · Ollama local models stay free
+                            {PLAN_CAPACITY.free.capacityBlurb}
                           </p>
                         </div>
 
                         <ul className="space-y-3.5">
-                          {[
-                            "1 seat (solo)",
-                            "Local Ollama models (free, unlimited)",
-                            "All cloud features (capped by 100 cr)",
-                            "Watermark on exports",
-                            "3 active projects",
-                            "Full canvas & layer editor",
-                          ].map((feature, idx) => (
+                          {PLAN_CAPACITY.free.whatYouCanDo.map((feature, idx) => (
                             <li key={idx} className="flex items-start gap-3 text-xs text-white/80 leading-snug">
                               <Check className="w-3.5 h-3.5 text-white/40 shrink-0 mt-0.5" />
                               <span>{feature}</span>
@@ -487,27 +480,33 @@ export default function PricingPage() {
                         {/* Credit allotment */}
                         <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] p-3.5 backdrop-blur-md">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-[10px] font-bold text-[#3275F8] uppercase tracking-wider">Monthly credits</span>
+                            <span className="text-[10px] font-bold text-[#3275F8] uppercase tracking-wider">What you get</span>
                             <Info className="w-3 h-3 text-white/40" />
                           </div>
                           <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-bold text-white">2,500</span>
-                            <span className="text-[11px] text-white/55">≈ $25 USD of AI</span>
+                            <span className="text-2xl font-bold text-white">
+                              {activeTab === "annual"
+                                ? PLAN_CAPACITY.starter_annual.creditsLabel
+                                : PLAN_CAPACITY.starter_monthly.creditsLabel}
+                            </span>
+                            <span className="text-[11px] text-white/55">
+                              {activeTab === "annual"
+                                ? PLAN_CAPACITY.starter_annual.creditsSub
+                                : PLAN_CAPACITY.starter_monthly.creditsSub}
+                            </span>
                           </div>
                           <p className="mt-1.5 text-[10.5px] text-white/45 leading-snug">
-                            ~50 AI video clips · or 2,500 chats · or 60 min of indexing · mix &amp; match
+                            {activeTab === "annual"
+                              ? PLAN_CAPACITY.starter_annual.capacityBlurb
+                              : PLAN_CAPACITY.starter_monthly.capacityBlurb}
                           </p>
                         </div>
 
                         <ul className="space-y-3.5">
-                          {[
-                            "All cloud LLMs (light / standard / premium)",
-                            "Kling O1 Pro video generation (Runware)",
-                            "TwelveLabs clip indexing + search",
-                            "1-month credit rollover",
-                            "Overage opt-in (1.5× sticker)",
-                            "No watermark",
-                          ].map((feature, idx) => (
+                          {(activeTab === "annual"
+                            ? PLAN_CAPACITY.starter_annual.whatYouCanDo
+                            : PLAN_CAPACITY.starter_monthly.whatYouCanDo
+                          ).map((feature, idx) => (
                             <li key={idx} className="flex items-start gap-3 text-xs text-white/80 leading-snug">
                               <Check className="w-3.5 h-3.5 text-[#3275F8] shrink-0 mt-0.5" />
                               <span>{feature}</span>
@@ -542,32 +541,37 @@ export default function PricingPage() {
                           loading={pricingLoading}
                           getPlanPrice={getUsdPrice}
                         />
-                        <p className="text-[11px] text-white/50 -mt-4 mb-6">3 pooled seats</p>
+                        <p className="text-[11px] text-white/50 -mt-4 mb-6">3 seats · most teams land here</p>
 
-                        {/* Credit allotment */}
                         <div className="mb-6 rounded-xl border border-[#3275F8]/30 bg-[#3275F8]/[0.05] p-3.5 backdrop-blur-md shadow-inner">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-[10px] font-bold text-[#3275F8] uppercase tracking-wider">Monthly credits</span>
+                            <span className="text-[10px] font-bold text-[#3275F8] uppercase tracking-wider">What you get</span>
                             <Info className="w-3 h-3 text-[#3275F8]/70" />
                           </div>
                           <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-bold text-white">5,500</span>
-                            <span className="text-[11px] text-white/55">≈ $55 USD of AI</span>
+                            <span className="text-2xl font-bold text-white">
+                              {activeTab === "annual"
+                                ? PLAN_CAPACITY.pro_annual.creditsLabel
+                                : PLAN_CAPACITY.pro_monthly.creditsLabel}
+                            </span>
+                            <span className="text-[11px] text-white/55">
+                              {activeTab === "annual"
+                                ? PLAN_CAPACITY.pro_annual.creditsSub
+                                : PLAN_CAPACITY.pro_monthly.creditsSub}
+                            </span>
                           </div>
                           <p className="mt-1.5 text-[10.5px] text-white/55 leading-snug">
-                            ~110 AI clips · or 5,500 chats · or 250 min indexing · pooled across seats
+                            {activeTab === "annual"
+                              ? PLAN_CAPACITY.pro_annual.capacityBlurb
+                              : PLAN_CAPACITY.pro_monthly.capacityBlurb}
                           </p>
                         </div>
 
                         <ul className="space-y-3.5">
-                          {[
-                            "3 pooled seats",
-                            "Everything in Starter",
-                            "Priority Runware queue (peak)",
-                            "Usage analytics per seat",
-                            "2-month credit rollover",
-                            "Overage opt-in (1.3× sticker)",
-                          ].map((feature, idx) => (
+                          {(activeTab === "annual"
+                            ? PLAN_CAPACITY.pro_annual.whatYouCanDo
+                            : PLAN_CAPACITY.pro_monthly.whatYouCanDo
+                          ).map((feature, idx) => (
                             <li key={idx} className="flex items-start gap-3 text-xs text-white/90 leading-snug">
                               <Check className="w-3.5 h-3.5 text-[#3275F8] shrink-0 mt-0.5" />
                               <span>{feature}</span>
@@ -597,32 +601,37 @@ export default function PricingPage() {
                           loading={pricingLoading}
                           getPlanPrice={getUsdPrice}
                         />
-                        <p className="text-[11px] text-white/50 -mt-4 mb-6">8 pooled seats</p>
+                        <p className="text-[11px] text-white/50 -mt-4 mb-6">8 seats · never think about the meter</p>
 
-                        {/* Credit allotment */}
                         <div className="mb-6 rounded-xl border border-white/10 bg-white/[0.03] p-3.5 backdrop-blur-md">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-[10px] font-bold text-[#3275F8] uppercase tracking-wider">Monthly credits</span>
+                            <span className="text-[10px] font-bold text-[#3275F8] uppercase tracking-wider">What you get</span>
                             <Info className="w-3 h-3 text-white/40" />
                           </div>
                           <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-bold text-white">25,000</span>
-                            <span className="text-[11px] text-white/55">≈ $250 USD of AI</span>
+                            <span className="text-2xl font-bold text-white">
+                              {activeTab === "annual"
+                                ? PLAN_CAPACITY.max_annual.creditsLabel
+                                : PLAN_CAPACITY.max_monthly.creditsLabel}
+                            </span>
+                            <span className="text-[11px] text-white/55">
+                              {activeTab === "annual"
+                                ? PLAN_CAPACITY.max_annual.creditsSub
+                                : PLAN_CAPACITY.max_monthly.creditsSub}
+                            </span>
                           </div>
                           <p className="mt-1.5 text-[10.5px] text-white/55 leading-snug">
-                            ~500 AI clips · or 25k chats · or 1,600 min indexing · 8-seat pool
+                            {activeTab === "annual"
+                              ? PLAN_CAPACITY.max_annual.capacityBlurb
+                              : PLAN_CAPACITY.max_monthly.capacityBlurb}
                           </p>
                         </div>
 
                         <ul className="space-y-3.5">
-                          {[
-                            "8 pooled seats",
-                            "Everything in Pro",
-                            "Priority Runware queue 24/7",
-                            "3-month credit rollover",
-                            "Overage opt-in (1.2× sticker)",
-                            "Custom voices (3/org)",
-                          ].map((feature, idx) => (
+                          {(activeTab === "annual"
+                            ? PLAN_CAPACITY.max_annual.whatYouCanDo
+                            : PLAN_CAPACITY.max_monthly.whatYouCanDo
+                          ).map((feature, idx) => (
                             <li key={idx} className="flex items-start gap-3 text-xs text-white/80 leading-snug">
                               <Check className="w-3.5 h-3.5 text-[#3275F8] shrink-0 mt-0.5" />
                               <span>{feature}</span>
@@ -635,6 +644,10 @@ export default function PricingPage() {
                     </div>
                   </LiquidGlassCard>
                 </div>
+
+                <p className="md:col-span-2 lg:col-span-4 text-center text-[11px] text-white/40 leading-relaxed pt-2 max-w-3xl mx-auto">
+                  {CREDITS_FOOTNOTE}
+                </p>
               </motion.div>
             ) : (
               /* Enterprise View — Integrated Liquid Glass Split Dashboard */
