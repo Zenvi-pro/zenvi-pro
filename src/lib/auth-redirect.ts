@@ -141,3 +141,33 @@ export async function resolvePostLoginPath(next: string | null): Promise<string>
 
   return `/checkout?plan=${checkout.planKey}`;
 }
+
+// Marks a session as having come from a verified password-recovery link.
+// AuthCallback consumes the PASSWORD_RECOVERY event before /reset-password mounts,
+// so the reset page cannot see it; the marker is bound to the user id so an
+// unrelated session can never unlock the reset form.
+const RECOVERY_KEY = "zenvi:recovery-user";
+
+export function markRecoverySession(userId: string): void {
+  try {
+    sessionStorage.setItem(RECOVERY_KEY, userId);
+  } catch {
+    /* storage unavailable: reset page falls back to PASSWORD_RECOVERY only */
+  }
+}
+
+export function isRecoverySession(userId: string): boolean {
+  try {
+    return sessionStorage.getItem(RECOVERY_KEY) === userId;
+  } catch {
+    return false;
+  }
+}
+
+export function clearRecoverySession(): void {
+  try {
+    sessionStorage.removeItem(RECOVERY_KEY);
+  } catch {
+    /* ignore */
+  }
+}

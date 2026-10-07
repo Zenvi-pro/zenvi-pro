@@ -2,7 +2,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/integrations/supabase/client", () => ({ supabase: { rpc: vi.fn() } }));
 
-import { goToPostLoginPath, isExternalAppPath, safeNextPath } from "./auth-redirect";
+import {
+  clearRecoverySession,
+  goToPostLoginPath,
+  isExternalAppPath,
+  isRecoverySession,
+  markRecoverySession,
+  safeNextPath,
+} from "./auth-redirect";
 
 describe("post-login destinations", () => {
   const replace = vi.fn();
@@ -49,5 +56,48 @@ describe("post-login destinations", () => {
 
     goToPostLoginPath("/download", navigate);
     expect(navigate).toHaveBeenCalledWith("/download", { replace: true });
+  });
+});
+
+describe("recovery session marker", () => {
+  beforeEach(() => {
+    const store = new Map<string, string>();
+    vi.stubGlobal("sessionStorage", {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => void store.set(k, v),
+      removeItem: (k: string) => void store.delete(k),
+    });
+  });
+
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("only unlocks the user whose recovery link was verified", () => {
+    expect(isRecoverySession("user-a")).toBe(false);
+    markRecoverySession("user-a");
+    expect(isRecoverySession("user-a")).toBe(true);
+    expect(isRecoverySession("user-b")).toBe(false);
+  });
+
+  it("is cleared after the reset completes", () => {
+    markRecoverySession("user-a");
+    clearRecoverySession();
+    expect(isRecoverySession("user-a")).toBe(false);
+  });
+
+  it("fails closed when storage throws", () => {
+    vi.stubGlobal("sessionStorage", {
+      getItem: () => {
+        throw new Error("blocked");
+      },
+      setItem: () => {
+        throw new Error("blocked");
+      },
+      removeItem: () => {
+        throw new Error("blocked");
+      },
+    });
+    expect(() => markRecoverySession("user-a")).not.toThrow();
+    expect(isRecoverySession("user-a")).toBe(false);
+    expect(() => clearRecoverySession()).not.toThrow();
   });
 });

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { consumeAuthRedirect, goToPostLoginPath, resolvePostLoginPath } from "@/lib/auth-redirect";
+import { consumeAuthRedirect, goToPostLoginPath, markRecoverySession, resolvePostLoginPath } from "@/lib/auth-redirect";
 
 // Landing page for OAuth redirects (GitHub, Google).
 // Supabase exchanges the auth code for a session when this page loads.
@@ -24,12 +24,22 @@ export default function AuthCallbackPage() {
 
     let handled = false;
 
+    // A callback whose code exchange fails never emits SIGNED_IN / PASSWORD_RECOVERY.
+    const fallback = window.setTimeout(() => {
+      if (handled) return;
+      handled = true;
+      subscription.unsubscribe();
+      navigate("/login", { replace: true });
+    }, 10000);
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (handled) return;
 
       if (event === "PASSWORD_RECOVERY" || (session && isRecovery)) {
         handled = true;
         subscription.unsubscribe();
+        window.clearTimeout(fallback);
+        if (session) markRecoverySession(session.user.id);
         goToReset();
         return;
       }
@@ -39,6 +49,7 @@ export default function AuthCallbackPage() {
         if (handled) return;
         handled = true;
         subscription.unsubscribe();
+        window.clearTimeout(fallback);
         const { next, state: desktopState } = consumeAuthRedirect(searchParams);
 
         if (desktopState) {
@@ -58,11 +69,15 @@ export default function AuthCallbackPage() {
         }
         handled = true;
         subscription.unsubscribe();
+        window.clearTimeout(fallback);
         navigate("/", { replace: true });
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      window.clearTimeout(fallback);
+      subscription.unsubscribe();
+    };
   }, [navigate, searchParams]);
 
   return (

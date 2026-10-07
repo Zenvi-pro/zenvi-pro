@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { CheckCircle, Eye, EyeOff, Loader2 } from "lucide-react";
@@ -9,6 +9,7 @@ import { ZenviLogo } from "@/components/ZenviLogo";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { clearRecoverySession, isRecoverySession } from "@/lib/auth-redirect";
 
 async function passwordMatchesCurrent(email: string, password: string): Promise<boolean> {
   const url = import.meta.env.VITE_SUPABASE_URL;
@@ -51,14 +52,18 @@ export default function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [samePasswordError, setSamePasswordError] = useState(false);
 
+  // Id of the user whose recovery link was verified; the form only ever updates that account.
+  const recoveryUserId = useRef<string | null>(null);
+
   const loginPath = state ? `/login?state=${encodeURIComponent(state)}` : "/login";
 
   useEffect(() => {
     let settled = false;
 
-    const markReady = () => {
+    const markReady = (userId: string) => {
       if (settled) return;
       settled = true;
+      recoveryUserId.current = userId;
       setStatus("ready");
     };
 
@@ -70,14 +75,16 @@ export default function ResetPasswordPage() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY" && session) {
-        markReady();
+        markReady(session.user.id);
         return;
       }
-      if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
-        markReady();
+      // AuthCallback verifies the link and marks the session before redirecting here.
+      // An ordinary signed-in session without that marker must not unlock the form.
+      if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION") && isRecoverySession(session.user.id)) {
+        markReady(session.user.id);
         return;
       }
-      if (event === "INITIAL_SESSION" && !session && !isRecoveryUrl()) {
+      if (event === "INITIAL_SESSION" && !isRecoveryUrl()) {
         markInvalid();
       }
     });
@@ -108,7 +115,9 @@ export default function ResetPasswordPage() {
     try {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       if (sessionError) throw sessionError;
-      if (!session) throw new Error("This reset link is invalid or has expired.");
+      if (!session || session.user.id !== recoveryUserId.current) {
+        throw new Error("This reset link is invalid or has expired.");
+      }
 
       const email = session.user.email;
       if (email && (await passwordMatchesCurrent(email, password))) {
@@ -126,7 +135,17 @@ export default function ResetPasswordPage() {
         throw error;
       }
 
-      await supabase.auth.signOut();
+      let { error: signOutError } = await supabase.auth.signOut();
+      if (signOutError) ({ error: signOutError } = await supabase.auth.signOut({ scope: "local" }));
+      if (signOutError) {
+        toast({
+          title: "Password updated",
+          description: "We could not sign you out. Close this tab, then sign in with your new password.",
+          variant: "destructive",
+        });
+        return;
+      }
+      clearRecoverySession();
       setStatus("done");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Could not update your password.";
