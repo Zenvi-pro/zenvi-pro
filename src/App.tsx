@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Download from "./pages/Download";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ResetPassword from "./pages/ResetPassword";
 import AuthSuccess from "./pages/AuthSuccess";
 import AuthCallback from "./pages/AuthCallback";
 import Checkout from "./pages/Checkout";
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/auth/success" element={<AuthSuccess />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/checkout" element={<Checkout />} />

@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { consumeAuthRedirect, goToPostLoginPath, resolvePostLoginPath } from "@/lib/auth-redirect";
+import { consumeAuthRedirect, goToPostLoginPath, markRecoverySession, resolvePostLoginPath } from "@/lib/auth-redirect";
 
 // Landing page for OAuth redirects (GitHub, Google).
 // Supabase exchanges the auth code for a session when this page loads.
@@ -11,9 +11,45 @@ export default function AuthCallbackPage() {
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
+    const isRecovery =
+      searchParams.get("type") === "recovery" ||
+      new URLSearchParams(window.location.hash.replace(/^#/, "")).get("type") === "recovery";
+
+    const goToReset = () => {
+      const reset = new URL("/reset-password", window.location.origin);
+      const desktopState = searchParams.get("state");
+      if (desktopState) reset.searchParams.set("state", desktopState);
+      navigate(`${reset.pathname}${reset.search}${window.location.hash}`, { replace: true });
+    };
+
+    let handled = false;
+
+    // A callback whose code exchange fails never emits SIGNED_IN / PASSWORD_RECOVERY.
+    const fallback = window.setTimeout(() => {
+      if (handled) return;
+      handled = true;
+      subscription.unsubscribe();
+      navigate("/login", { replace: true });
+    }, 10000);
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
+      if (handled) return;
+
+      if (event === "PASSWORD_RECOVERY" || (session && isRecovery)) {
+        handled = true;
         subscription.unsubscribe();
+        window.clearTimeout(fallback);
+        if (session) markRecoverySession(session.user.id);
+        goToReset();
+        return;
+      }
+
+      if (session && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
+        await new Promise((resolve) => window.setTimeout(resolve, 150));
+        if (handled) return;
+        handled = true;
+        subscription.unsubscribe();
+        window.clearTimeout(fallback);
         const { next, state: desktopState } = consumeAuthRedirect(searchParams);
 
         if (desktopState) {
@@ -28,12 +64,20 @@ export default function AuthCallbackPage() {
           goToPostLoginPath(dest, navigate);
         }
       } else if (event === "INITIAL_SESSION" && !session) {
+        if (searchParams.get("code") || window.location.hash.includes("access_token")) {
+          return;
+        }
+        handled = true;
         subscription.unsubscribe();
+        window.clearTimeout(fallback);
         navigate("/", { replace: true });
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      window.clearTimeout(fallback);
+      subscription.unsubscribe();
+    };
   }, [navigate, searchParams]);
 
   return (
