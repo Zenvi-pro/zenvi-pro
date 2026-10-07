@@ -21,6 +21,7 @@ import { useTierPricing } from "@/hooks/useTierPricing";
 import { stripeEdgeFunctionUrl, stripeEdgeHeaders } from "@/lib/stripe-edge";
 import { useCurrency } from "@/hooks/useCurrency";
 import { currencyMeta } from "@shared/currency.ts";
+import { PLAN_CAPACITY, CREDITS_FOOTNOTE } from "@/lib/planCapacity";
 
 const PLANS = {
   starter_monthly: {
@@ -29,15 +30,8 @@ const PLANS = {
     interval: "monthly" as const,
     description: "Your AI video editor, always on.",
     features: [
-      "2,500 credits/month (~$25 USD of AI usage)",
-      "≈ 50 AI clips OR 2,500 chats OR 60 min indexing",
-      "1 seat",
-      "All cloud LLMs (light / standard / premium)",
-      "Kling O1 Pro video generation (Runware)",
-      "TwelveLabs clip indexing + smart search",
-      "1-month credit rollover",
-      "Overage opt-in (1.5× sticker, $50 USD cap)",
-      "No watermark",
+      `${PLAN_CAPACITY.starter_monthly.creditsLabel} credits/month (${PLAN_CAPACITY.starter_monthly.creditsSub})`,
+      ...PLAN_CAPACITY.starter_monthly.whatYouCanDo,
     ],
   },
   starter_annual: {
@@ -46,77 +40,51 @@ const PLANS = {
     interval: "annual" as const,
     description: "Your AI video editor, always on.",
     features: [
-      "3,000 credits/month (annual bonus)",
-      "1 seat",
-      "All cloud LLMs (light / standard / premium)",
-      "Kling O1 Pro video generation (Runware)",
-      "TwelveLabs clip indexing + smart search",
-      "1-month credit rollover",
-      "No watermark",
+      `${PLAN_CAPACITY.starter_annual.creditsLabel} credits/month (${PLAN_CAPACITY.starter_annual.creditsSub})`,
+      ...PLAN_CAPACITY.starter_annual.whatYouCanDo,
     ],
   },
   pro_monthly: {
     name: "Pro",
     tier: "pro",
     interval: "monthly" as const,
-    description: "Studio-ready power, pooled across your team.",
+    description: "Studio-ready power for your team.",
     features: [
-      "5,500 credits/month (~$55 USD of AI usage)",
-      "≈ 110 AI clips OR 5,500 chats OR 250 min indexing",
-      "3 pooled seats",
-      "Everything in Starter",
-      "Priority Runware queue at peak",
-      "Per-seat usage analytics",
-      "2-month credit rollover",
-      "Overage opt-in (1.3× sticker, $150 USD cap)",
+      `${PLAN_CAPACITY.pro_monthly.creditsLabel} credits/month (${PLAN_CAPACITY.pro_monthly.creditsSub})`,
+      ...PLAN_CAPACITY.pro_monthly.whatYouCanDo,
     ],
   },
   pro_annual: {
     name: "Pro (Annual)",
     tier: "pro",
     interval: "annual" as const,
-    description: "Studio-ready power, pooled across your team.",
+    description: "Studio-ready power for your team.",
     features: [
-      "6,600 credits/month (annual bonus)",
-      "3 pooled seats",
-      "Everything in Starter",
-      "Priority Runware queue at peak",
-      "Per-seat usage analytics",
-      "2-month credit rollover",
+      `${PLAN_CAPACITY.pro_annual.creditsLabel} credits/month (${PLAN_CAPACITY.pro_annual.creditsSub})`,
+      ...PLAN_CAPACITY.pro_annual.whatYouCanDo,
     ],
   },
   max_monthly: {
     name: "Max",
     tier: "max",
     interval: "monthly" as const,
-    description: "One pool. Eight editors. Unlimited creativity.",
+    description: "Eight editors. Room to create at scale.",
     features: [
-      "25,000 credits/month (~$250 USD of AI usage)",
-      "≈ 500 AI clips OR 25k chats OR 1,600 min indexing",
-      "8 pooled seats",
-      "Everything in Pro",
-      "Priority Runware queue 24/7",
-      "3-month credit rollover",
-      "Overage opt-in (1.2× sticker, $500 USD cap)",
-      "Custom voices (3/org)",
-      "Beta access to new models",
+      `${PLAN_CAPACITY.max_monthly.creditsLabel} credits/month (${PLAN_CAPACITY.max_monthly.creditsSub})`,
+      ...PLAN_CAPACITY.max_monthly.whatYouCanDo,
     ],
   },
   max_annual: {
     name: "Max (Annual)",
     tier: "max",
     interval: "annual" as const,
-    description: "One pool. Eight editors. Unlimited creativity.",
+    description: "Eight editors. Room to create at scale.",
     features: [
-      "30,000 credits/month (annual bonus)",
-      "8 pooled seats",
-      "Everything in Pro",
-      "Priority Runware queue 24/7",
-      "3-month credit rollover",
-      "Custom voices (3/org)",
+      `${PLAN_CAPACITY.max_annual.creditsLabel} credits/month (${PLAN_CAPACITY.max_annual.creditsSub})`,
+      ...PLAN_CAPACITY.max_annual.whatYouCanDo,
     ],
   },
-} as const;
+};
 
 type PlanKey = keyof typeof PLANS;
 type Status = "checking-auth" | "no-code" | "ready" | "redirecting" | "error" | "upgrading";
@@ -468,6 +436,9 @@ export default function CheckoutPage() {
                 </li>
               ))}
             </ul>
+            <p className="mb-6 text-[10.5px] text-white/40 leading-relaxed">
+              {CREDITS_FOOTNOTE}
+            </p>
 
             <div className="mb-6 rounded-lg border border-white/[0.06] bg-white/[0.02] p-4">
               <p className="text-[11px] font-semibold uppercase tracking-wider text-white/60 mb-1.5">
