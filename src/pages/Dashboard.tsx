@@ -20,6 +20,7 @@ import { useTierPricing } from "@/hooks/useTierPricing";
 import OutOfCreditsModal, { shouldShowOocModal, markOocModalDismissed } from "@/components/OutOfCreditsModal";
 import { useQueryClient } from "@tanstack/react-query";
 import { buildCheckoutHref } from "@/lib/checkout-routing";
+import { PLAN_CAPACITY } from "@/lib/planCapacity";
 import { stripeEdgeFunctionUrl, stripeEdgeHeaders } from "@/lib/stripe-edge";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -1009,8 +1010,8 @@ export default function DashboardPage() {
               name="Starter"
               price={getPlanPrice("starter", "monthly")?.display ?? "—"}
               cadence={getPlanPrice("starter", "monthly")?.period ?? "/mo"}
-              tagline="Ship every week"
-              bullets={["2,500 credits · 25+ AI clips", "35+ Assistant edits", "Unlimited timeline edits free"]}
+              tagline="Ship something every week"
+              bullets={[...PLAN_CAPACITY.starter_monthly.tileBullets]}
             />
             <PlanTile
               tier="pro"
@@ -1018,8 +1019,8 @@ export default function DashboardPage() {
               name="Pro"
               price={getPlanPrice("pro", "monthly")?.display ?? "—"}
               cadence={getPlanPrice("pro", "monthly")?.period ?? "/mo"}
-              tagline="The production workhorse"
-              bullets={["5,500 credits · 50+ AI clips", "80+ Assistant edits", "3 seats · stop rationing"]}
+              tagline="Real production volume"
+              bullets={[...PLAN_CAPACITY.pro_monthly.tileBullets]}
               accent
             />
             <PlanTile
@@ -1029,7 +1030,7 @@ export default function DashboardPage() {
               price={getPlanPrice("max", "monthly")?.display ?? "—"}
               cadence={getPlanPrice("max", "monthly")?.period ?? "/mo"}
               tagline="Never think about the meter"
-              bullets={["25,000 credits · 220+ AI clips", "350+ Assistant edits", "8 seats · agency runway"]}
+              bullets={[...PLAN_CAPACITY.max_monthly.tileBullets]}
             />
           </div>
         </motion.section>

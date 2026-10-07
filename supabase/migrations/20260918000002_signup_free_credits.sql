@@ -70,7 +70,7 @@ BEGIN
   SELECT EXISTS (
     SELECT 1 FROM public.subscriptions s
     WHERE s.user_id = p_user_id
-      AND s.status IN ('active', 'trialing')
+      AND s.status IN ('active', 'trialing', 'past_due')
       AND s.tier IS DISTINCT FROM 'free'
   ) INTO v_has_paid;
   IF v_has_paid THEN
@@ -142,6 +142,15 @@ BEGIN
 END;
 $$;
 
+GRANT EXECUTE ON FUNCTION public.allocate_free_tier_monthly() TO service_role;
+
+-- These are SECURITY DEFINER and SET balances. Postgres grants EXECUTE to PUBLIC by
+-- default (and Supabase to anon / authenticated), so without this any signed-in user
+-- could reset another user's balance by passing their id. Server-side callers only.
+REVOKE ALL ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.allocate_free_tier_for_user(uuid) FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.allocate_free_tier_monthly() FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.allocate_free_tier_for_user(uuid) TO service_role;
 GRANT EXECUTE ON FUNCTION public.allocate_free_tier_monthly() TO service_role;
 
 COMMENT ON FUNCTION public.handle_new_user IS

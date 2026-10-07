@@ -409,18 +409,19 @@ GRANT EXECUTE ON FUNCTION public.allocate_free_tier_for_user(uuid) TO service_ro
 -- ═════════════════════════════════════════════════════════════════════════════
 -- 9. Retroactive credit for monthly paid subscribers hit by the 10x bug
 -- ═════════════════════════════════════════════════════════════════════════════
--- Shortfall = advertised monthly_points - what they currently have in the
--- subscription bucket from this cycle (capped so we never overshoot the
--- restored monthly allotment).
+-- Shortfall = restored monthly allotment minus what the LAST renewal actually
+-- allocated. Never derived from the current balance: that is already net of
+-- spending and would hand back credits the user has used. Users with no renewal
+-- record are skipped (we cannot tell what they were given), and a user is only
+-- ever credited once.
 DO $$
 DECLARE
   r RECORD;
-  v_target INTEGER;
+  v_allocated INTEGER;
   v_shortfall INTEGER;
 BEGIN
   FOR r IN
-    SELECT s.user_id, s.tier, uc.subscription_points, uc.total_points,
-           tc.monthly_points AS target
+    SELECT s.user_id, s.tier, tc.monthly_points AS target
     FROM public.subscriptions s
     JOIN public.user_credits uc ON uc.user_id = s.user_id
     JOIN public.tier_config tc ON tc.tier = s.tier
@@ -428,10 +429,26 @@ BEGIN
       AND s.tier IN ('starter', 'pro', 'max')
       AND COALESCE(s.billing_interval, 'monthly') = 'monthly'
   LOOP
-    v_target := r.target;
-    -- Credit the difference between the restored allotment and current
-    -- subscription_points, but only if they're below the restored amount.
-    v_shortfall := GREATEST(0, v_target - COALESCE(r.subscription_points, 0));
+    IF EXISTS (
+      SELECT 1 FROM public.point_transactions pt
+      WHERE pt.user_id = r.user_id AND pt.operation = 'retroactive_10x_fix'
+    ) THEN
+      CONTINUE;
+    END IF;
+
+    SELECT pt.points_delta INTO v_allocated
+    FROM public.point_transactions pt
+    WHERE pt.user_id = r.user_id
+      AND pt.txn_type = 'allocation'
+      AND pt.bucket = 'subscription'
+      AND pt.operation = 'cycle_renewal'
+    ORDER BY pt.created_at DESC
+    LIMIT 1;
+    IF v_allocated IS NULL THEN
+      CONTINUE;
+    END IF;
+
+    v_shortfall := GREATEST(0, r.target - v_allocated);
     IF v_shortfall > 0 THEN
       PERFORM public.credit_points(
         r.user_id,
@@ -439,8 +456,7 @@ BEGIN
         'subscription',
         'allocation',
         'retroactive_10x_fix',
-        format('Retroactive credit: restored %s plan to %s monthly pts (was %s)',
-               r.tier, v_target, r.subscription_points)
+        format('Retroactive credit: %s plan renewal gave %s of %s monthly pts', r.tier, v_allocated, r.target)
       );
     END IF;
   END LOOP;

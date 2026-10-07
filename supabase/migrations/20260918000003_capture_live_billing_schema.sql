@@ -397,8 +397,8 @@ BEGIN
       RETURN 'standard_mode';
     END IF;
     v_overage_usd := round(v_remaining * 0.01, 6);
-    IF v_uc.overage_limit_usd > 0
-       AND (COALESCE(v_uc.overage_spent_cycle, 0) + v_overage_usd) > v_uc.overage_limit_usd THEN
+    -- A limit of 0 means "no overage budget", not "unlimited".
+    IF (COALESCE(v_uc.overage_spent_cycle, 0) + v_overage_usd) > v_uc.overage_limit_usd THEN
       RETURN 'overage_cap';
     END IF;
   END IF;
