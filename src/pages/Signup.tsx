@@ -13,6 +13,7 @@ import {
   safeNextPath,
   stashAuthRedirect,
 } from "@/lib/auth-redirect";
+import { completeDesktopSignIn } from "@/lib/desktop-handoff";
 
 function GoogleIcon() {
   return (
@@ -55,7 +56,11 @@ export default function SignupPage() {
       const { data, error } = await supabase.auth.signUp({
         email: email.trim().toLowerCase(),
         password,
-        options: { data: { desktop_state: state ?? null } },
+        options: {
+          data: { desktop_state: state ?? null },
+          // The confirmation link finishes the desktop sign-in too.
+          ...(isDesktop ? { emailRedirectTo: getAuthCallbackUrl({ next, state }) } : {}),
+        },
       });
 
       if (error) throw error;
@@ -64,11 +69,9 @@ export default function SignupPage() {
         setIsVerifyStep(true);
       } else if (data.session) {
         if (isDesktop && state) {
-          await supabase.rpc("complete_desktop_auth_session", {
-            session_state: state,
-            p_access_token: data.session.access_token,
-            p_refresh_token: data.session.refresh_token,
-          });
+          if (!(await completeDesktopSignIn(state, data.session))) {
+            throw new Error("Account created, but the Zenvi app could not be told. Sign in again.");
+          }
           navigate("/auth/success");
         } else {
           const dest = await resolvePostLoginPath(next);

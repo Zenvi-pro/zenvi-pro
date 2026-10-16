@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { CheckCircle, Eye, EyeOff, Loader2 } from "lucide-react";
+import { CheckCircle, Eye, EyeOff, Loader2, Monitor } from "lucide-react";
 import { Github } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,7 @@ import {
   safeNextPath,
   stashAuthRedirect,
 } from "@/lib/auth-redirect";
+import { completeDesktopSignIn, currentAccount } from "@/lib/desktop-handoff";
 function GoogleIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
@@ -59,6 +60,48 @@ export default function LoginPage() {
   const [isVerifyStep, setIsVerifyStep] = useState(false);
   const [isForgotStep, setIsForgotStep] = useState(false);
   const [isForgotSent, setIsForgotSent] = useState(false);
+  // Already signed in here while the Zenvi app asks: offer that account in one click.
+  const [existingEmail, setExistingEmail] = useState<string | null>(null);
+  const [checkingExisting, setCheckingExisting] = useState(isDesktop);
+  const [isHandingOff, setIsHandingOff] = useState(false);
+
+  useEffect(() => {
+    if (!isDesktop) return;
+    let cancelled = false;
+    currentAccount()
+      .then((account) => {
+        if (!cancelled && account) setExistingEmail(account.email || "your Zenvi account");
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (!cancelled) setCheckingExisting(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isDesktop]);
+
+  const handleContinueAsExisting = async () => {
+    if (!state) return;
+    setIsHandingOff(true);
+    try {
+      const account = await currentAccount();
+      if (!account) {
+        setExistingEmail(null);
+        toast({ title: "Sign in again", description: "Your session here has ended.", variant: "destructive" });
+        return;
+      }
+      if (!(await completeDesktopSignIn(state, account.session))) {
+        throw new Error("Could not pass the sign-in to the Zenvi app. Try again.");
+      }
+      navigate("/auth/success");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Could not pass the sign-in to the Zenvi app.";
+      toast({ title: "Sign in failed", description: msg, variant: "destructive" });
+    } finally {
+      setIsHandingOff(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,7 +122,11 @@ export default function LoginPage() {
           : await supabase.auth.signUp({
               email: email.trim().toLowerCase(),
               password,
-              options: { data: { desktop_state: state ?? null } },
+              options: {
+                data: { desktop_state: state ?? null },
+                // The confirmation link finishes the desktop sign-in too.
+                ...(isDesktop ? { emailRedirectTo: getAuthCallbackUrl({ next, state }) } : {}),
+              },
             });
 
       const { data, error } = result;
@@ -92,11 +139,9 @@ export default function LoginPage() {
       }
 
       if (isDesktop && data.session && state) {
-        await supabase.rpc("complete_desktop_auth_session", {
-          session_state: state,
-          p_access_token: data.session.access_token,
-          p_refresh_token: data.session.refresh_token,
-        });
+        if (!(await completeDesktopSignIn(state, data.session))) {
+          throw new Error("Signed in, but the Zenvi app could not be told. Try again.");
+        }
         navigate("/auth/success");
       } else {
         const dest = await resolvePostLoginPath(next);
@@ -251,7 +296,46 @@ export default function LoginPage() {
               )}
 
               <div className="rounded-xl border border-transparent bg-transparent p-0 md:p-5">
-                {isVerifyStep || isForgotSent ? (
+                {isDesktop && (checkingExisting || existingEmail) && !isVerifyStep && !isForgotStep && !isForgotSent ? (
+                  checkingExisting ? (
+                    <div className="flex justify-center py-10">
+                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                    </div>
+                  ) : (
+                    <motion.div
+                      key="continue"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                      className="text-center"
+                    >
+                      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-primary/30 bg-primary/10">
+                        <Monitor className="h-7 w-7 text-primary" />
+                      </div>
+                      <h1 className="mb-2 text-[20px] font-semibold tracking-tight text-white">Sign in to the Zenvi app</h1>
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        You're signed in here as <span className="text-white font-medium">{existingEmail}</span>.
+                        Continue to use this account in the Zenvi app on your computer.
+                      </p>
+                      <Button
+                        type="button"
+                        onClick={handleContinueAsExisting}
+                        disabled={isHandingOff}
+                        className="mt-6 h-9 w-full bg-white text-sm font-medium text-black hover:bg-white/90"
+                      >
+                        {isHandingOff ? <Loader2 className="h-4 w-4 animate-spin" /> : `Continue as ${existingEmail}`}
+                      </Button>
+                      <button
+                        type="button"
+                        onClick={() => setExistingEmail(null)}
+                        disabled={isHandingOff}
+                        className="mt-4 text-xs font-medium text-muted-foreground hover:text-white transition-colors"
+                      >
+                        Use a different account
+                      </button>
+                    </motion.div>
+                  )
+                ) : isVerifyStep || isForgotSent ? (
                   <div className="text-center py-2">
                     <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-primary/30 bg-primary/10">
                       <CheckCircle className="h-7 w-7 text-primary" />

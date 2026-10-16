@@ -35,7 +35,7 @@ export default function DashboardLayout() {
   }, [navigate]);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    await supabase.auth.signOut({ scope: "local" });
     setMobileMenuOpen(false);
     navigate("/");
   };
