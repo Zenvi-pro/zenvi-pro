@@ -45,7 +45,7 @@ const Navbar = ({ onOpenWaitlist, onOpenAccessCode, isIntroActive }: NavbarProps
   }, []);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    await supabase.auth.signOut({ scope: "local" });
     setMobileMenuOpen(false);
     navigate("/");
   };

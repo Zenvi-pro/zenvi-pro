@@ -242,7 +242,7 @@ export default function CheckoutPage() {
       if (session.expires_at != null && session.expires_at <= now + 60) {
         const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
         if (refreshError || !refreshed.session) {
-          await supabase.auth.signOut();
+          await supabase.auth.signOut({ scope: "local" });
           navigate(loginUrl);
           return;
         }
@@ -314,7 +314,7 @@ export default function CheckoutPage() {
       const payload = await res.json().catch(() => ({}));
 
       if (res.status === 401) {
-        await supabase.auth.signOut();
+        await supabase.auth.signOut({ scope: "local" });
         navigate(loginUrl);
         return;
       }

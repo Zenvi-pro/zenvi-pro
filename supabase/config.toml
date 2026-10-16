@@ -61,3 +61,8 @@ verify_jwt = false
 
 [functions.claude-generate]
 verify_jwt = true
+
+# A one-time sign-in link for the caller's own account; the website redeems it
+# for the Zenvi desktop app's own session (src/lib/desktop-handoff.ts).
+[functions.desktop-session-link]
+verify_jwt = true
