@@ -61,3 +61,6 @@ verify_jwt = false
 
 [functions.claude-generate]
 verify_jwt = true
+
+[functions.sync-model-pricing]
+verify_jwt = false
