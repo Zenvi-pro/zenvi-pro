@@ -2,7 +2,13 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { consumeAuthRedirect, goToPostLoginPath, markRecoverySession, resolvePostLoginPath } from "@/lib/auth-redirect";
+import { completeDesktopAuth } from "@/lib/desktop-auth";
+import {
+  consumeAuthRedirect,
+  goToPostLoginPath,
+  markRecoverySession,
+  resolvePostLoginPath,
+} from "@/lib/auth-redirect";
 
 // Landing page for OAuth redirects (GitHub, Google).
 // Supabase exchanges the auth code for a session when this page loads.
@@ -53,12 +59,7 @@ export default function AuthCallbackPage() {
         const { next, state: desktopState } = consumeAuthRedirect(searchParams);
 
         if (desktopState) {
-          await supabase.rpc("complete_desktop_auth_session", {
-            session_state: desktopState,
-            p_access_token: session.access_token,
-            p_refresh_token: session.refresh_token,
-          });
-          navigate("/auth/success", { replace: true });
+          await completeDesktopAuth(desktopState, session, navigate);
         } else {
           const dest = await resolvePostLoginPath(next);
           goToPostLoginPath(dest, navigate);

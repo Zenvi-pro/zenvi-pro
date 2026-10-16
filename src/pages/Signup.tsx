@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2, CheckCircle, Github } from "lucide-react";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { completeDesktopAuth } from "@/lib/desktop-auth";
 import {
   getAuthCallbackUrl,
   goToPostLoginPath,
@@ -40,6 +41,36 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isVerifyStep, setIsVerifyStep] = useState(false);
   const [oauthLoading, setOauthLoading] = useState<"github" | "google" | null>(null);
+  const [isCheckingSession, setIsCheckingSession] = useState(isDesktop);
+
+  // Desktop already-signed-in users should authorize on /login, not create another account.
+  useEffect(() => {
+    if (!isDesktop || !state) {
+      setIsCheckingSession(false);
+      return;
+    }
+    let cancelled = false;
+    setIsCheckingSession(true);
+    void supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
+      if (data.session) {
+        navigate(`/login?state=${encodeURIComponent(state)}`, { replace: true });
+        return;
+      }
+      setIsCheckingSession(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isDesktop, navigate, state]);
+
+  const finishDesktopAuth = useCallback(
+    async (session: { access_token: string; refresh_token: string }) => {
+      if (!state) return;
+      await completeDesktopAuth(state, session, navigate);
+    },
+    [navigate, state],
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,12 +95,7 @@ export default function SignupPage() {
         setIsVerifyStep(true);
       } else if (data.session) {
         if (isDesktop && state) {
-          await supabase.rpc("complete_desktop_auth_session", {
-            session_state: state,
-            p_access_token: data.session.access_token,
-            p_refresh_token: data.session.refresh_token,
-          });
-          navigate("/auth/success");
+          await finishDesktopAuth(data.session);
         } else {
           const dest = await resolvePostLoginPath(next);
           goToPostLoginPath(dest, navigate);
@@ -94,6 +120,15 @@ export default function SignupPage() {
     });
     setOauthLoading(null);
   };
+
+  if (isCheckingSession) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center px-6">
+        <Loader2 className="w-5 h-5 text-primary animate-spin" />
+        <p className="mt-3 text-sm text-muted-foreground">Checking your session…</p>
+      </div>
+    );
+  }
 
   if (isVerifyStep) {
     return (

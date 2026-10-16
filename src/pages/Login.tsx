@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Github } from "lucide-react";
+import type { Session } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -11,6 +12,7 @@ import { ZenviLogo } from "@/components/ZenviLogo";
 import { FlickeringGrid } from "@/components/ui/flickering-grid";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { completeDesktopAuth } from "@/lib/desktop-auth";
 import {
   getAuthCallbackUrl,
   getPasswordResetUrl,
@@ -59,6 +61,63 @@ export default function LoginPage() {
   const [isVerifyStep, setIsVerifyStep] = useState(false);
   const [isForgotStep, setIsForgotStep] = useState(false);
   const [isForgotSent, setIsForgotSent] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(isDesktop);
+  const [existingSession, setExistingSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    if (!isDesktop) {
+      setIsCheckingSession(false);
+      return;
+    }
+    let cancelled = false;
+    setIsCheckingSession(true);
+    void supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
+      setExistingSession(data.session ?? null);
+      setIsCheckingSession(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isDesktop, state]);
+
+  const finishDesktopAuth = useCallback(
+    async (session: Pick<Session, "access_token" | "refresh_token">) => {
+      if (!state) return;
+      await completeDesktopAuth(state, session, navigate);
+    },
+    [navigate, state],
+  );
+
+  const handleAuthorize = async () => {
+    if (!existingSession || !state) return;
+    setIsLoading(true);
+    try {
+      await finishDesktopAuth(existingSession);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Could not authorize the desktop app.";
+      toast({ title: "Authorization failed", description: msg, variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUseDifferentAccount = async () => {
+    setIsLoading(true);
+    try {
+      await supabase.auth.signOut();
+      setExistingSession(null);
+      setAuthMode("signin");
+      setIsVerifyStep(false);
+      setIsForgotStep(false);
+      setIsForgotSent(false);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Could not sign out.";
+      toast({ title: "Sign out failed", description: msg, variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,12 +151,7 @@ export default function LoginPage() {
       }
 
       if (isDesktop && data.session && state) {
-        await supabase.rpc("complete_desktop_auth_session", {
-          session_state: state,
-          p_access_token: data.session.access_token,
-          p_refresh_token: data.session.refresh_token,
-        });
-        navigate("/auth/success");
+        await finishDesktopAuth(data.session);
       } else {
         const dest = await resolvePostLoginPath(next);
         goToPostLoginPath(dest, navigate);
@@ -218,24 +272,26 @@ export default function LoginPage() {
               fps={0.5}
             />
             <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-br from-transparent via-white/[0.01] to-transparent" />
-            <div className="fixed right-5 top-6 z-30 flex justify-end sm:right-7 lg:absolute lg:right-4 lg:top-6">
-              <Button
-                variant="outline"
-                size="default"
-                onClick={() => {
-                  setIsVerifyStep(false);
-                  setIsForgotStep(false);
-                  setIsForgotSent(false);
-                  setAuthMode((prev) => (isForgotStep || isForgotSent || prev === "signin" ? "signup" : "signin"));
-                }}
-                className="h-10 rounded-lg border-primary/35 bg-primary/10 px-4 text-sm font-semibold text-white shadow-[0_0_0_1px_rgba(0,102,255,0.2),0_6px_28px_rgba(0,102,255,0.2)] hover:bg-primary/20 hover:border-primary/55"
-              >
-                {authMode === "signin" && !isForgotStep ? "Sign up" : "Sign in"}
-              </Button>
-            </div>
+            {!isCheckingSession && !existingSession && (
+              <div className="fixed right-5 top-6 z-30 flex justify-end sm:right-7 lg:absolute lg:right-4 lg:top-6">
+                <Button
+                  variant="outline"
+                  size="default"
+                  onClick={() => {
+                    setIsVerifyStep(false);
+                    setIsForgotStep(false);
+                    setIsForgotSent(false);
+                    setAuthMode((prev) => (isForgotStep || isForgotSent || prev === "signin" ? "signup" : "signin"));
+                  }}
+                  className="h-10 rounded-lg border-primary/35 bg-primary/10 px-4 text-sm font-semibold text-white shadow-[0_0_0_1px_rgba(0,102,255,0.2),0_6px_28px_rgba(0,102,255,0.2)] hover:bg-primary/20 hover:border-primary/55"
+                >
+                  {authMode === "signin" && !isForgotStep ? "Sign up" : "Sign in"}
+                </Button>
+              </div>
+            )}
 
             <div className="relative z-10 w-full max-w-[450px] py-24 md:py-10 lg:py-0">
-              {isDesktop && (
+              {isDesktop && !existingSession && !isCheckingSession && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.97 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -251,7 +307,46 @@ export default function LoginPage() {
               )}
 
               <div className="rounded-xl border border-transparent bg-transparent p-0 md:p-5">
-                {isVerifyStep || isForgotSent ? (
+                {isCheckingSession ? (
+                  <div className="flex flex-col items-center justify-center py-16">
+                    <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                    <p className="mt-3 text-sm text-muted-foreground">Checking your session…</p>
+                  </div>
+                ) : isDesktop && existingSession ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                    className="text-center"
+                  >
+                    <h1 className="mb-1 text-[20px] font-semibold tracking-tight text-white drop-shadow-[0_0_16px_rgba(0,102,255,0.22)]">
+                      Authorize Zenvi Desktop
+                    </h1>
+                    <p className="mb-6 text-[13px] text-muted-foreground leading-relaxed">
+                      Continue as{" "}
+                      <span className="font-medium text-white">
+                        {existingSession.user.email ?? "your account"}
+                      </span>{" "}
+                      to sign in to the app.
+                    </p>
+                    <Button
+                      type="button"
+                      disabled={isLoading}
+                      onClick={() => void handleAuthorize()}
+                      className="h-9 w-full bg-white text-sm font-medium text-black hover:bg-white/90"
+                    >
+                      {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Continue"}
+                    </Button>
+                    <button
+                      type="button"
+                      disabled={isLoading}
+                      onClick={() => void handleUseDifferentAccount()}
+                      className="mt-4 text-xs font-medium text-muted-foreground hover:text-white transition-colors disabled:opacity-50"
+                    >
+                      Use a different account
+                    </button>
+                  </motion.div>
+                ) : isVerifyStep || isForgotSent ? (
                   <div className="text-center py-2">
                     <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-primary/30 bg-primary/10">
                       <CheckCircle className="h-7 w-7 text-primary" />
