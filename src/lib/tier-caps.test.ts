@@ -2,8 +2,8 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
-// enforce_tier_caps treats 0 as "no cap". Free accounts are limited by their credit
-// balance only, so the latest migration that sets free-tier caps must zero them (#306).
+// enforce_tier_caps treats 0 as "no cap". Every plan is limited by its credit balance
+// only, so the latest migration that sets tier caps must zero them for all tiers (#306).
 const MIGRATIONS = path.resolve(__dirname, "../../supabase/migrations");
 
 const migrations = readdirSync(MIGRATIONS)
@@ -13,11 +13,11 @@ const migrations = readdirSync(MIGRATIONS)
 
 const last = (match: RegExp) => migrations.filter((sql) => match.test(sql)).pop() ?? "";
 
-describe("free tier caps", () => {
-  it("leaves free accounts uncapped on video generation and indexing", () => {
-    const sql = last(/tier_config[\s\S]*'free'|'free'[\s\S]*tier_config/);
+describe("tier caps", () => {
+  it("leaves every tier uncapped on video generation and indexing", () => {
+    const sql = last(/tier_config[\s\S]*max_daily_generations/);
     expect(sql).toMatch(
-      /UPDATE public\.tier_config\s+SET max_daily_generations\s*=\s*0,\s*max_indexing_minutes_per_month\s*=\s*0\s+WHERE tier = 'free'/,
+      /UPDATE public\.tier_config\s+SET max_daily_generations\s*=\s*0,\s*max_indexing_minutes_per_month\s*=\s*0\s*;/,
     );
   });
 
