@@ -84,6 +84,31 @@ describe("planNewPricingRows", () => {
     expect(plan).toEqual([]);
   });
 
+  it("skips text-output models the backend treats as non-chat by name", () => {
+    const priced = { cost: { input: 1.25, output: 10 }, modalities: text };
+    const plan = planNewPricingRows(
+      {
+        google: {
+          models: {
+            "gemini-2.5-computer-use-preview-10-2025": priced,
+            "deep-research-lite": priced,
+            "gemini-4-argon": priced,
+          },
+        },
+        openai: {
+          models: {
+            "gpt-4o-transcribe": priced,
+            "omni-moderation-latest": priced,
+            "gpt-5-search-api": priced,
+            "gpt-3.5-turbo-instruct": priced,
+          },
+        },
+      } as ModelsDevCatalog,
+      [],
+    );
+    expect(plan.map((r) => r.model_pattern)).toEqual(["gemini-4-argon%"]);
+  });
+
   it("does not add a dated variant once its new alias row covers it", () => {
     const plan = planNewPricingRows(
       catalog({

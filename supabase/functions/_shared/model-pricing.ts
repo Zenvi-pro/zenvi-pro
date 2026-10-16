@@ -13,6 +13,15 @@
 /** models.dev provider keys that match the backend's chat providers. */
 export const CHAT_PROVIDERS = ["openai", "anthropic", "google", "xai"];
 
+/** Same as the backend's `_NON_CHAT_MARKERS` (core/providers/discovery.py): ids that are not chat models. */
+const NON_CHAT_MARKERS = [
+  "embedding", "embed", "tts", "whisper", "transcribe", "audio",
+  "dall-e", "image", "moderation", "realtime", "rerank", "sora",
+  "search-api", "computer-use", "robotics", "lyria", "veo",
+  "nano-banana", "imagine", "deep-research", "guard", "babbage",
+  "davinci", "instruct",
+];
+
 interface ModelsDevModel {
   cost?: { input?: number; output?: number; cache_read?: number; cache_write?: number };
   modalities?: { output?: string[] };
@@ -63,6 +72,7 @@ export function planNewPricingRows(catalog: ModelsDevCatalog, existing: PricingR
       if (!input || !output || outputs.length !== 1 || outputs[0] !== "text") continue;
       // `_` and `%` are LIKE wildcards; no chat model id uses them.
       if (/[%_\\]/.test(id)) continue;
+      if (NON_CHAT_MARKERS.some((m) => id.toLowerCase().includes(m))) continue;
 
       // The `%` catch-all never counts: it keeps unpriced models off the picker.
       const billed = billedRow(rows, provider, id);
