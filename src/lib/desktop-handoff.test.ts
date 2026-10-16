@@ -13,7 +13,7 @@ vi.mock("@supabase/supabase-js", () => ({
   createClient: () => ({ auth: { verifyOtp } }),
 }));
 
-import { completeDesktopSignIn } from "./desktop-handoff";
+import { completeDesktopSignIn, confirmationCode, withTimeout } from "./desktop-handoff";
 
 const browser = {
   access_token: "browser-access",
@@ -36,6 +36,7 @@ describe("handing a sign-in to the Zenvi desktop app", () => {
     });
 
     expect(await completeDesktopSignIn("state-1", browser)).toBe(true);
+    expect(invoke).toHaveBeenCalledWith("desktop-session-link", { body: { state: "state-1" } });
     expect(verifyOtp).toHaveBeenCalledWith({ token_hash: "hash", type: "magiclink" });
     expect(rpc).toHaveBeenCalledWith("complete_desktop_auth_session", {
       session_state: "state-1",
@@ -71,5 +72,23 @@ describe("handing a sign-in to the Zenvi desktop app", () => {
     rpc.mockResolvedValue({ data: null, error: { message: "permission denied" } });
 
     expect(await completeDesktopSignIn("state-1", browser)).toBe(false);
+  });
+});
+
+describe("the confirmation code", () => {
+  it("matches the Zenvi app's (classes/auth_manager.py confirmation_code)", async () => {
+    expect(await confirmationCode("00000000-0000-4000-8000-000000000000")).toBe("5QA-FM2");
+    expect(await confirmationCode("3f2b8c1e-9d4a-4e7b-a1c2-5d6e7f8a9b0c")).toBe("UPJ-EH3");
+  });
+});
+
+describe("checking for a signed-in account", () => {
+  it("gives up after the timeout instead of spinning forever", async () => {
+    vi.useFakeTimers();
+    const never = new Promise<string | null>(() => undefined);
+    const result = withTimeout(never, 4000, null);
+    await vi.advanceTimersByTimeAsync(4000);
+    expect(await result).toBeNull();
+    vi.useRealTimers();
   });
 });

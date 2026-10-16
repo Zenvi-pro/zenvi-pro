@@ -34,8 +34,10 @@ export default function DashboardLayout() {
     });
   }, [navigate]);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut({ scope: "local" });
+  // Sign out signs this browser out; "all devices" also ends the Zenvi
+  // desktop app's sessions, e.g. after losing a laptop.
+  const handleSignOut = async (everywhere = false) => {
+    await supabase.auth.signOut({ scope: everywhere ? "global" : "local" });
     setMobileMenuOpen(false);
     navigate("/");
   };
@@ -96,11 +98,18 @@ export default function DashboardLayout() {
           )}
           <button
             type="button"
-            onClick={handleSignOut}
+            onClick={() => handleSignOut()}
             className="flex items-center gap-2 text-[12px] text-white/40 hover:text-white/70 transition-colors"
           >
             <LogOut size={13} />
             Sign out
+          </button>
+          <button
+            type="button"
+            onClick={() => handleSignOut(true)}
+            className="mt-2 text-[11px] text-white/30 hover:text-white/60 transition-colors"
+          >
+            Sign out of all devices
           </button>
         </div>
       </aside>
@@ -174,11 +183,18 @@ export default function DashboardLayout() {
                 )}
                 <button
                   type="button"
-                  onClick={handleSignOut}
+                  onClick={() => handleSignOut()}
                   className="flex items-center gap-2 text-[13px] text-white/45 hover:text-white/80"
                 >
                   <LogOut size={14} />
                   Sign out
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleSignOut(true)}
+                  className="mt-3 text-[12px] text-white/35 hover:text-white/70"
+                >
+                  Sign out of all devices
                 </button>
               </div>
             </motion.aside>

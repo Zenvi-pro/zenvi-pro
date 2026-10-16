@@ -19,7 +19,7 @@ import {
   safeNextPath,
   stashAuthRedirect,
 } from "@/lib/auth-redirect";
-import { completeDesktopSignIn, currentAccount } from "@/lib/desktop-handoff";
+import { completeDesktopSignIn, confirmationCode, currentAccount, withTimeout } from "@/lib/desktop-handoff";
 function GoogleIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
@@ -39,6 +39,9 @@ export default function LoginPage() {
   const state = searchParams.get("state");
   const next = safeNextPath(searchParams.get("next"));
   const isDesktop = !!state;
+  // v=2: the Zenvi app shows the confirmation code, so a browser that is
+  // already signed in may approve in one click (older apps get the form).
+  const canApprove = isDesktop && searchParams.get("v") === "2";
 
   const modeParam = searchParams.get("mode");
   const [authMode, setAuthMode] = useState<"signin" | "signup">(
@@ -62,13 +65,16 @@ export default function LoginPage() {
   const [isForgotSent, setIsForgotSent] = useState(false);
   // Already signed in here while the Zenvi app asks: offer that account in one click.
   const [existingEmail, setExistingEmail] = useState<string | null>(null);
-  const [checkingExisting, setCheckingExisting] = useState(isDesktop);
+  const [checkingExisting, setCheckingExisting] = useState(canApprove);
   const [isHandingOff, setIsHandingOff] = useState(false);
+  const [code, setCode] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isDesktop) return;
+    if (!canApprove || !state) return;
     let cancelled = false;
-    currentAccount()
+    confirmationCode(state).then((c) => !cancelled && setCode(c)).catch(() => undefined);
+    // A slow or offline check falls back to the form instead of a spinner forever.
+    withTimeout(currentAccount(), 4000, null)
       .then((account) => {
         if (!cancelled && account) setExistingEmail(account.email || "your Zenvi account");
       })
@@ -79,7 +85,7 @@ export default function LoginPage() {
     return () => {
       cancelled = true;
     };
-  }, [isDesktop]);
+  }, [canApprove, state]);
 
   const handleContinueAsExisting = async () => {
     if (!state) return;
@@ -296,7 +302,7 @@ export default function LoginPage() {
               )}
 
               <div className="rounded-xl border border-transparent bg-transparent p-0 md:p-5">
-                {isDesktop && (checkingExisting || existingEmail) && !isVerifyStep && !isForgotStep && !isForgotSent ? (
+                {canApprove && (checkingExisting || (existingEmail && code)) && !isVerifyStep && !isForgotStep && !isForgotSent ? (
                   checkingExisting ? (
                     <div className="flex justify-center py-10">
                       <Loader2 className="h-5 w-5 animate-spin text-primary" />
@@ -317,6 +323,13 @@ export default function LoginPage() {
                         You're signed in here as <span className="text-white font-medium">{existingEmail}</span>.
                         Continue to use this account in the Zenvi app on your computer.
                       </p>
+                      <div className="mt-5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-3">
+                        <p className="text-[11px] uppercase tracking-wide text-muted-foreground/70">Code</p>
+                        <p className="mt-1 font-mono text-xl font-semibold tracking-[0.2em] text-white">{code}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          Continue only if the Zenvi app on your computer shows this code.
+                        </p>
+                      </div>
                       <Button
                         type="button"
                         onClick={handleContinueAsExisting}

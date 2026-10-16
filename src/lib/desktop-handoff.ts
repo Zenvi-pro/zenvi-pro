@@ -21,7 +21,7 @@ import { supabase } from "@/integrations/supabase/client";
 export async function completeDesktopSignIn(state: string, session: Session): Promise<boolean> {
   let handoff: Pick<Session, "access_token" | "refresh_token"> = session;
   try {
-    const own = await mintDesktopSession(session.user.id);
+    const own = await mintDesktopSession(state, session.user.id);
     if (own) handoff = own;
   } catch (err) {
     console.warn("Desktop sign-in: sharing this browser's session instead", err);
@@ -40,9 +40,9 @@ export async function completeDesktopSignIn(state: string, session: Session): Pr
 }
 
 /** A new, independent session for the signed-in user, or null. */
-export async function mintDesktopSession(userId: string): Promise<Session | null> {
+export async function mintDesktopSession(state: string, userId: string): Promise<Session | null> {
   const { data, error } = await supabase.functions.invoke<{ token_hash?: string }>("desktop-session-link", {
-    body: {},
+    body: { state },
   });
   if (error || !data?.token_hash) return null;
 
@@ -62,6 +62,27 @@ export async function mintDesktopSession(userId: string): Promise<Session | null
   const desktop = verified?.session;
   if (verifyError || !desktop || desktop.user.id !== userId) return null;
   return desktop;
+}
+
+// Letters and digits that can't be misread for each other (no I/1, O/0).
+const CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+/**
+ * The code the Zenvi app shows next to a browser sign-in (classes/auth_manager.py
+ * confirmation_code: SHA-256 of the state, first 30 bits, 6 characters).
+ * A sign-in link someone else made shows a code that doesn't match the app's.
+ */
+export async function confirmationCode(state: string): Promise<string> {
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(state)));
+  const bits = ((digest[0] << 24) | (digest[1] << 16) | (digest[2] << 8) | digest[3]) >>> 2;
+  let code = "";
+  for (let i = 0; i < 6; i++) code += CODE_ALPHABET[(bits >>> (5 * (5 - i))) & 31];
+  return `${code.slice(0, 3)}-${code.slice(3)}`;
+}
+
+/** Resolves to *fallback* if *promise* takes longer than *ms*. */
+export function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([promise, new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms))]);
 }
 
 /** The signed-in user this browser could hand to the desktop app, checked with the server. */

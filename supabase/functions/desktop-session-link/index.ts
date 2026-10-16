@@ -14,6 +14,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 // is sent, and the link is only ever for the caller: the email comes from
 // their verified JWT, never from the request.
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const CORS = {
   // Bearer-token API (no cookies), called from zenvi.pro and preview deployments.
   "Access-Control-Allow-Origin": "*",
@@ -36,9 +38,22 @@ Deno.serve(async (req) => {
   const { data: { user }, error: authError } = await caller.auth.getUser();
   if (authError || !user?.email) return json({ error: "Unauthorized" }, 401);
 
+  // Only for a desktop sign-in that is still waiting: retries and repeated
+  // clicks don't leave extra sessions nobody holds.
+  const { state } = await req.json().catch(() => ({}));
+  if (typeof state !== "string" || !UUID.test(state)) return json({ error: "Missing sign-in state" }, 400);
+
   const admin = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
+  const { data: existing, error: lookupError } = await admin
+    .from("desktop_auth_sessions").select("state").eq("state", state).maybeSingle();
+  if (lookupError) {
+    console.error("desktop-session-link: lookup failed", lookupError.message);
+    return json({ error: "Could not create a desktop sign-in" }, 500);
+  }
+  if (existing) return json({ error: "This sign-in was already completed" }, 409);
+
   const { data, error } = await admin.auth.admin.generateLink({ type: "magiclink", email: user.email });
   if (error || !data?.properties?.hashed_token || data.user?.id !== user.id) {
     console.error("desktop-session-link: could not create a sign-in link", error?.message ?? "no token");
